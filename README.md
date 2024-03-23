@@ -24,6 +24,11 @@ Open App in [http://localhost:3000](http://localhost:3000).
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-
 <br/>
+
+Database has been created with [vercel](./https://vercel.com), you have to create a new postgres database and fill your .env file corresponding with your db credentials in vercel.
+
+Seeding database structure and some initial data test with command: `npm run seed`
+
+
 `Author: Andoni ALONSO TORT`
