@@ -41,3 +41,5 @@ next-env.d.ts
 # workspace
 *.code-workspace
 
+# ignore media
+public/images/media_sections/*
