@@ -1,43 +1,92 @@
 'use client';
 
 import {
-  HomeIcon
+  HomeIcon, ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
+import { SectionsNavBarClient } from '@/app/resumes/[username]/interfaces';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
-const links = [
-  { name: 'Home', href: '/resumes', icon: HomeIcon }
+interface ParamsProps {
+  home:SectionsNavBarClient|null
+  sections:SectionsNavBarClient[]|[]
+}
+
+interface LinkParam {
+  name: string,
+  href: string,
+  icon: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & { title?: string, titleId?: string } & React.RefAttributes<SVGSVGElement>>;
+}
+
+const mainLinksObj = [
+  { name: 'Home', href: '/', icon: HomeIcon },
+  { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon },
 ];
 
-export default function NavLinks() {
+export default function NavLinks( { params } : Readonly<{ params: ParamsProps }>) {
   const pathname = usePathname();
+  const sections = params.sections;
+  const home = params.home;
+  const mainLinks = mainLinksObj.map( link => makeLink( link ) );
+
+  let username = null;
+  let homeLink = null;
+  if( home ) {
+    const homeObj = { name: home.name, href: `${pathname}/${home.type}/${home.id}`, icon: HomeIcon }
+    homeLink = makeLink( homeObj );
+
+    username = pathname.split('/')[ 2 ];
+  }
+
+  let sectionsLinks = null;
+  if( sections.length > 0 ) {
+    const sectionsObj = sections.map( s => {
+      return { name: s.name, href: `${pathname}/${s.type}/${s.id}`, icon: HomeIcon }
+    } );
+    sectionsLinks = sectionsObj.map( section => makeLink( section ) );
+  }
+  
+  return (
+    <div className='w-full flex-none'>
+      <div className='grid grid-rows-* gap-1'>
+        {mainLinks}
+      </div>
+      <div className='grid grid-rows-* gap-1 mt-10'>
+        <div className='text-gray-600 font-bold text-lg'>
+          {username}
+        </div>
+        {homeLink}
+        {sectionsLinks}
+      </div>
+    </div>
+    
+  );
+}
+
+/**
+ * Create the link with the information in element
+ * @param link
+ * @returns {Link} Element to put in the nav bar
+ */
+function makeLink( link:LinkParam ) {
+  const LinkIcon = link.icon;
 
   return (
-    <>
-      { links.map( ( link ) => {
-
-        const LinkIcon = link.icon;
-
-        return (
-          <Link
-            key={link.name}
-            href={link.href}
-            className={clsx(
-              'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
-              'bg-sky-100 text-blue-600'
-              /*{
-                'bg-sky-100 text-blue-600': pathname === link.href,
-              },*/
-            )}
-          >
-            <LinkIcon className="w-6" />
-            <p className="hidden md:block">{link.name}</p>
-          </Link>
-        );
-      })}
-    </>
+    <Link
+      key={link.name}
+      href={link.href}
+      className={clsx(
+        'flex h-[48px] grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium',
+        'bg-gray-50 bg-sky-100 text-blue-600',
+        'hover:bg-sky-100 hover:text-blue-600',
+        'md:flex-none md:justify-start md:p-2 md:px-3'
+      )}
+    >
+      <LinkIcon className="w-6" />
+          <p className="block">{link.name}</p>
+    </Link>
   );
+
 }

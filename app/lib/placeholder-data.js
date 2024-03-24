@@ -54,7 +54,19 @@ const SECTION = [
         backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
-    }
+    },
+    {
+        section_id:'11111111-1111-1111-1111-111111111126',
+        name: 'My Home',
+        created: '2024-03-23T17:15:57.508Z',
+        visible: true,
+        type:'Home',
+        style:1,
+        backgroundColor:'#82a3c0',
+        backgroundImage:null,
+
+        resume_id:'11111111-1111-1111-1111-111111111112',
+    },
 ];
 
 const PROJECT = [
