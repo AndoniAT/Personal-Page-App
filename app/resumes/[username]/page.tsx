@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Resume User',
 };
 
-  export default async function Page({ params }: Readonly<{ params: { username: string } }>) {
+  export default async function Page({ params }: { params: { username: string } }) {
     const username = params.username;
 
     const user = await getUserByUsername( username );

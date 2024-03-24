@@ -6,7 +6,7 @@ interface LayoutProps {
   sections: Section[]
 }
 
-export default function Layout({ children, sections }: Readonly<LayoutProps>) {
+export default function Layout({ children, sections }: LayoutProps) {
 
   return (
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden bg-slate-100">
