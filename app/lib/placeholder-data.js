@@ -1,6 +1,7 @@
 const USERS = [
     {
         user_id:'11111111-1111-1111-1111-111111111111',
+        username: 'AndoniAT',
         firstname: 'Andoni',
         lastname: 'Alonso Tort',
         password: 'User123?',
