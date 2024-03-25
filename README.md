@@ -30,6 +30,6 @@ Database has been created with [vercel](./https://vercel.com), you have to creat
 
 Seeding database structure and some initial data test with command: `npm run seed`
 Test code with lint: `npm run lint`
-Build in production: npm run build
+Build in production: `npm run build`
 
 `Author: Andoni ALONSO TORT`
