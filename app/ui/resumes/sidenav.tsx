@@ -3,12 +3,11 @@ import NavLinks from '@/app/ui/resumes/nav-links';
 import { SectionsNavBarClient } from '@/app/resumes/[username]/interfaces';
 
 import { Section } from '../../lib/definitions'; 
-
 import AcmeLogo from '@/app/ui/acme-logo';
 
-export default function SideNav( { sections } : { sections: Section[] } ) {
+export default function SideNav( { sections } : { sections: Section[]|[] } ) {
 
-  if( !sections ) {
+  if( sections.length == 0 ) {
     return createSideNav( { home:null, sections:[]} )
   }
 

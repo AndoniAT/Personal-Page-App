@@ -29,6 +29,7 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 Database has been created with [vercel](./https://vercel.com), you have to create a new postgres database and fill your .env file corresponding with your db credentials in vercel.
 
 Seeding database structure and some initial data test with command: `npm run seed`
-
+Test code with lint: `npm run lint`
+Build in production: npm run build
 
 `Author: Andoni ALONSO TORT`
