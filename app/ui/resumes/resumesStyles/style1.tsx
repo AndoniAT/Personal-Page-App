@@ -1,4 +1,6 @@
 
+import { lusitana } from '@/app/ui/fonts';
+
 export default async function Style1Wrapper() {
     await new Promise( ( resolve, reject ) => {
         setTimeout(()=> {
@@ -7,8 +9,8 @@ export default async function Style1Wrapper() {
     });
   
     return (
-      <div className="text-black">
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl text-black`}>
         Load style1
-      </div>
+      </h1>
     );
 }

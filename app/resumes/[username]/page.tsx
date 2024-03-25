@@ -1,4 +1,3 @@
-import { lusitana } from '@/app/ui/fonts';
 import { getUserByUsername } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -32,6 +31,3 @@ export default async function Page(
       </main>
     );
 }
-/*        <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl text-black`}>
-          Resume
-        </h1>*/
