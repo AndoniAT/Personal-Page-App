@@ -57,12 +57,12 @@ const SECTION = [
     },
     {
         section_id:'11111111-1111-1111-1111-111111111126',
-        name: 'My Home',
+        name: 'My OTHER Home',
         created: '2024-03-23T17:15:57.508Z',
         visible: true,
         type:'Home',
         style:1,
-        backgroundColor:'#82a3c0',
+        backgroundColor:'#18191a',
         backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',

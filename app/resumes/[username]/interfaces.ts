@@ -1,4 +1,4 @@
-export interface SectionsNavBarClient {
+export interface SectionsNavBar {
     id: string,
     name: string,
     created: Date,

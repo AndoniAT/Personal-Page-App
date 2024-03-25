@@ -27,3 +27,22 @@ export async function getAllUserSections( username: string) {
     throw new Error( 'Failed to fetch sections.' );
   }
 }
+
+export async function getHomeUserSection( username: string) {
+  let type = 'Home';
+
+  try {
+    const sections = await sql`SELECT * FROM SECTION
+                                  WHERE 
+                                  type = ${type} AND
+                                  resume_id in( SELECT resume_id  FROM RESUME
+                                      WHERE user_id in( SELECT user_id FROM USERS 
+                                        WHERE username = ${username}))`;
+    const home = sections.rows[ 0 ] as Section;
+    return home;
+
+  } catch ( error ) {
+    console.error( 'Failed to fetch section home:', error );
+    throw new Error( 'Failed to fetch section home.' );
+  }
+}

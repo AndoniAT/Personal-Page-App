@@ -16,6 +16,6 @@ export type Section = {
     visible: boolean;
     type: SectionType;
     style: number;
-    backgroundColor: string;
-    backgroundImage: string;
+    backgroundcolor: string;
+    backgroundimage: string;
 };

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import NavLinks from '@/app/ui/resumes/nav-links';
-import { SectionsNavBarClient } from '@/app/resumes/[username]/interfaces';
+import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
 import { Section } from '../../lib/definitions'; 
 import AcmeLogo from '@/app/ui/acme-logo';
@@ -42,8 +42,8 @@ function constructSection( section:Section ) {
 }
 
 function createSideNav( paramsSend : {
-  home: SectionsNavBarClient|null,
-  sections: SectionsNavBarClient[]|[]
+  home: SectionsNavBar|null,
+  sections: SectionsNavBar[]|[]
 }) {
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">

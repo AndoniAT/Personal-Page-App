@@ -31,3 +31,10 @@ body {
     text-wrap: balance;
   }
 }
+
+/*.myBackgroundHome {
+  @apply bg-red-100;
+}*/
+.myBackgroundHome {
+  /*background-color: green;*/
+}

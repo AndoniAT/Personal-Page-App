@@ -1,4 +1,4 @@
-import { getUserByUsername } from '@/app/lib/data';
+import { getUserByUsername, getHomeUserSection } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -13,20 +13,42 @@ export default async function Page(
   { 
     params 
   }: Readonly<{ 
-    params: { username: string } 
+    params: { 
+      username: string 
+    } 
   }>) {
 
     const username = params.username;
     const user = await getUserByUsername( username );
-
+    
     if ( !user ) {
       notFound();
     }
+    const home = await getHomeUserSection( username );
+    console.log('check gome')
+    const sendData = {
+      user: {
+        firstname: user.firstname,
+        lastname: user.lastname,
+        photo: user.photo,
+        email: user.email,
+      },
+      section: {
+        name: home.name,
+        created: home.created,
+        type: home.type,
+        backgroundcolor: home.backgroundcolor,
+        backgroundimage: home.backgroundimage
+      }
+    }
+
+    console.log('send data!!!');
+    console.log(sendData.section);
 
     return (
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>
-          <Style1Wrapper/>
+          <Style1Wrapper data={sendData}/>
         </Suspense>
       </main>
     );
