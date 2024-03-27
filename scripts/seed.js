@@ -210,7 +210,10 @@ async function seedMedia( client ) {
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS MEDIA (
             media_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-            filename VARCHAR(255) NOT NULL,
+            filename TEXT NOT NULL,
+            url TEXT NOT NULL,
+            downloadUrl TEXT NOT NULL,
+            contentType VARCHAR(255) NOT NULL,
             position INT,
             isHero BOOLEAN DEFAULT False,
 
@@ -222,7 +225,7 @@ async function seedMedia( client ) {
         console.log( `Created "MEDIA" table` );
     
         // Insert data into the "PROJECT" table
-        const insertedMedias = await Promise.all(
+        /*const insertedMedias = await Promise.all(
           
             MEDIA.map( async ( media ) => {
 
@@ -232,13 +235,13 @@ async function seedMedia( client ) {
             ON CONFLICT ( media_id ) DO NOTHING;
           `;
           } ),
-        );
+        );*/
     
-        console.log( `Seeded : ${insertedMedias.length} medias` );
+        //console.log( `Seeded : ${insertedMedias.length} medias` );
     
         return {
           createTable,
-          users: insertedMedias,
+          //users: insertedMedias,
         };
       } catch ( error ) {
         console.error( 'Error seeding medias:', error );

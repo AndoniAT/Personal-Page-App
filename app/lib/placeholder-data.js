@@ -57,7 +57,7 @@ const SECTION = [
     },
     {
         section_id:'11111111-1111-1111-1111-111111111126',
-        name: 'My OTHER Home',
+        name: 'My Home',
         created: '2024-03-23T17:15:57.508Z',
         visible: true,
         type:'Home',
@@ -85,14 +85,14 @@ const PROJECT = [
 ];
 
 const MEDIA = [
-    {
+    /*{
         media_id:'11111111-1111-1111-1111-111111111118',
         filename:'project1.png',
         position:1,
 
         section_id:'11111111-1111-1111-1111-111111111113',
         project_id:'11111111-1111-1111-1111-111111111117'
-    }
+    }*/
 ]
 
 const SOCIAL_MEDIA = [

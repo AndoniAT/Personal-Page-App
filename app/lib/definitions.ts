@@ -1,5 +1,6 @@
 export type User = {
     user_id: string;
+    username: string;
     firstname: string;
     lastname: string;
     password: string;
@@ -19,3 +20,15 @@ export type Section = {
     backgroundcolor: string;
     backgroundimage: string;
 };
+
+export type Media = {
+    media_id: string
+    filename: string
+    url: string,
+    downloadurl: string,
+    contenttype: string
+    position: number
+    ishero: boolean
+    section_id: number
+    project_id: number
+}
