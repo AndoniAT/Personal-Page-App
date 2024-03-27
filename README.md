@@ -32,4 +32,16 @@ Seeding database structure and some initial data test with command: `npm run see
 Test code with lint: `npm run lint`
 Build in production: `npm run build`
 
+
+For the login, we need to generate a secret key for the application. This key is used to encrypt cookies, ensuring the security of user sessions. Run the following command : `openssl rand -base64 32`
+
+Then, in .env file, add the generated key to the AUTH_SECRET variable:
+
+`AUTH_SECRET=your-secret-key`
+
+NOTE : For auth to work in production, we'll need to update our environment variables in your Vercel project too.
+
+
+
+
 `Author: Andoni ALONSO TORT`

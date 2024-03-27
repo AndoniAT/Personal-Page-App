@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  HomeIcon, ClipboardDocumentCheckIcon
+  HomeIcon, ClipboardDocumentCheckIcon, UserCircleIcon
 } from '@heroicons/react/24/outline';
 import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
@@ -22,7 +22,7 @@ interface LinkParam {
 
 const mainLinksObj = [
   { name: 'Home', href: '/', icon: HomeIcon },
-  { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon },
+  { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon }
 ];
 
 export default function NavLinks( { params } : { params: ParamsProps }) {
