@@ -35,6 +35,6 @@ body {
 /*.myBackgroundHome {
   @apply bg-red-100;
 }*/
-.myBackgroundHome {
-  /*background-color: green;*/
+.myBackgroundPage {
+  @apply bg-slate-100
 }

@@ -2,16 +2,17 @@ import Link from 'next/link';
 import NavLinks from '@/app/ui/resumes/nav-links';
 import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
-import { Section } from '../../lib/definitions'; 
+import { Section, User } from '../../lib/definitions'; 
 import AcmeLogo from '@/app/ui/acme-logo';
-import { PowerIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 import { goToLogin } from '@/app/lib/actions';
+import { redirect } from 'next/dist/server/api-utils';
 
-export default async function SideNav( { sections } : { sections: Section[]|[] } ) {
+export default async function SideNav( { sections, user } : { sections: Section[]|[], user: User|null } ) {
 
   if( sections.length == 0 ) {
-    return await createSideNav( { home:null, sections:[]} )
+    return await createSideNav( { home:null, sections:[], user: null} )
   }
 
   const home = sections.find( s => s.type == 'Home' );
@@ -25,7 +26,8 @@ export default async function SideNav( { sections } : { sections: Section[]|[] }
 
   const paramsSend = {
     home: homeSend,
-    sections: sectionsSend
+    sections: sectionsSend,
+    user: user
   }
 
   return await createSideNav( paramsSend )
@@ -47,8 +49,13 @@ function constructSection( section:Section ) {
 async function createSideNav( paramsSend : {
   home: SectionsNavBar|null,
   sections: SectionsNavBar[]|[]
+  user: User|null
 }) {
+  let { user } = paramsSend;
+
   let session = await auth();
+  
+  let isUsersSessionProfile = !( !session || session.user?.email != user?.email);
 
   return (
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
@@ -62,7 +69,20 @@ async function createSideNav( paramsSend : {
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
         <NavLinks params={paramsSend}/>
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
+        {
+          (isUsersSessionProfile) ? 
+          <Link href={`/resumes/${user?.username}/edit/section`}
+           >
+            <div className='flex content-center gap-2 cursor-pointer'>
+              <PencilSquareIcon className='stroke-slate-700 w-10'/> 
+              <span className='inline-block text-black align-middle h-fit content-center place-self-center m-l-10'>
+                Edit my page
+              </span>
+            </div>
+          </Link>
+          : <></>
+        }
+        <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block"></div>
         {
           session?.user ? (
                 <form

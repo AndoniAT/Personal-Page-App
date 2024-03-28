@@ -25,7 +25,7 @@ const mainLinksObj = [
   { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon }
 ];
 
-export default function NavLinks( { params } : { params: ParamsProps }) {
+export default function NavLinks( { params } : Readonly<{ params: ParamsProps }>) {
   const pathname = usePathname();
   const sections = params.sections;
   const home = params.home;

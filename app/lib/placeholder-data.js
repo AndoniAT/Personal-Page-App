@@ -8,6 +8,15 @@ const USERS = [
         photo: null,
         email: 'example@example.com'
     },
+    {
+        user_id:'11111111-1111-1111-1111-111111111555',
+        username: 'User',
+        firstname: 'user',
+        lastname: 'example',
+        password: 'User123?',
+        photo: null,
+        email: 'user@example.com'
+    },
 ];
 
 const RESUME = [
@@ -15,6 +24,11 @@ const RESUME = [
         resume_id:'11111111-1111-1111-1111-111111111112',
         created:'2024-03-23T17:13:57.508Z',
         user_id:'11111111-1111-1111-1111-111111111111'
+    },
+    {
+        resume_id:'11111111-1111-1111-1111-111111111113',
+        created:'2024-03-28T17:13:57.508Z',
+        user_id:'11111111-1111-1111-1111-111111111555'
     }
 ];
 
@@ -66,6 +80,18 @@ const SECTION = [
         backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
+    },
+    {
+        section_id:'11111111-1111-1111-1111-111111111226',
+        name: 'Home User',
+        created: '2024-03-28T17:15:57.508Z',
+        visible: true,
+        type:'Home',
+        style:1,
+        backgroundColor:'#18191a',
+        backgroundImage:null,
+
+        resume_id:'11111111-1111-1111-1111-111111111113',
     },
 ];
 

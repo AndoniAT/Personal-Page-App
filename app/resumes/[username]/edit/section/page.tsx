@@ -1,12 +1,12 @@
 import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/api/data';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
-import { Style1Wrapper } from '@/app/ui/resumes/resumesStyles/style1';
+import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
+import { requiresSessionUserProperty } from '@/app/lib/actions';
 
 export const metadata: Metadata = {
-  title: 'Resume User',
+  title: 'Edit User\'s Section',
 };
 
 export default async function Page(
@@ -17,13 +17,10 @@ export default async function Page(
       username: string 
     } 
   }>) {
+    await requiresSessionUserProperty( params.username );
 
     const username = params.username;
     const user = await getUserByUsername( username );
-    console.log('checking user', user);
-    if ( !user ) {console.log('not found');
-      notFound();
-    }
 
     const home = await getHomeUserSection( username );
     const medias = await getMediasForSection( home.section_id );
@@ -43,14 +40,15 @@ export default async function Page(
         backgroundcolor: home.backgroundcolor,
         backgroundimage: home.backgroundimage,
         medias: medias
-      }
+      },
+      putHomeHeroForUser: putHomeHeroForUser
     }
 
     return (
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>
-            <Style1Wrapper data={sendData}/>
+            <Style1EditView data={sendData}/>
         </Suspense>
       </main>
     );
-}
+  }
