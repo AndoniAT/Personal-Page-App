@@ -1,4 +1,4 @@
-import { put } from '@vercel/blob';
+import { put, del  } from '@vercel/blob';
 import { revalidatePath } from 'next/cache';
 
 /**
@@ -14,4 +14,12 @@ export async function uploadImage(formData: FormData) {
     });
     revalidatePath('/');
     return blob;
+}
+
+export async function deleteImage(formData: FormData) {
+  'use server'
+  const urlToDelete = formData.get('url') as string;
+  await del(urlToDelete);
+ 
+  return new Response();
 }

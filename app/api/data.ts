@@ -1,6 +1,6 @@
 import { sql } from '@vercel/postgres';
 import { User, Section, Media } from '../lib/definitions';
-import { uploadImage } from './images';
+import { deleteImage, uploadImage } from './images';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -94,7 +94,10 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
                 downloadUrl = ${blob.downloadUrl},
                 contentType = ${blob.contentType} 
                 WHERE media_id = ${media.media_id};`;
-
+      
+      const formData = new FormData();
+      formData.append( 'url', media.url );
+      await deleteImage( formData );
     } else {
       // Create Hero
       await sql`INSERT INTO MEDIA (
