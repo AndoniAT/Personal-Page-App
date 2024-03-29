@@ -5,7 +5,8 @@ export interface UserClient {
     firstname: string,
     lastname: string,
     photo: string,
-    email: string
+    email: string,
+    photo_profile_id: string
 }
 
 export interface SectionsClient {

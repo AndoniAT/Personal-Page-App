@@ -6,6 +6,7 @@ export type User = {
     password: string;
     photo: string;
     email: string;
+    photo_profile_id: string;
 };
 
 export type SectionType = 'Projects' | 'Gallery' | 'Custom' | 'Home';

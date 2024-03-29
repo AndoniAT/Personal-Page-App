@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { notFound, redirect, RedirectType } from 'next/navigation'
-import { getUserByUsername } from '../api/data';
+import { getUserByUsername } from './data';
 
 export async function goToLogin() {
     'use server'

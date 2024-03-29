@@ -1,6 +1,6 @@
 import SideNav from '@/app/ui/resumes/sidenav';
 import { Section } from '../../lib/definitions'; 
-import { getUserByUsername, getAllUserSections } from '@/app/api/data';
+import { getUserByUsername, getAllUserSections } from '@/app/lib/data';
 import { ErrorBoundary } from 'next/dist/client/components/error-boundary';
 import { notFound } from 'next/navigation';
 
@@ -13,7 +13,6 @@ Readonly<{
   children: React.ReactNode,
   params: { username: string } 
 }>) {
-  
   const username = params.username;
   let sections = await getAllUserSections( username );
   const user = await getUserByUsername( username );

@@ -1,4 +1,4 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/api/data';
+import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
@@ -32,6 +32,7 @@ export default async function Page(
         lastname: user.lastname,
         photo: user.photo,
         email: user.email,
+        photo_profile_id: user.photo_profile_id,
       },
       section: {
         name: home.name,

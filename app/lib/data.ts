@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-import { User, Section, Media } from '../lib/definitions';
+import { User, Section, Media } from './definitions';
 import { deleteImage, uploadImage } from './images';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -9,7 +9,7 @@ export async function getUserByUsername( username: string ) {
   noStore();
   try {
     const user = await sql`SELECT * FROM USERS WHERE username=${username}`;
-    
+
     return user.rows[ 0 ] as User;
 
   } catch ( error ) {

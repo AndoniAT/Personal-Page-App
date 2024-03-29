@@ -2,7 +2,6 @@
 
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
-import { goHome } from '../lib/actions';
 
 export async function authenticate(
     prevState: string | undefined,

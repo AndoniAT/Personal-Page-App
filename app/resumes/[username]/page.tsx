@@ -1,4 +1,4 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/api/data';
+import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -15,13 +15,14 @@ export default async function Page(
   }: Readonly<{ 
     params: { 
       username: string 
-    } 
+    }
   }>) {
 
     const username = params.username;
+
     const user = await getUserByUsername( username );
-    console.log('checking user', user);
-    if ( !user ) {console.log('not found');
+
+    if ( !user ) {
       notFound();
     }
 
@@ -35,6 +36,7 @@ export default async function Page(
         lastname: user.lastname,
         photo: user.photo,
         email: user.email,
+        photo_profile_id: user.photo_profile_id
       },
       section: {
         name: home.name,
@@ -49,7 +51,9 @@ export default async function Page(
     return (
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>
+            {
             <Style1Wrapper data={sendData}/>
+            }
         </Suspense>
       </main>
     );

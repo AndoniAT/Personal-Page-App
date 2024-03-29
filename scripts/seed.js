@@ -26,7 +26,7 @@ async function dropTables( client ) {
       }
 }
 
-async function seedUsers( client ) {
+async function createUsers( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
         
@@ -39,84 +39,43 @@ async function seedUsers( client ) {
             lastname VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            photo VARCHAR(255)
-          );
-        `;
+            photo_profile_id UUID
+            );
+            `;
     
         console.log( `Created "USERS" table` );
-    
-        // Insert data into the "USERS" table
-        const insertedUsers = await Promise.all(
-          
-            USERS.map( async ( user ) => {
 
-            const hashedPassword = await bcrypt.hash( user.password, 10 );
-            
-            return client.sql`
-            INSERT INTO USERS ( user_id, username, firstname, lastname, email, password, photo )
-            VALUES ( ${user.user_id}, ${user.username}, ${user.firstname}, ${user.lastname}, ${user.email}, ${hashedPassword}, ${user.photo} )
-            ON CONFLICT ( user_id ) DO NOTHING;
-          `;
-          } ),
-        );
-    
-        console.log( `Seeded : ${insertedUsers.length} users` );
-    
-        return {
-          createTable,
-          users: insertedUsers
-        };
+        return createTable;
       } catch ( error ) {
-        console.error('Error seeding users:', error);
+        console.error('Error create users:', error);
         throw error;
       }
 }
 
-async function seedResume( client ) {
+async function createResume( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-        // Create the "USERS" table if it doesn't exist
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS RESUME (
             resume_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
             created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            user_id UUID REFERENCES USERS( user_id ) ON UPDATE CASCADE ON DELETE CASCADE
-          );
-        `;
+            user_id UUID
+            );
+            `;
     
         console.log( `Created "RESUME" table` );
-    
-        // Insert data into the "USERS" table
-        const insertedResumes = await Promise.all(
-          
-            RESUME.map( async ( resume ) => {
-            
-            return client.sql`
-            INSERT INTO RESUME ( resume_id, user_id )
-            VALUES ( ${resume.resume_id}, ${resume.user_id} )
-            ON CONFLICT ( resume_id ) DO NOTHING;
-          `;
-          } ),
-        );
-    
-        console.log( `Seeded : ${insertedResumes.length} resumes` );
-    
-        return {
-          createTable,
-          resumes: insertedResumes,
-        };
+        return createTable;
       } catch (error) {
-        console.error( 'Error seeding resumes:', error );
+        console.error( 'Error create resumes:', error );
         throw error;
       }
 }
 
-async function seedSection( client ) {
+async function createSection( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-        // Create the "USERS" table if it doesn't exist
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS SECTION (
             section_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -127,38 +86,20 @@ async function seedSection( client ) {
             style INT DEFAULT 1,
             backgroundColor VARCHAR(7) DEFAULT '#FFFFFF',
             backgroundImage VARCHAR(255),
-            resume_id UUID REFERENCES RESUME( resume_id ) ON UPDATE CASCADE ON DELETE CASCADE
+            
+            resume_id UUID
           );
         `;
     
         console.log(`Created "SECTION" table`);
-    
-        // Insert data into the "USERS" table
-        const insertedSections = await Promise.all(
-          
-            SECTION.map( async ( section ) => {
-
-            return client.sql`
-            INSERT INTO SECTION ( section_id, name, visible, type, style, backgroundColor, backgroundImage, resume_id )
-            VALUES ( ${section.section_id}, ${section.name}, ${section.visible}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.backgroundImage}, ${section.resume_id})
-            ON CONFLICT ( section_id ) DO NOTHING;
-          `;
-          } ),
-        );
-    
-        console.log( `Seeded : ${insertedSections.length} sections` );
-    
-        return {
-          createTable,
-          users: insertedSections,
-        };
+        return createTable;
       } catch ( error ) {
-        console.error( 'Error seeding sections:', error );
+        console.error( 'Error creating sections:', error );
         throw error;
       }
 }
 
-async function seedProject( client ) {
+async function createProject( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
@@ -177,32 +118,15 @@ async function seedProject( client ) {
     
         console.log( `Created "PROJECT" table` );
     
-        // Insert data into the "PROJECT" table
-        const insertedProjects = await Promise.all(
-          
-            PROJECT.map( async ( project ) => {
+        return createTable;
 
-            return client.sql`
-            INSERT INTO PROJECT ( project_id, name, link, technologies, description, moreInfo, team )
-            VALUES ( ${project.project_id}, ${project.name}, ${project.link}, ${project.technologies}, ${project.description}, ${project.moreInfo}, ${project.team} )
-            ON CONFLICT ( project_id ) DO NOTHING;
-          `;
-          } ),
-        );
-    
-        console.log( `Seeded : ${insertedProjects.length} projects` );
-    
-        return {
-          createTable,
-          users: insertedProjects,
-        };
       } catch ( error ) {
-        console.error( 'Error seeding projects:', error );
+        console.error( 'Error create projects:', error );
         throw error;
       }
 }
 
-async function seedMedia( client ) {
+async function createMedia( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
         
@@ -217,39 +141,20 @@ async function seedMedia( client ) {
             position INT,
             isHero BOOLEAN DEFAULT False,
 
-            section_id UUID REFERENCES SECTION( section_id ) ON UPDATE CASCADE ON DELETE CASCADE,
-            project_id UUID REFERENCES PROJECT( project_id ) ON UPDATE CASCADE ON DELETE CASCADE
+            section_id UUID,
+            project_id UUID
           );
         `;
     
-        console.log( `Created "MEDIA" table` );
-    
-        // Insert data into the "PROJECT" table
-        /*const insertedMedias = await Promise.all(
-          
-            MEDIA.map( async ( media ) => {
+        return createTable;
 
-            return client.sql`
-            INSERT INTO MEDIA ( media_id, filename, position, section_id, project_id )
-            VALUES ( ${media.media_id}, ${media.filename}, ${media.position}, ${media.section_id}, ${media.project_id} )
-            ON CONFLICT ( media_id ) DO NOTHING;
-          `;
-          } ),
-        );*/
-    
-        //console.log( `Seeded : ${insertedMedias.length} medias` );
-    
-        return {
-          createTable,
-          //users: insertedMedias,
-        };
       } catch ( error ) {
-        console.error( 'Error seeding medias:', error );
+        console.error( 'Error creating medias:', error );
         throw error;
       }
 }
 
-async function seedSocialMedia( client ) {
+async function createSocialMedia( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
@@ -263,41 +168,22 @@ async function seedSocialMedia( client ) {
         `;
     
         console.log( `Created "SOCIAL_MEDIA" table` );
-    
-        // Insert data into the "PROJECT" table
-        const insertedSocialMedias = await Promise.all(
-          
-            SOCIAL_MEDIA.map( async ( social_media ) => {
-
-            return client.sql`
-            INSERT INTO SOCIAL_MEDIA ( social_id, name, icon )
-            VALUES ( ${social_media.social_id}, ${social_media.name}, ${social_media.icon} )
-            ON CONFLICT ( social_id ) DO NOTHING;
-          `;
-          } ),
-        );
-    
-        console.log( `Seeded : ${insertedSocialMedias.length} social medias` );
-    
-        return {
-          createTable,
-          users: insertedSocialMedias,
-        };
+        return createTable;
       } catch ( error ) {
-        console.error( 'Error seeding social medias:', error );
+        console.error( 'Error creating social medias:', error );
         throw error;
       }
 }
 
-async function seedSocialMediaUser( client ) {
+async function createSocialMediaUser( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
         // Create the "USERS" table if it doesn't exist
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS SOCIAL_MEDIA_USER (
-            user_id UUID REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
-            social_id UUID REFERENCES SOCIAL_MEDIA(social_id) ON UPDATE CASCADE ON DELETE CASCADE,
+            user_id UUID,
+            social_id UUID,
             link VARCHAR(255) NOT NULL,
             username VARCHAR(255),
 
@@ -307,28 +193,76 @@ async function seedSocialMediaUser( client ) {
     
         console.log(`Created "SOCIAL_MEDIA" table`);
     
-        return {
-          createTable
-        };
+        return createTable
 
       } catch ( error ) {
-        console.error( 'Error seeding social medias:', error );
+        console.error( 'Error creating social medias:', error );
         throw error;
       }
+}
+
+async function seedTables( client ) {
+  await seedUsers( client );
+  await seedResume( client );
+  await seedSection( client );
+
+  await seedProject( client );
+  await seedMedia( client );
+  await seedSocialMedia( client );
+  await seedSocialMediaUser( client );
+  return;
+}
+
+async function createTables( client ) {
+  await createUsers( client );
+  await createResume( client );
+  await createSection( client );
+
+  await createProject( client );
+  await createMedia( client );
+  await createSocialMedia( client );
+  await createSocialMediaUser( client );
+  return;
+}
+
+async function createForeignKeys( client ) {
+  try {
+    await client.sql`ALTER TABLE USERS
+      ADD CONSTRAINT fk_users_media FOREIGN KEY (photo_profile_id) REFERENCES MEDIA(media_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+    
+    await client.sql`ALTER TABLE RESUME
+      ADD CONSTRAINT fk_resume_users FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+    
+    await client.sql`ALTER TABLE SECTION
+      ADD CONSTRAINT fk_section_resume FOREIGN KEY (resume_id) REFERENCES RESUME(resume_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+    
+    await client.sql`ALTER TABLE MEDIA
+      ADD CONSTRAINT fk_media_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+  
+    await client.sql`ALTER TABLE MEDIA
+      ADD CONSTRAINT fk_media_project FOREIGN KEY (project_id) REFERENCES PROJECT(project_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+  
+    await client.sql`ALTER TABLE SOCIAL_MEDIA_USER
+      ADD CONSTRAINT fk_user_socialmedia FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+  
+    await client.sql`ALTER TABLE SOCIAL_MEDIA_USER
+      ADD CONSTRAINT fk_socialmedia_user FOREIGN KEY (social_id) REFERENCES SOCIAL_MEDIA(social_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+  } catch( e ) {
+    console.log('Error generating foreign keys', e);
+    throw new Error( e );
+  }
+
+  return;
 }
 
 async function main() {
     const client = await db.connect();
     
     await dropTables( client );
-    await seedUsers( client );
-    await seedResume( client );
-    await seedSection( client );
+    await createTables( client );
+    await createForeignKeys( client );
+    await seedTables( client );
 
-    await seedProject( client );
-    await seedMedia( client );
-    await seedSocialMedia( client );
-    await seedSocialMediaUser( client );
 
     await client.end();
   }
@@ -339,3 +273,170 @@ main().catch((err) => {
       err,
     );
 });
+
+async function seedUsers( client ) {
+  try {  
+      const insertedUsers = await Promise.all(
+        
+          USERS.map( async ( user ) => {
+
+          const hashedPassword = await bcrypt.hash( user.password, 10 );
+          let users = await client.sql`
+          INSERT INTO USERS ( user_id, username, firstname, lastname, email, password )
+          VALUES ( ${user.user_id}, ${user.username}, ${user.firstname}, ${user.lastname}, ${user.email}, ${hashedPassword} )
+          ON CONFLICT ( user_id ) DO NOTHING
+          RETURNING user_id;
+        `;
+            console.log('inserted users', users);
+          return users;
+        } ),
+      );
+  
+      console.log( `Seeded : ${insertedUsers.length} users` );
+  
+      return {
+        users: insertedUsers
+      };
+    } catch ( error ) {
+      console.error('Error seeding users:', error);
+      throw error;
+    }
+}
+
+async function seedResume( client ) {
+  try {
+      const insertedResumes = await Promise.all(
+        
+          RESUME.map( async ( resume ) => {
+          
+          return client.sql`
+          INSERT INTO RESUME ( resume_id, user_id )
+          VALUES ( ${resume.resume_id}, ${resume.user_id} )
+          ON CONFLICT ( resume_id ) DO NOTHING;
+        `;
+        } ),
+      );
+  
+      console.log( `Seeded : ${insertedResumes.length} resumes` );
+  
+      return {
+        resumes: insertedResumes,
+      };
+    } catch (error) {
+      console.error( 'Error seeding resumes:', error );
+      throw error;
+    }
+}
+
+async function seedSection( client ) {
+  try {
+      const insertedSections = await Promise.all(
+        
+          SECTION.map( async ( section ) => {
+
+          return client.sql`
+          INSERT INTO SECTION ( section_id, name, visible, type, style, backgroundColor, backgroundImage, resume_id )
+          VALUES ( ${section.section_id}, ${section.name}, ${section.visible}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.backgroundImage}, ${section.resume_id})
+          ON CONFLICT ( section_id ) DO NOTHING;
+        `;
+        } ),
+      );
+  
+      console.log( `Seeded : ${insertedSections.length} sections` );
+  
+      return {
+        users: insertedSections,
+      };
+    } catch ( error ) {
+      console.error( 'Error seeding sections:', error );
+      throw error;
+    }
+}
+
+async function seedProject( client ) {
+  try {
+
+        const insertedProjects = await Promise.all(
+        
+          PROJECT.map( async ( project ) => {
+
+          return client.sql`
+          INSERT INTO PROJECT ( project_id, name, link, technologies, description, moreInfo, team )
+          VALUES ( ${project.project_id}, ${project.name}, ${project.link}, ${project.technologies}, ${project.description}, ${project.moreInfo}, ${project.team} )
+          ON CONFLICT ( project_id ) DO NOTHING;
+        `;
+        } ),
+      );
+  
+      console.log( `Seeded : ${insertedProjects.length} projects` );
+  
+      return {
+        users: insertedProjects,
+      };
+    } catch ( error ) {
+      console.error( 'Error seeding projects:', error );
+      throw error;
+    }
+}
+
+async function seedMedia( client ) {
+  try {
+      // Insert data into the "PROJECT" table
+      /*const insertedMedias = await Promise.all(
+        
+          MEDIA.map( async ( media ) => {
+
+          return client.sql`
+          INSERT INTO MEDIA ( media_id, filename, position, section_id, project_id )
+          VALUES ( ${media.media_id}, ${media.filename}, ${media.position}, ${media.section_id}, ${media.project_id} )
+          ON CONFLICT ( media_id ) DO NOTHING;
+        `;
+        } ),
+      );*/
+  
+      //console.log( `Seeded : ${insertedMedias.length} medias` );
+  
+      return {
+        //users: insertedMedias,
+      };
+    } catch ( error ) {
+      console.error( 'Error seeding medias:', error );
+      throw error;
+    }
+}
+
+async function seedSocialMedia( client ) {
+  try {
+      // Insert data into the "PROJECT" table
+      const insertedSocialMedias = await Promise.all(
+        
+          SOCIAL_MEDIA.map( async ( social_media ) => {
+
+          return client.sql`
+          INSERT INTO SOCIAL_MEDIA ( social_id, name, icon )
+          VALUES ( ${social_media.social_id}, ${social_media.name}, ${social_media.icon} )
+          ON CONFLICT ( social_id ) DO NOTHING;
+        `;
+        } ),
+      );
+  
+      console.log( `Seeded : ${insertedSocialMedias.length} social medias` );
+  
+      return {
+        users: insertedSocialMedias,
+      };
+    } catch ( error ) {
+      console.error( 'Error seeding social medias:', error );
+      throw error;
+    }
+}
+
+async function seedSocialMediaUser( client ) {
+    try {
+        return {};
+
+      } catch ( error ) {
+        console.error( 'Error seeding social medias:', error );
+        throw error;
+      }
+}
