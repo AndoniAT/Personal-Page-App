@@ -1,4 +1,4 @@
-/* == API EXEMPLES == 
+ //== API EXEMPLES == 
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { NextResponse } from 'next/server';
 
@@ -11,7 +11,7 @@ export async function GET(request: Request ) {
 }
 
 
-export async function POST( req: Request, context:any ) {
+/*export async function POST( req: Request, context:any ) {
   noStore();
   const { params } = context;
   let media_url = '';
