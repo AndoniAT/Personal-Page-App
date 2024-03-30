@@ -9,7 +9,7 @@ import { auth, signOut } from '@/auth';
 import { goToLogin } from '@/app/lib/actions';
 import { redirect } from 'next/dist/server/api-utils';
 
-export default async function SideNav( { sections, user, mode } : { sections: Section[]|[], user: User|null, mode: 'edit'|never } ) {
+export default async function SideNav( { sections, user, mode } : { sections: Section[]|[], user: User|null, mode?: 'edit'|never } ) {
 
   if( sections.length == 0 ) {
     return await createSideNav( { home:null, sections:[], user: null } )
