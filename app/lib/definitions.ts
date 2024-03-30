@@ -30,8 +30,8 @@ export type Media = {
     contenttype: string
     position: number
     ishero: boolean
-    section_id: number
-    project_id: number
+    section_id: string
+    project_id?: string
     update: Function|never
 }
 

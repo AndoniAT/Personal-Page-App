@@ -147,7 +147,7 @@ export function Style1EditView(
     };
 
     const handleHeroChange = async () => {
-      if ( heroInputRef?.current?.files && heroInputRef.current.files.length > 0 ) {
+      if ( hero?.update && heroInputRef?.current?.files && heroInputRef.current.files.length > 0 ) {
         const formData = new FormData();
         formData.append( 'image', heroInputRef.current.files[ 0 ] );
         setLoading( true );
@@ -158,7 +158,7 @@ export function Style1EditView(
     };
 
     const handleProfileChange = async () => {
-      if ( profileInputRef?.current?.files && profileInputRef.current.files.length > 0 ) {
+      if ( user?.photo_profile?.update && profileInputRef?.current?.files && profileInputRef.current.files.length > 0 ) {
         const formData = new FormData();
         formData.append( 'image', profileInputRef.current.files[ 0 ] );
         setLoading( true );
@@ -169,13 +169,13 @@ export function Style1EditView(
     };
 
     useEffect(() => {
-      if( user.photo_profile && !photoProfile ) {
+      if( user?.photo_profile?.url && !photoProfile ) {
         setPhotoProfile( user.photo_profile.url );
       }
     }, [ photoProfile, user.photo_profile ]);
     
     useEffect(() => {
-      if( hero && !heroPhoto ) {
+      if( hero && !heroPhoto && hero.url ) {
         setHeroPhoto( hero.url );
       }
     }, [ heroPhoto, hero ]);

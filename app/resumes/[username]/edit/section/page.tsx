@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
+import { MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 
 export const metadata: Metadata = {
   title: 'Edit User\'s Section',
@@ -23,18 +24,24 @@ export default async function Page(
     const user = await getUserByUsername( username );
 
     const home = await getHomeUserSection( username );
-    const medias = await getMediasForSection( home.section_id );
+    const medias = await getMediasForSection( home.section_id ) as MediaClient[];
 
-    let hero = medias.find( m => m.ishero );
     
-    if( hero ) {
-      hero.update = putHomeHeroForUser;
+    let heroInMedia = medias.find( m => m.ishero );
+    
+    if( heroInMedia ) {
+      heroInMedia.update = putHomeHeroForUser;
+    } else {
+      let hero = { update: putHomeHeroForUser, ishero:true, section_id: home.section_id } as MediaClient;
+      medias.push( hero );
     }
 
-    let photo_profile = await getProfilePhotoForUser( user.username );
+    let photo_profile = await getProfilePhotoForUser( user.username ) as MediaClient
   
     if( photo_profile ) {
       photo_profile.update = putProfilePhotoForUser;
+    } else {
+      photo_profile = { update: putProfilePhotoForUser  } as MediaClient;
     }
 
     const sendData = {
