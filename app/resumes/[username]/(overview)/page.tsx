@@ -1,4 +1,4 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/lib/data';
+import { getUserByUsername, getHomeUserSection, getMediasForSection, getProfilePhotoForUser } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -28,6 +28,7 @@ export default async function Page(
 
     const home = await getHomeUserSection( username );
     const medias = await getMediasForSection( home.section_id );
+    let photo_profile = await getProfilePhotoForUser( user.username );
 
     const sendData = {
       user: {
@@ -36,7 +37,7 @@ export default async function Page(
         lastname: user.lastname,
         photo: user.photo,
         email: user.email,
-        photo_profile_id: user.photo_profile_id
+        photo_profile: photo_profile
       },
       section: {
         name: home.name,

@@ -38,3 +38,23 @@ body {
 .myBackgroundPage {
   @apply bg-slate-100
 }
+
+
+/* Page resumes*/
+#resumePageStyle1 .profilePhotoContainer {
+  box-shadow: '11px 7px 29px 0px #404040';
+}
+
+#resumePageStyle1 .image-container {
+  height: 100%;
+  position: relative;
+  padding: 2px;
+  
+  @apply bg-zinc-400
+}
+#resumePageStyle1 .image-container .image {
+  width: 100%;
+  height: 100%;
+  position: relative !important;
+  object-fit: cover;
+}

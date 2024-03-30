@@ -4,15 +4,15 @@ import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
 import { Section, User } from '../../lib/definitions'; 
 import AcmeLogo from '@/app/ui/acme-logo';
-import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import { PowerIcon, UserCircleIcon, PencilSquareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 import { goToLogin } from '@/app/lib/actions';
 import { redirect } from 'next/dist/server/api-utils';
 
-export default async function SideNav( { sections, user } : { sections: Section[]|[], user: User|null } ) {
+export default async function SideNav( { sections, user, mode } : { sections: Section[]|[], user: User|null, mode: 'edit'|never } ) {
 
   if( sections.length == 0 ) {
-    return await createSideNav( { home:null, sections:[], user: null} )
+    return await createSideNav( { home:null, sections:[], user: null } )
   }
 
   const home = sections.find( s => s.type == 'Home' );
@@ -21,13 +21,14 @@ export default async function SideNav( { sections, user } : { sections: Section[
   const homeSend = constructSection( home );
 
   // Other sections
-  sections = sections.filter( s => s.type != 'Home' ).filter( s => s.visible );
-  const sectionsSend = sections.filter( s => s.visible ).map( s => constructSection( s ) );
+  sections = sections.filter( s => s.type != 'Home' ).filter( s => s.public );
+  const sectionsSend = sections.filter( s => s.public ).map( s => constructSection( s ) );
 
   const paramsSend = {
     home: homeSend,
     sections: sectionsSend,
-    user: user
+    user: user,
+    mode: mode
   }
 
   return await createSideNav( paramsSend )
@@ -50,8 +51,9 @@ async function createSideNav( paramsSend : {
   home: SectionsNavBar|null,
   sections: SectionsNavBar[]|[]
   user: User|null
+  mode?: 'edit'|never
 }) {
-  let { user } = paramsSend;
+  let { user, mode } = paramsSend;
 
   let session = await auth();
   
@@ -71,15 +73,29 @@ async function createSideNav( paramsSend : {
         <NavLinks params={paramsSend}/>
         {
           (isUsersSessionProfile) ? 
-          <Link href={`/resumes/${user?.username}/edit/section`}
-           >
-            <div className='flex content-center gap-2 cursor-pointer'>
-              <PencilSquareIcon className='stroke-slate-700 w-10'/> 
-              <span className='inline-block text-black align-middle h-fit content-center place-self-center m-l-10'>
-                Edit my page
-              </span>
-            </div>
-          </Link>
+              
+                (mode == 'edit' ) ?
+                <>
+                  <Link href={`/resumes/${user?.username}`}>
+                    <div className='flex content-center gap-2 cursor-pointer'>
+                      <EyeIcon className='stroke-slate-700 w-5'/> 
+                      <span className='inline-block text-black align-middle h-fit content-center place-self-center m-l-10'>
+                        Visual mode
+                      </span>
+                    </div>
+                  </Link>
+                </>
+                :
+                <>
+                  <Link href={`/resumes/${user?.username}/edit/section`}>
+                    <div className='flex content-center gap-2 cursor-pointer'>
+                      <PencilSquareIcon className='stroke-slate-700 w-5'/> 
+                      <span className='inline-block text-black align-middle h-fit content-center place-self-center m-l-10'>
+                        Edit mode
+                      </span>
+                    </div>
+                  </Link>
+                </>
           : <></>
         }
         <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block"></div>

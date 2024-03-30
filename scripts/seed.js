@@ -81,7 +81,7 @@ async function createSection( client ) {
             section_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            visible BOOLEAN DEFAULT TRUE,
+            public BOOLEAN DEFAULT TRUE,
             type VARCHAR(20) CHECK (type IN ('Projects', 'Gallery', 'Custom', 'Home')),
             style INT DEFAULT 1,
             backgroundColor VARCHAR(7) DEFAULT '#FFFFFF',
@@ -335,8 +335,8 @@ async function seedSection( client ) {
           SECTION.map( async ( section ) => {
 
           return client.sql`
-          INSERT INTO SECTION ( section_id, name, visible, type, style, backgroundColor, backgroundImage, resume_id )
-          VALUES ( ${section.section_id}, ${section.name}, ${section.visible}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.backgroundImage}, ${section.resume_id})
+          INSERT INTO SECTION ( section_id, name, public, type, style, backgroundColor, backgroundImage, resume_id )
+          VALUES ( ${section.section_id}, ${section.name}, ${section.public}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.backgroundImage}, ${section.resume_id})
           ON CONFLICT ( section_id ) DO NOTHING;
         `;
         } ),

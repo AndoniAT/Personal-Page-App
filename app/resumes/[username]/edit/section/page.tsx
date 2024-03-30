@@ -1,6 +1,6 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser } from '@/app/lib/data';
+import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser, putProfilePhotoForUser, getProfilePhotoForUser } from '@/app/lib/data';
 import { Metadata } from 'next';
-import { Suspense } from 'react';
+import { Suspense, use } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
@@ -25,6 +25,18 @@ export default async function Page(
     const home = await getHomeUserSection( username );
     const medias = await getMediasForSection( home.section_id );
 
+    let hero = medias.find( m => m.ishero );
+    
+    if( hero ) {
+      hero.update = putHomeHeroForUser;
+    }
+
+    let photo_profile = await getProfilePhotoForUser( user.username );
+  
+    if( photo_profile ) {
+      photo_profile.update = putProfilePhotoForUser;
+    }
+
     const sendData = {
       user: {
         username: user.username,
@@ -32,7 +44,7 @@ export default async function Page(
         lastname: user.lastname,
         photo: user.photo,
         email: user.email,
-        photo_profile_id: user.photo_profile_id,
+        photo_profile: photo_profile
       },
       section: {
         name: home.name,
@@ -41,8 +53,7 @@ export default async function Page(
         backgroundcolor: home.backgroundcolor,
         backgroundimage: home.backgroundimage,
         medias: medias
-      },
-      putHomeHeroForUser: putHomeHeroForUser
+      }
     }
 
     return (

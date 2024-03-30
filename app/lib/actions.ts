@@ -18,7 +18,7 @@ export async function goHome() {
  */
 export async function requiresSessionUserProperty( username:string ) {
     'use server'
-    let session = await auth();
+    let session = await requiresLogin();
     const user = await getUserByUsername( username );
 
     if( !user ) {
@@ -26,6 +26,16 @@ export async function requiresSessionUserProperty( username:string ) {
     }
 
     if( !session || session.user?.email != user.email ) {
-        throw new Error('You don\'t have acces to this page');
+        throw new Error('You don\'t have acces to this action');
     }
+}
+
+
+export async function requiresLogin() {
+    'use server'
+    let session = await auth();
+    if( !session ) {
+        throw new Error('You are not login');
+    }
+    return session;
 }

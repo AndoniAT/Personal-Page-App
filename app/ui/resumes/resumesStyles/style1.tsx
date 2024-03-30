@@ -1,8 +1,33 @@
 'use client'
 import { UserClient, SectionsClient } from './interfaces'
 import clsx from 'clsx';
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation'
+import Image from 'next/image';
+
+const styles = {
+  hero : {
+    withProfilePhoto: 'col-span-12 xl:col-span-9 max-h-48 min-h-48 2xl:min-h-64',
+    withoutProfilePhoto: 'col-span-12 min-h-28 max-h-28 2xl:min-h-64',
+    gral: 'rounded-l-xl w-full',
+
+    imageContainer: 'image-container p-1 bg-gray-300 rounded-xl',
+    image: 'image rounded-xl',
+    noImage: 'image-container p-1 bg-gray-300 rounded-xl'
+  },
+  profilePhoto: {
+    principalContainer: 'hidden col-span-3 pl-10 pr-10 pt-5 pb-5 rounded-r-xl xl:block',
+    imageContainer: 'm-auto flex w-full items-center gap-4 rounded-full bg-slate-50 p-1 bg-opacity-50 h-fit profilePhotoContainer justify-center',
+    image: 'flex h-max min-h-36 max-h-36 2xl:min-h-52 2xl:max-h-52 w-max shrink-0 grow-0 items-center justify-center rounded-full text-green-700'
+
+  },
+  edit: {
+    hover: 'hover:opacity-25 ease-in duration-300 cursor-pointer ',
+  },
+  status: {
+    loading: 'hover:cursor-progress'
+  }
+};
 
 /**
  * Style 1 for home page
@@ -21,27 +46,72 @@ export function Style1Wrapper(
     const user = data.user;
     const home = data.section;
     const hero = home.medias.find( m => m.ishero );
+    const [ photoProfile, setPhotoProfile ] = useState<string|undefined>( undefined );
+
+    useEffect(() => {
+      if( user.photo_profile && !photoProfile ) {
+        setPhotoProfile( user.photo_profile.url );
+      }
+    }, [ photoProfile ]);
 
     return (
-      <div style={{ backgroundColor: home.backgroundcolor }} className='w-full p-1'>
-        <div className="w-full bg-gray-200 h-80">
-                  <div className="grid grid-cols-1 gap-4 h-full">
-                      <div className="grid grid-cols-12 h-full">
-                          <div className="col-span-9 p-1 rounded-l-xl">
-                            <div className={`h-full bg-gray-300 rounded-xl`}
-                              style={ (hero?.url) ? { backgroundImage: `url(${hero?.url})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover' } : {} }
-                            ></div>
+      <div style={{ backgroundColor: home.backgroundcolor }} className={clsx({
+        ['w-full h-screen']: true
+      })} id='resumePageStyle1'>
+        <div>
+          <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
+            <div className="grid grid-cols-1 gap-4 h-full">
+              <div className="grid grid-cols-12 h-full">
+                          { /* Hero */}
+                          <div className={clsx({ 
+                            [styles.hero.gral] : true,
+                            [styles.hero.withProfilePhoto] : !!photoProfile,
+                            [styles.hero.withoutProfilePhoto] : !photoProfile
+                            })}>
+                            {
+                              (hero?.url) ? 
+                              <div className={styles.hero.imageContainer}>
+                                  <Image
+                                          src={hero.url}
+                                          layout='fill'
+                                          alt="Hero"
+                                          className={styles.hero.image}
+                                        />
+                              </div>
+
+                              :<div className={styles.hero.noImage}></div>
+                            }
                           </div>
-                        <div className="col-span-3 p-10 rounded-r-xl">
-                          <div className={`bg-gray-300 rounded-full h-full`}>
+
+                          
+                          { /* Profile photo */}
+                          {
+                          photoProfile ? 
+                          <div className={styles.profilePhoto.principalContainer}>
+                            <div className="flex h-full w-full">
+                              <div className={styles.profilePhoto.imageContainer}>
+                                <Image
+                                  src={photoProfile}
+                                  width={500}
+                                  height={500}
+                                  alt="Profile"
+                                  className={styles.profilePhoto.image}
+                                />
+                                </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                  </div>
+                          :
+                          <></>
+                          }
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
 }
+
+
 
 export function Style1EditView( 
   {
@@ -49,21 +119,20 @@ export function Style1EditView(
   } : Readonly<{
     data : {
         user: UserClient,
-        section: SectionsClient,
-        putHomeHeroForUser: Function
+        section: SectionsClient
       }
     }>) {
 
     const paramsUrl = useParams<{ username: string }>()
     const heroInputRef = useRef<HTMLInputElement>(null);
     const profileInputRef = useRef<HTMLInputElement>(null);
-    const [ photoProfile, setPhotoProfile ] = useState<string|undefined>( undefined );
+    const [ photoProfile, setPhotoProfile ] = useState<string>( '' );
+    const [ heroPhoto, setHeroPhoto ] = useState<string>( '' );
+    const [ loading, setLoading ] = useState<boolean>( false );
 
     const user = data.user;
     const home = data.section;
     const hero = home.medias.find( m => m.ishero );
-
-    const putHomeHeroForUser = data.putHomeHeroForUser;
 
     const handleHeroClick = () => {
       if (heroInputRef.current) {
@@ -77,11 +146,14 @@ export function Style1EditView(
       }
     };
 
-    const handleHeroChange = () => {
+    const handleHeroChange = async () => {
       if ( heroInputRef?.current?.files && heroInputRef.current.files.length > 0 ) {
         const formData = new FormData();
         formData.append( 'image', heroInputRef.current.files[ 0 ] );
-        putHomeHeroForUser( user.username, formData );
+        setLoading( true );
+        let url = await hero?.update( paramsUrl.username, formData)
+        setHeroPhoto( url );
+        setLoading( false );
       }
     };
 
@@ -89,67 +161,112 @@ export function Style1EditView(
       if ( profileInputRef?.current?.files && profileInputRef.current.files.length > 0 ) {
         const formData = new FormData();
         formData.append( 'image', profileInputRef.current.files[ 0 ] );
-
-        const response = await fetch(`/api/users/${paramsUrl.username}/profileImage`, {
-          method: 'POST',
-          body: formData
-        });
-        let { media_id } = await response.json();
-        setPhotoProfile( media_id );
+        setLoading( true );
+        let url = await user.photo_profile?.update( paramsUrl.username, formData);
+        setPhotoProfile( url );
+        setLoading( false );
       }
     };
 
     useEffect(() => {
-      (async () => {
-        if( user.photo_profile_id ) {
-          let result = await fetch(`/api/medias/${user.photo_profile_id}`);
-          const data = await result.json();
-
-          setPhotoProfile(data.url);
-        }
-
-      })()
+      if( user.photo_profile && !photoProfile ) {
+        setPhotoProfile( user.photo_profile.url );
+      }
     }, [ photoProfile ]);
+    
+    useEffect(() => {
+      if( hero && !heroPhoto ) {
+        setHeroPhoto( hero.url );
+      }
+    }, [ heroPhoto ]);
 
     return (
-      <div style={{ backgroundColor: home.backgroundcolor }} className='w-full p-1'>
-        <div className="w-full bg-gray-200 h-fit">
-                  <div className="grid grid-cols-1 gap-4 h-full">
-                      <div className="grid grid-cols-12 h-full">
-                          <div className="col-span-9 p-1 rounded-l-xl cursor-pointer hidden h-80 xl:block" onClick={handleHeroClick}>
-                            <div className={`h-full bg-gray-300 rounded-xl`}
-                              style={ (hero?.url) ? { backgroundImage: `url(${hero?.url})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover' } : {} }
-                            >
-                                <input
-                                    ref={heroInputRef}
-                                    type="file"
-                                    id="image"
-                                    name="image"
-                                    required
-                                    onChange={handleHeroChange}
-                                    style={{ display: 'none' }}
-                                />
+      <div style={{ backgroundColor: home.backgroundcolor }} 
+      className={clsx({ 
+        ['w-full h-screen'] : true,
+        [ styles.status.loading ]: loading
+       })} id='resumePageStyle1'>
+        <div>
+          <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
+              <div className="grid grid-cols-1 gap-4 h-full">
+                <div className="grid grid-cols-12 h-full">
+                { /* Hero */}
+                <div className={clsx({ 
+                  [styles.edit.hover] : !loading,
+                  [styles.hero.gral] : true,
+                  [styles.hero.withProfilePhoto] : true
+                  })}
+                   onClick={handleHeroClick}>
+                            {
+                              (heroPhoto) ? 
+                              <div className={styles.hero.imageContainer}>
+                                  <Image
+                                          src={heroPhoto}
+                                          layout='fill'
+                                          alt="Hero"
+                                          className={styles.hero.image}
+                                        />
                               </div>
-                          </div>
-                          <div className="col-span-3 rounded-r-xl cursor-pointer">
-                              <div className='h-full p-1 w-full flex justify-center  items-center	'>
-                                <div className={`bg-gray-300 rounded-full size-4/6 cursor-pointer`} onClick={handleProfileClick}
-                                style={ (photoProfile) ? { backgroundImage: `url(${photoProfile})`, backgroundRepeat: 'no-repeat', backgroundSize: 'cover' } : {} }
-                                >
-                                    <input
-                                          ref={profileInputRef}
-                                          type="file"
-                                          id="imageProfile"
-                                          name="imageProfile"
-                                          required
-                                          onChange={handleProfileChange}
-                                          style={{ display: 'none' }}
-                                      />
-                                </div>
-                              </div>
-                          </div>
+
+                              : <div className={styles.hero.imageContainer}></div>
+                            }
+                  <input
+                    ref={heroInputRef}
+                    type="file"
+                    id="imageHero"
+                    name="imageHero"
+                    required
+                    onChange={handleHeroChange}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+                { /* Profile photo */}
+                {
+                  ( photoProfile ) ? 
+                  <div className={styles.profilePhoto.principalContainer}>
+                    <div className={clsx({
+                        [ 'cursor-pointer flex h-full w-full' ]: true,
+                        [ styles.edit.hover]: true,
+                        [ styles.status.loading]: loading
+                      })} 
+                      onClick={handleProfileClick}>
+                      <div className={styles.profilePhoto.imageContainer}>
+                        <Image
+                          src={photoProfile}
+                          width={500}
+                          height={500}
+                          alt="Profile"
+                          className={styles.profilePhoto.image}
+                        />
+                        </div>
+                    </div>
+                  </div>
+                  :
+                  <div className="col-span-3 rounded-r-xl cursor-pointer">
+                      <div className='h-full p-1 w-full flex justify-center  items-center	'>
+                        <div className={clsx({
+                          [ styles.edit.hover ]: !loading,
+                          [ 'bg-gray-300 rounded-full size-4/6' ]: true,
+
+                          })} onClick={handleProfileClick}>
+                        </div>
                       </div>
                   </div>
+                }
+                {
+                    <input
+                    ref={profileInputRef}
+                    type="file"
+                    id="imageProfile"
+                    name="imageProfile"
+                    required
+                    onChange={handleProfileChange}
+                    style={{ display: 'none' }}
+                />
+                }
+                </div>
+              </div>
+          </div>
         </div>
       </div>
     );

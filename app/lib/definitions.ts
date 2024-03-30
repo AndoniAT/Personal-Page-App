@@ -15,7 +15,7 @@ export type Section = {
     section_id: string;
     name: string;
     created: Date;
-    visible: boolean;
+    public: boolean;
     type: SectionType;
     style: number;
     backgroundcolor: string;
@@ -32,4 +32,18 @@ export type Media = {
     ishero: boolean
     section_id: number
     project_id: number
+    update: Function|never
+}
+
+export type MediaEditMode = {
+    media_id: string
+    filename: string
+    url: string,
+    downloadurl: string,
+    contenttype: string
+    position: number
+    ishero: boolean
+    section_id: number
+    project_id: number
+    update: Function|never
 }

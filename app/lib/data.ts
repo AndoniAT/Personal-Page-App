@@ -4,6 +4,7 @@ import { deleteImage, uploadImage } from './images';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
+import { requiresSessionUserProperty } from './actions';
 
 export async function getUserByUsername( username: string ) {
   noStore();
@@ -71,9 +72,31 @@ export async function getMediasForSection( section_id: string ) {
   }
 }
 
+export async function getProfilePhotoForUser( username:string ) {
+  noStore();
+
+  try {
+    const medias = await sql`SELECT * FROM MEDIA
+                              WHERE 
+                              media_id IN (SELECT photo_profile_id FROM USERS
+                                          WHERE username = ${username})`;
+
+    if( medias.rows && medias.rows.length > 0 ) {
+      return medias.rows[ 0 ] as Media;
+    } else {
+      return null;
+    }
+
+  } catch ( error:any ) {
+    throw new Error( 'Failed to fetch profile photo for user.' + error?.message );
+  }
+}
+
 export async function putHomeHeroForUser( username: string, formData: FormData ) {
   'use server'
   noStore();
+  await requiresSessionUserProperty( username );
+
   let blob = await uploadImage( formData );
   
   try {
@@ -98,6 +121,8 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
       const formData = new FormData();
       formData.append( 'url', media.url );
       await deleteImage( formData );
+      revalidatePath(`/resumes/${username}/edit/section`);
+      return blob.url;
     } else {
       // Create Hero
       await sql`INSERT INTO MEDIA (
@@ -112,10 +137,69 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
 
         VALUES ( ${blob.pathname}, ${blob.url}, ${blob.downloadUrl}, ${blob.contentType}, 1, TRUE, ${home.section_id}, null )
         ON CONFLICT ( media_id ) DO NOTHING;`
-    }
-    revalidatePath(`/resumes/${username}/`); //  clear the client cache and make a new server request.
+        revalidatePath(`/resumes/${username}/edit/section`);
+        return blob.url;
+      }
   } catch ( error ) {
     console.error( 'Failed set new photo hero home:', error );
     throw new Error( 'Failed set new photo hero home:' );
+  }
+}
+
+export async function putProfilePhotoForUser( username: string, formData: FormData ) {
+  'use server'
+  noStore();    
+
+  let blob = await uploadImage( formData );
+  
+  try {
+    const user = await getUserByUsername( username );
+
+    const medias = await sql`SELECT * FROM MEDIA
+                                WHERE 
+                                media_id = ${user?.photo_profile_id}`;
+
+    if( medias && medias.rows.length > 0 ) {
+      // Update Hero
+      const media = medias.rows[ 0 ] as Media;
+      await sql`UPDATE MEDIA
+                SET 
+                filename = ${blob.pathname},
+                url = ${blob.url},
+                downloadUrl = ${blob.downloadUrl},
+                contentType = ${blob.contentType} 
+                WHERE media_id = ${media.media_id};`;
+      
+      const formData = new FormData();
+      formData.append( 'url', media.url );
+      await deleteImage( formData );
+      revalidatePath(`/resumes/${username}/edit/section`);
+      return blob.url;
+    } else {
+      // Create Profile Image
+      let inserted = await sql`INSERT INTO MEDIA (
+        filename,
+        url,
+        downloadUrl,
+        contentType
+        )
+
+        VALUES ( ${blob.pathname}, ${blob.url}, ${blob.downloadUrl}, ${blob.contentType})
+        RETURNING media_id;`;
+      console.log('inserted', inserted);
+      let photoMedia = inserted.rows[ 0 ] as Media;
+
+      console.log('check after inserted', photoMedia);
+      await sql`UPDATE USERS
+      SET 
+      photo_profile_id = ${photoMedia.media_id}
+      WHERE user_id = ${user.user_id};`
+      revalidatePath(`/resumes/${username}/edit/section`);
+      return blob.url;
+    }
+
+  } catch ( error ) {
+    console.error( 'Failed set new photo profile:', error );
+    throw new Error( 'Failed set new photo profile:' );
   }
 }
