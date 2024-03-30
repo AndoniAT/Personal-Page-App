@@ -52,7 +52,7 @@ export function Style1Wrapper(
       if( user.photo_profile && !photoProfile ) {
         setPhotoProfile( user.photo_profile.url );
       }
-    }, [ photoProfile ]);
+    }, [ photoProfile, user.photo_profile ]);
 
     return (
       <div style={{ backgroundColor: home.backgroundcolor }} className={clsx({
@@ -172,13 +172,13 @@ export function Style1EditView(
       if( user.photo_profile && !photoProfile ) {
         setPhotoProfile( user.photo_profile.url );
       }
-    }, [ photoProfile ]);
+    }, [ photoProfile, user.photo_profile ]);
     
     useEffect(() => {
       if( hero && !heroPhoto ) {
         setHeroPhoto( hero.url );
       }
-    }, [ heroPhoto ]);
+    }, [ heroPhoto, hero ]);
 
     return (
       <div style={{ backgroundColor: home.backgroundcolor }} 
