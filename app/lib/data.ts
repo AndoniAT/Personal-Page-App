@@ -203,3 +203,18 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
     throw new Error( 'Failed set new photo profile:' );
   }
 }
+
+export async function changeBackgroundSection( id:string, color:string, username:string ) {
+  'use server';
+  noStore();
+  await requiresSessionUserProperty( username );
+  console.log('changking value', color);
+  try {
+    await sql`UPDATE SECTION
+              SET backgroundcolor = ${color} WHERE section_id =${id};`;
+    revalidatePath(`/resumes/${username}/edit/section`);
+    return color;
+  } catch( e ) {
+    throw new Error( 'Failed to change the backgorund' );
+  }
+}

@@ -1,4 +1,4 @@
-import SideNav from '@/app/ui/resumes/sidenav';
+import SideNav from '@/app/ui/resumes/navBar/sidenav';
 
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {  
   return (

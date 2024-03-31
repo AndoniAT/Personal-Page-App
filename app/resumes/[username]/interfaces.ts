@@ -2,5 +2,9 @@ export interface SectionsNavBar {
     id: string,
     name: string,
     created: Date,
-    type: string
+    type: string,
+    background: {
+        update?: Function,
+        color: string
+    }
 }

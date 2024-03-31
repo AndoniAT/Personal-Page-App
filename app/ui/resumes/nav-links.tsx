@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
 interface ParamsProps {
-  home:SectionsNavBar|null
+  home  :SectionsNavBar|null
   sections:SectionsNavBar[]|[]
 }
 
