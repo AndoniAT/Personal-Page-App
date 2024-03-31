@@ -11,9 +11,9 @@ import { redirect } from 'next/dist/server/api-utils';
 import EditModeNavBar from './editModeNavBar';
 import { changeBackgroundSection } from '@/app/lib/data';
 
-export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit'|never, currentSection:Section } ) {
+export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit'|never, currentSection:Section|null } ) {
 
-  if( sections.length == 0 || !user ) {
+  if( sections.length == 0 || !user || !currentSection ) {
     return await createSideNav({ home:null, sections:[], user:null, currentSection:null });
   }
 
