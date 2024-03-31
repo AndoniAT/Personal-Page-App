@@ -21,7 +21,7 @@ export default async function SideNav( { sections, user, mode, currentSection } 
   if( !home ) throw new Error('No home page');
 
   // Other sections
-  sections = sections.filter( s => s.type != home.section_id ).filter( s => s.public );
+  sections = sections.filter( s => s.section_id != home.section_id ).filter( s => s.public );
 
   const homeSend = constructSection( home );
   const currentSectionSend = constructSection( currentSection );
