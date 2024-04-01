@@ -7,6 +7,11 @@ export async function goToLogin() {
     redirect('/login');
 }
 
+export async function goToCreateAccount() {
+    'use server'
+    redirect('/createAccount');
+}
+
 export async function goHome() {
     'use server'
     redirect('/', RedirectType.replace );

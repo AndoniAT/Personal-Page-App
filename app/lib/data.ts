@@ -19,6 +19,19 @@ export async function getUserByUsername( username: string ) {
   }
 }
 
+export async function getUserByEmail( email: string ) {
+  noStore();
+  try {
+    const user = await sql`SELECT * FROM USERS WHERE email=${email}`;
+
+    return user.rows[ 0 ] as User;
+
+  } catch ( error ) {
+    console.error( 'Failed to fetch user:', error );
+    throw new Error( 'Failed to fetch user.' );
+  }
+}
+
 export async function getAllUserSections( username: string) {
   noStore();
   try {
