@@ -111,8 +111,6 @@ export function Style1Wrapper(
     );
 }
 
-
-
 export function Style1EditView( 
   {
     data 
@@ -208,7 +206,8 @@ export function Style1EditView(
                                         />
                               </div>
 
-                              : <div className={styles.hero.imageContainer}></div>
+                              : <div className={styles.hero.imageContainer}>
+                              </div>
                             }
                   <input
                     ref={heroInputRef}

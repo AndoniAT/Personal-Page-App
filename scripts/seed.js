@@ -135,10 +135,12 @@ async function createMedia( client ) {
           CREATE TABLE IF NOT EXISTS MEDIA (
             media_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
             filename TEXT NOT NULL,
+            key TEXT NOT NULL,
             url TEXT NOT NULL,
-            downloadUrl TEXT NOT NULL,
             contentType VARCHAR(255) NOT NULL,
-            position INT,
+            size INT NOT NULL,
+
+            position INT NOT NULL,
             isHero BOOLEAN DEFAULT False,
 
             section_id UUID,

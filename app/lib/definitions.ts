@@ -25,11 +25,14 @@ export type Section = {
 export type Media = {
     media_id: string
     filename: string
+    key: string,
     url: string,
-    downloadurl: string,
-    contenttype: string
+    contenttype: string,
+    size:number,
+
     position: number
     ishero: boolean
+
     section_id: string
     project_id?: string
     update: Function|never

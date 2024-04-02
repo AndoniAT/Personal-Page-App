@@ -1,11 +1,10 @@
 import { sql } from '@vercel/postgres';
 import { User, Section, Media } from './definitions';
-import { deleteImage, uploadImage } from './images';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from './actions';
-
+import { utapi } from "@/server/uploadthing";
 export async function getUserByUsername( username: string ) {
   noStore();
   try {
@@ -110,8 +109,10 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
   noStore();
   await requiresSessionUserProperty( username );
 
-  let blob = await uploadImage( formData );
-  
+  const imageFile = formData.get('image') as File;
+  const response = await utapi.uploadFiles([imageFile]);
+  const image = response[ 0 ].data;
+
   try {
     const home = await getHomeUserSection( username );
 
@@ -123,35 +124,39 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
     if( medias && medias.rows.length > 0 ) {
       // Update Hero
       const media = medias.rows[ 0 ] as Media;
+      console.log('chekc image', image);
       await sql`UPDATE MEDIA
                 SET 
-                filename = ${blob.pathname},
-                url = ${blob.url},
-                downloadUrl = ${blob.downloadUrl},
-                contentType = ${blob.contentType} 
+                filename = ${image?.name},
+                key = ${image?.key},
+                url = ${image?.url},
+                size = ${image?.size},
+                contentType = ${image?.type}
                 WHERE media_id = ${media.media_id};`;
       
-      const formData = new FormData();
-      formData.append( 'url', media.url );
-      await deleteImage( formData );
+      await utapi.deleteFiles([media?.key]);
+
       revalidatePath(`/resumes/${username}/edit/section`);
-      return blob.url;
+      return image?.url;
     } else {
       // Create Hero
       await sql`INSERT INTO MEDIA (
         filename,
+        key,
         url,
-        downloadUrl,
+        size,
         contentType,
+
         position,
         isHero,
+
         section_id,
         project_id )
 
-        VALUES ( ${blob.pathname}, ${blob.url}, ${blob.downloadUrl}, ${blob.contentType}, 1, TRUE, ${home.section_id}, null )
+        VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, 1, TRUE, ${home.section_id}, null )
         ON CONFLICT ( media_id ) DO NOTHING;`
         revalidatePath(`/resumes/${username}/edit/section`);
-        return blob.url;
+        return image?.url;
       }
   } catch ( error ) {
     console.error( 'Failed set new photo hero home:', error );
@@ -163,8 +168,11 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
   'use server'
   noStore();    
 
-  let blob = await uploadImage( formData );
-  
+  //let blob = await uploadImage( formData );
+  const imageFile = formData.get('image') as File;
+  const response = await utapi.uploadFiles([imageFile]);
+  const image = response[ 0 ].data;
+
   try {
     const user = await getUserByUsername( username );
 
@@ -177,29 +185,31 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
       const media = medias.rows[ 0 ] as Media;
       await sql`UPDATE MEDIA
                 SET 
-                filename = ${blob.pathname},
-                url = ${blob.url},
-                downloadUrl = ${blob.downloadUrl},
-                contentType = ${blob.contentType} 
+                filename = ${image?.name},
+                key = ${image?.key},
+                url = ${image?.url},
+                size = ${image?.size},
+                contentType = ${image?.type}
                 WHERE media_id = ${media.media_id};`;
-      
-      const formData = new FormData();
-      formData.append( 'url', media.url );
-      await deleteImage( formData );
+
+      await utapi.deleteFiles([media?.key]);
       revalidatePath(`/resumes/${username}/edit/section`);
-      return blob.url;
+      return image?.url;
     } else {
       // Create Profile Image
       let inserted = await sql`INSERT INTO MEDIA (
         filename,
+        key,
         url,
-        downloadUrl,
-        contentType
+        size,
+        contentType,
+
+        position
         )
 
-        VALUES ( ${blob.pathname}, ${blob.url}, ${blob.downloadUrl}, ${blob.contentType})
+        VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, 0)
         RETURNING media_id;`;
-      console.log('inserted', inserted);
+
       let photoMedia = inserted.rows[ 0 ] as Media;
 
       console.log('check after inserted', photoMedia);
@@ -208,7 +218,7 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
       photo_profile_id = ${photoMedia.media_id}
       WHERE user_id = ${user.user_id};`
       revalidatePath(`/resumes/${username}/edit/section`);
-      return blob.url;
+      return image?.url;
     }
 
   } catch ( error ) {
@@ -221,7 +231,7 @@ export async function changeBackgroundSection( id:string, color:string, username
   'use server';
   noStore();
   await requiresSessionUserProperty( username );
-  console.log('changking value', color);
+
   try {
     await sql`UPDATE SECTION
               SET backgroundcolor = ${color} WHERE section_id =${id};`;

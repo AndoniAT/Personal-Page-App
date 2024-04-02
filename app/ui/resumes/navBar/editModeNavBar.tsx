@@ -42,7 +42,7 @@ export default function EditModeNavBar(  {
             </span>
           </div>
         </Link>
-        <div className='h-80 w-full text-black mt-5 pt-1 border-t border-t-gray-300 '>
+        <div className=' w-full text-black mt-5 pt-1 border-t border-t-gray-300 '>
           <div className='w-full flex'>
             <span>Background</span>
             <div
