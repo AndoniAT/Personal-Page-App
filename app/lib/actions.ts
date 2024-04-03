@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { notFound, redirect, RedirectType } from 'next/navigation'
-import { getUserByUsername } from './data';
+import { getUserByEmail, getUserByUsername } from './data';
 
 export async function goToLogin() {
     'use server'
@@ -10,6 +10,15 @@ export async function goToLogin() {
 export async function goToCreateAccount() {
     'use server'
     redirect('/createAccount');
+}
+
+export async function goToMyresume() {
+    'use server'
+    let session = await requiresLogin();
+    if( session?.user?.email ) {
+        let { username } = await getUserByEmail( session.user?.email);
+        redirect(`/resumes/${username}`);
+    }
 }
 
 export async function goHome() {

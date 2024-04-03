@@ -6,7 +6,7 @@ import { Section, User } from '../../../lib/definitions';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon, UserCircleIcon, PencilSquareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
-import { goToCreateAccount, goToLogin } from '@/app/lib/actions';
+import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import { redirect } from 'next/dist/server/api-utils';
 import EditModeNavBar from './editModeNavBar';
 import { changeBackgroundSection } from '@/app/lib/data';
@@ -94,32 +94,40 @@ async function createSideNav( paramsSend : {
         <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block"></div>
         {
           session?.user ? (
-                <form
-              action={async () => {
-                'use server';
-                await signOut();
-              }}
-            >
-              <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-sky-200 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-                <PowerIcon className="w-6" />
-                <div className="text-blue-600 text-sm font-medium">Sign Out</div>
-              </button>
-            </form>
+                <div className='grid grid-cols-2'>
+                    <form
+                      action={async () => {
+                        'use server';
+                        await signOut();
+                      }}
+                    >
+                      <button className="sessionIconsNavBar">
+                        <PowerIcon className="w-6" />
+                        <div className="text-blue-600 text-sm font-medium">Sign Out</div>
+                      </button>
+                  </form>
+                  <form action={goToMyresume}>
+                    <button className="sessionIconsNavBar">
+                      <UserCircleIcon className="w-6" />
+                      <div className="text-blue-600 text-sm font-medium">My resume</div>
+                    </button>
+                  </form>
+                </div>
           ) : 
           (
             <div className='grid grid-cols-2'>
               <form action={goToLogin}>
-                <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-sky-200 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
+                <button className="sessionIconsNavBar">
                   <PowerIcon className="w-6" />
                   <div className="text-blue-600 text-sm font-medium">Login</div>
                 </button>
               </form>
               <form action={goToCreateAccount}>
-              <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md p-3 text-sm font-mediu hover:bg-sky-200 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
-                <UserCircleIcon className="w-6" />
-                <div className="text-blue-600 text-sm font-medium">Create an account</div>
-              </button>
-            </form>
+                <button className="sessionIconsNavBar">
+                  <UserCircleIcon className="w-6" />
+                  <div className="text-blue-600 text-sm font-medium">Create an account</div>
+                </button>
+              </form>
             </div>
           )
         }
