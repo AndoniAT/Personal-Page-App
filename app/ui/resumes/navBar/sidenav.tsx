@@ -91,7 +91,7 @@ async function createSideNav( paramsSend : {
            <></>
         }
 
-        <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block"></div>
+        <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
         {
           session?.user ? (
                 <div className='grid grid-cols-2'>

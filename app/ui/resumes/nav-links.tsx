@@ -81,7 +81,9 @@ function makeLink( link:LinkParam ) {
         'flex h-[48px] grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium',
         'bg-gray-50 bg-sky-100 text-blue-600',
         'hover:bg-sky-100 hover:text-blue-600',
-        'md:flex-none md:justify-start md:p-2 md:px-3'
+        'md:flex-none md:justify-start md:p-2 md:px-3',
+        'border-solid border-2 border-slate-400',
+        'transition ease-in-out delay-75 bg-blue-500 hover:-translate-y-1 hover:scale-105 hover:bg-blue-200 duration-300 '
       )}
     >
       <LinkIcon className="w-6" />

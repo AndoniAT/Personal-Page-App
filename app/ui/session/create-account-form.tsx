@@ -19,7 +19,7 @@ export default function CreateAccountForm() {
 
   return (
     <form action={dispatch} className="space-y-3">
-      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
+      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8 border-solid border-2 border-slate-400 from-current">
         <div className="w-full">
           <div className='grid grid-rows-1 grid-cols-2 gap-3'>
             <div className='firstname'>
