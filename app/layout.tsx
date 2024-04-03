@@ -15,11 +15,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body className={clsx({
-        [ inter.className ] :true,
-        [ 'bg-slate-200' ]: true
+        [ inter.className ] :true
       })}>{children}</body>
     </html>
   );
