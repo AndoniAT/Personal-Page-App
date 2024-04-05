@@ -30,3 +30,22 @@ export interface SectionsClient {
     backgroundimage: string,
     medias: MediaClient[]
 }
+
+export interface Block {
+    id:number,
+    numLines:number,
+    numCols:number,
+    defClassName:string,
+    customClassName: string,
+    elements:ElementBlock[]
+}
+
+export interface ElementBlock {
+    id: number,
+    lineFrom: number,
+    lineTo: number,
+    colFrom: number,
+    colTo: number,
+    defClassName: string,
+    customClassName: string
+}
