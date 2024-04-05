@@ -18,6 +18,8 @@ async function dropTables( client ) {
         await client.sql`DROP TABLE IF EXISTS MEDIA CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS SOCIAL_MEDIA CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS SOCIAL_MEDIA_USER CASCADE;`;
+        await client.sql`DROP TABLE IF EXISTS BLOCK CASCADE;`;
+        await client.sql`DROP TABLE IF EXISTS ELEMENT CASCADE;`;
         console.log( 'Tables deleted' );
 
     } catch ( error ) {
@@ -103,7 +105,6 @@ async function createProject( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-        // Create the "USERS" table if it doesn't exist
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS PROJECT (
             project_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -160,7 +161,6 @@ async function createSocialMedia( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-        // Create the "USERS" table if it doesn't exist
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS SOCIAL_MEDIA (
             social_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -181,7 +181,6 @@ async function createSocialMediaUser( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
 
-        // Create the "USERS" table if it doesn't exist
         const createTable = await client.sql`
           CREATE TABLE IF NOT EXISTS SOCIAL_MEDIA_USER (
             user_id UUID,
@@ -193,7 +192,7 @@ async function createSocialMediaUser( client ) {
           );
         `;
     
-        console.log(`Created "SOCIAL_MEDIA" table`);
+        console.log(`Created "SOCIAL_MEDIA USER" table`);
     
         return createTable
 
@@ -201,6 +200,65 @@ async function createSocialMediaUser( client ) {
         console.error( 'Error creating social medias:', error );
         throw error;
       }
+}
+
+async function createBlock( client ) {
+  try {
+      await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+      
+      // Create the "USERS" table if it doesn't exist
+      const createTable = await client.sql`
+        CREATE TABLE IF NOT EXISTS BLOCK (
+          block_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+          numlines INT DEFAULT 12,
+          numcols INT DEFAULT 12,
+          defclassName TEXT NOT NULL,
+          customclassname TEXT,
+
+          section_id UUID NOT NULL
+        );
+      `;
+      console.log( `Created "BLOCK" table` );
+      return createTable;
+
+    } catch ( error ) {
+      console.error( 'Error creating block:', error );
+      throw error;
+    }
+}
+
+async function createElement( client ) {
+  try {
+      await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+      
+      // Create the "USERS" table if it doesn't exist
+      await client.sql`DROP TYPE type_element;`;
+      await client.sql`CREATE TYPE type_element AS ENUM ('text', 'media', 'youtube');`
+
+      const createTable = await client.sql`
+        CREATE TABLE IF NOT EXISTS ELEMENT (
+          element_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+          linefrom INT NOT NULL,
+          lineto INT NOT NULL,
+          colfrom INT NOT NULL,
+          colto INT NOT NULL,
+          defclassname TEXT NOT NULL,
+          customclassname TEXT,
+          content TEXT,
+          type type_element,
+          place INT,
+
+          block_id UUID NOT NULL,
+          media_id UUID
+        );
+      `;
+      console.log( `Created "ELEMENT" table` );
+      return createTable;
+
+    } catch ( error ) {
+      console.error( 'Error creating element:', error );
+      throw error;
+    }
 }
 
 async function seedTables( client ) {
@@ -224,6 +282,10 @@ async function createTables( client ) {
   await createMedia( client );
   await createSocialMedia( client );
   await createSocialMediaUser( client );
+
+  await createBlock( client );
+  await createElement( client );
+
   return;
 }
 
@@ -249,6 +311,10 @@ async function createForeignKeys( client ) {
   
     await client.sql`ALTER TABLE SOCIAL_MEDIA_USER
       ADD CONSTRAINT fk_socialmedia_user FOREIGN KEY (social_id) REFERENCES SOCIAL_MEDIA(social_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+    
+    await client.sql`ALTER TABLE BLOCK
+      ADD CONSTRAINT fk_block_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+
   } catch( e ) {
     console.log('Error generating foreign keys', e);
     throw new Error( e );
@@ -289,7 +355,7 @@ async function seedUsers( client ) {
           ON CONFLICT ( user_id ) DO NOTHING
           RETURNING user_id;
         `;
-            console.log('inserted users', users);
+          console.log('inserted users', users);
           return users;
         } ),
       );

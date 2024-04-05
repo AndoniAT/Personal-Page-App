@@ -4,7 +4,10 @@ import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
-import { MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
+import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
+import { revalidatePath } from 'next/cache';
+import { createNewBlock, getBlocksSection } from '@/app/lib/section/actions';
+import { Block } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
   title: 'Edit User\'s Section',
@@ -25,8 +28,8 @@ export default async function Page(
 
     const home = await getHomeUserSection( username );
     const medias = await getMediasForSection( home.section_id ) as MediaClient[];
+    const blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
 
-    
     let heroInMedia = medias.find( m => m.ishero );
     
     if( heroInMedia ) {
@@ -44,6 +47,16 @@ export default async function Page(
       photo_profile = { update: putProfilePhotoForUser  } as MediaClient;
     }
 
+    const createBlockBind = async () => {
+      'use server'
+      try {
+        await createNewBlock.call( { section_id: home.section_id, username: user.username } );
+        revalidatePath(`/resumes/${user.username}/edit/section`);
+      } catch( err ) {
+        console.log( 'err', err );
+      }
+    }
+
     const sendData = {
       user: {
         username: user.username,
@@ -59,7 +72,11 @@ export default async function Page(
         type: home.type,
         backgroundcolor: home.backgroundcolor,
         backgroundimage: home.backgroundimage,
-        medias: medias
+        medias: medias,
+        blocks: blocks,
+        actions: {
+          addBlock: createBlockBind
+        }
       }
     }
 

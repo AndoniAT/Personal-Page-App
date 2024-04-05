@@ -29,23 +29,28 @@ export interface SectionsClient {
     backgroundcolor: string,
     backgroundimage: string,
     medias: MediaClient[]
+    blocks: BlockClient[]|[]
+    actions?: {
+        addBlock: Function
+    }
 }
 
-export interface Block {
-    id:number,
-    numLines:number,
-    numCols:number,
-    defClassName:string,
-    customClassName: string,
-    elements:ElementBlock[]
+export interface BlockClient {
+    block_id:string,
+    numlines:number,
+    numcols:number,
+    defclassname:string,
+    customclassname: string|null,
+    section_id:string,
+    elements:ElementBlockClient[]|[]
 }
 
-export interface ElementBlock {
-    id: number,
-    lineFrom: number,
-    lineTo: number,
-    colFrom: number,
-    colTo: number,
-    defClassName: string,
-    customClassName: string
+export interface ElementBlockClient {
+    element_id: string,
+    linefrom: number,
+    lineto: number,
+    colfrom: number,
+    colto: number,
+    defclassname: string,
+    customclassname: string
 }

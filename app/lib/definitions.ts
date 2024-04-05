@@ -50,3 +50,27 @@ export type MediaEditMode = {
     project_id: number
     update: Function|never
 }
+
+export interface Block {
+    block_id:number,
+    numlines:number,
+    numcols:number,
+    defclassName:string,
+    customclassname: string,
+    section_id: string,
+    place:number,
+    elements?:Element[]
+}
+
+export interface ElementBlock {
+    element_id: string,
+    linefrom: number,
+    lineto: number,
+    colfrom: number,
+    colto: number,
+    defclassname: string,
+    customclassname: string,
+    content:string
+    type:'text'|'media'|'youtube',
+    block_id:string
+}

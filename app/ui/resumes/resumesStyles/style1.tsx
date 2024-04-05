@@ -1,10 +1,11 @@
 'use client'
-import { UserClient, SectionsClient, Block } from './interfaces'
+import { UserClient, SectionsClient, BlockClient, ElementBlockClient } from './interfaces'
 import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation'
 import Image from 'next/image';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
+import { BuildBlocks } from '../custom/blocks';
 
 const styles = {
   hero: {
@@ -129,11 +130,11 @@ export function Style1EditView(
   const [photoProfile, setPhotoProfile] = useState<string>('');
   const [heroPhoto, setHeroPhoto] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [blockPrepared, setblockPrepared] = useState<any[]>([]);
 
   const user = data.user;
   const home = data.section;
   const hero = home.medias.find(m => m.ishero);
+  let blocks = home.blocks as BlockClient[];
 
   const handleHeroClick = () => {
     if (heroInputRef.current) {
@@ -181,15 +182,16 @@ export function Style1EditView(
     }
   }, [heroPhoto, hero]);
 
-  let block = {
-    id: 1,
+  /*let block = {
+    block_id: '1',
     numLines: 12,
-    numCols: 12,
+    numcols: 12,
     defClassName: 'w-full min-h-80 h-fit grid grid-rows-12 grid-cols-12',
     customClassName: '',
+    section_id:'',
     elements: [
       {
-        id:3,
+        element_id:'3',
         lineFrom: 1,
         lineTo:1,
         colFrom:6,
@@ -198,7 +200,7 @@ export function Style1EditView(
         customClassName: 'bg-slate-200 border-solid border-2 border-sky-500'
       },
       {
-        id:4,
+        element_id:'4',
         lineFrom: 2,
         lineTo:2,
         colFrom:2,
@@ -207,7 +209,7 @@ export function Style1EditView(
         customClassName: 'bg-slate-200 border-solid border-2 border-sky-500'
       },
       {
-        id:5,
+        element_id:'5',
         lineFrom: 1,
         lineTo:12,
         colFrom:1,
@@ -216,24 +218,19 @@ export function Style1EditView(
         customClassName: 'bg-slate-200 border-solid border-2 border-sky-500 bg-red-200'
       }
     ]
-  } as Block;
+  } as BlockClient;*/
 
-  let blocks = [block];
-  /*let blockPrepared = buildBlocks(blocks);*/
-  
-  
-  useEffect( () => {
-    let blockPrepared_ = buildBlocksPage( blocks );
-    setTimeout( () => {
-      setblockPrepared( blockPrepared_ );
-    }, 1000);
-  }, []);
+  let handlerCreateSection = async () => {
+    home?.actions?.addBlock();
+  }
 
   return (
     <div style={{ backgroundColor: home.backgroundcolor }}
       className={clsx({
-        ['w-full h-screen']: true,
-        [styles.status.loading]: loading
+        ['w-full min-h-screen']: true,
+        [styles.status.loading]: loading,
+        /*['min-h-screen']: true,*/
+        ['h-fit pb-10']: true,
       })} id='resumePageStyle1'>
       <div>
         <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
@@ -319,7 +316,7 @@ export function Style1EditView(
         </div>
             <div className='p-5'>
               {
-                  blockPrepared
+                  <BuildBlocks blocks={blocks}/>
               }
             </div>
         {
@@ -329,121 +326,9 @@ export function Style1EditView(
       </div>
       <div className='grid grid-cols-12 grid-rows-1 h-20'>
         <div className='col-start-6 col-span-2 text-center flex justify-center'>
-          <PlusCircleIcon className='h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5'></PlusCircleIcon>
+          <PlusCircleIcon onClick={handlerCreateSection} className='h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5'></PlusCircleIcon>
         </div>
       </div>
     </div>
   );
-}
-
-function getOcupedCases(elements: any[]) {
-  let ocupedCases: any[] = [];
-  elements.forEach(el => {
-    let ys: number[] = [];
-
-    let fromLine = el.lineFrom;
-    let toLine = el.lineTo;
-
-    for (let i = fromLine; i <= toLine; i++) {
-      ys.push(i);
-    }
-
-    let xs: number[] = [];
-
-    let fromCol = el.colFrom;
-    let toCol = el.colTo;
-
-    for (let i = fromCol; i <= toCol; i++) {
-      xs.push(i);
-    }
-
-    // Cases
-    ys.forEach(y => {
-      xs.forEach(x => {
-        ocupedCases.push({
-          y: y,
-          x: x
-        })
-      })
-    });
-
-  });
-  return ocupedCases;
-}
-
-
-/**
- * Construct customed blocks to show in the  page
- * @param blocks 
- * @returns 
- */
-function buildBlocksPage( blocks:Block[] ) {
-  return blocks.map( ( block:Block ) => {
-    let totLines = block.numLines;
-    let totCols = block.numCols;
-
-    let elementsList:any = [];
-    elementsList.length = totLines * totCols;
-
-    let blockElements = block.elements;
-
-    // Set blocks in their position in array
-    blockElements.forEach( b => {
-      let lineFrom = b.lineFrom;
-      let colFrom = b.colFrom;
-
-      let elementSet = false;
-
-      // - 1 because of the index in array
-      for(let line = lineFrom; line <= b.lineTo; line++ ) {
-        for(let col = colFrom; col <= b.colTo; col++ ) {
-          let idxLine = line - 1;
-          let idxCol = col-1;
-          let setInLine = ( totCols * idxLine );
-          let setPosition = setInLine + idxCol;
-
-          if( !elementSet ) {
-            // If the element has not been set, save it in its first position
-            let spanRow = b.lineTo - b.lineFrom + 1;
-            let spanCol = b.colTo - b.colFrom + 1;
-            elementsList[ setPosition ] = <div style={{
-              gridRow: `span ${spanRow} / span ${spanRow}`,
-              gridColumn: `span ${spanCol} / span ${spanCol}`
-            }} className={`${b.defClassName} ${b.customClassName}`}/>,
-
-            elementSet = true;
-          } else {
-            // If the element has already been set, mark this case as ocuped
-            elementsList[ setPosition ] = 1;
-          }
-        }
-      }
-    } );
-
-    // Set edtiable elements with 1 col and 1 row in no ocuped positions
-    for (let index = 0; index < elementsList.length; index++) {
-      if( elementsList[index] == undefined ) {
-        elementsList[index] = <div className="col-span-1 h-full bg-slate-200 border-solid border-2 rounded border-slate-700 hover:scale-105"/>
-      }
-      
-    }
-    
-    /// Filter ocuped positions by one
-    elementsList = elementsList.filter( ( e:any ) => e != 1 );
-    
-    return ( 
-        <div key={`blk1`} className={clsx({
-        "w-full min-h-80 h-fit grid": true,
-        [`grid-rows-${totLines}`]: true,
-        [`grid-cols-${totCols}`]: true
-      })
-      }
-      >
-        {
-          elementsList
-        }
-
-      </div>
-    )
-  } );
 }

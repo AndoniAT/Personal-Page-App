@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import { Style1Wrapper } from '@/app/ui/resumes/resumesStyles/style1';
+import { getBlocksSection } from '@/app/lib/section/actions';
+import { BlockClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 
 export const metadata: Metadata = {
   title: 'Resume User',
@@ -29,6 +31,7 @@ export default async function Page(
     const home = await getHomeUserSection( username );
     const medias = await getMediasForSection( home.section_id );
     let photo_profile = await getProfilePhotoForUser( user.username );
+    const blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
 
     const sendData = {
       user: {
@@ -45,7 +48,8 @@ export default async function Page(
         type: home.type,
         backgroundcolor: home.backgroundcolor,
         backgroundimage: home.backgroundimage,
-        medias: medias
+        medias: medias,
+        blocks: blocks,
       }
     }
 

@@ -1,10 +1,12 @@
 import { sql } from '@vercel/postgres';
 import { User, Section, Media } from './definitions';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from './actions';
 import { utapi } from "@/server/uploadthing";
+import { getSectionByIdForUser } from './user/actions';
+
 export async function getUserByUsername( username: string ) {
   noStore();
   try {
@@ -124,7 +126,7 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
     if( medias && medias.rows.length > 0 ) {
       // Update Hero
       const media = medias.rows[ 0 ] as Media;
-      console.log('chekc image', image);
+
       await sql`UPDATE MEDIA
                 SET 
                 filename = ${image?.name},
