@@ -24,7 +24,7 @@ const STEPS = {
 export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
     return (<>
       {
-        blocks.map( ( block:BlockClient ) => <Block block={block} /> )
+        blocks.map( ( block:BlockClient ) => <Block key={block.block_id} block={block} /> )
       }
     </>)
   }
@@ -249,7 +249,7 @@ export function EmptyElement({
     } else {
       setColor('bg-slate-200')
     }
-  }, [ color, fusionBlocks ])
+  }, [ color, fusionBlocks, position ])
   
 
 
