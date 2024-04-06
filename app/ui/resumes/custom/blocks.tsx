@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../resumesStyles/interfaces";
 import clsx from "clsx";
-import { AcceptFussion, ChooseTypeFusion, TextElementType } from "./modals";
+import { AcceptFussion, ChooseTypeFusion, ErrorModal, TextElementType } from "./modals";
 import { FusionElementsBlock, Positions } from "@/app/lib/definitions";
 
 const STEPS = {
@@ -98,14 +98,21 @@ export function Block({
   const [fusionElements, setFusionElements] = useState<FusionElementsBlock>({from:null, to:null})
   const [typeSelected, setTypeSelected] = useState<string>('')
   const [step, setStep] = useState<number>(STEPS.NONE);
+  const [error, setError] = useState<string>('');
 
   let totLines = block.numlines;
   let totCols = block.numcols;
 
   let elements = block.elements ?? [];
 
+  let finishProcess = () => {
+    let newFussion = { from:null,  to:null } as FusionElementsBlock;
+    setFusionElements( newFussion );
+    setStep( STEPS.NONE );
+  }
+
   let handlerFusion = ( element:Positions ) => {
-    let newFussion = { from:null, to:null } as fusionBlocks;
+    let newFussion = { from:null, to:null } as FusionElementsBlock;
 
     if( !fusionElements.from ) {
       newFussion = {
@@ -139,12 +146,6 @@ export function Block({
     setStep( STEPS.ASK_ELEM_TYPE );
   };
 
-  let cancelFusion = () => {
-    let newFussion = { from:null, to:null};
-    setFusionElements( newFussion );
-    setStep( STEPS.NONE );
-  };
-
   let chooseElementType = ( type:string ) => {
     switch( type ) {
       case 'text':
@@ -164,9 +165,7 @@ export function Block({
         setStep( STEPS.SET_ELEM_VALUE );
         break;
       default:
-        let newFussion = { from:null,  to:null } as FusionElementsBlock;
-        setFusionElements( newFussion );
-        setStep( STEPS.NONE );
+        finishProcess();
         break;
     }
   }
@@ -178,10 +177,14 @@ export function Block({
     const formData = new FormData( event.currentTarget )
     if( block.actions?.addElement ) {
       formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );
-      let newBloc = await block.actions.addElement( 'text', formData );
-      let newFussion = { from:null,  to:null } as FusionElementsBlock;
-      setFusionElements( newFussion );
-      setStep( STEPS.NONE );
+      try {
+        await block.actions.addElement( 'text', formData );
+        finishProcess();
+      } catch( e:any ) {
+        console.log('Error :', e?.message);
+        setError( e?.message );
+        finishProcess();
+      }
     }
   }
 
@@ -201,7 +204,7 @@ export function Block({
     </div>
     {
       ( step == STEPS.ASK_FUSION ) ?
-        <AcceptFussion acceptFusion={acceptFusion} cancelFusion={cancelFusion}/>
+        <AcceptFussion acceptFusion={acceptFusion} cancelFusion={finishProcess}/>
       : <></>
     }
     {
@@ -215,6 +218,12 @@ export function Block({
     <TextElementType handler={SubmitCreateTextElementBlock}></TextElementType>
       : 
     <></>
+    }
+    {
+      ( error.length > 0 ) ?
+      <ErrorModal message={error} accept={() => { setError('') } }/>
+      :
+      <></>
     }
     </>
   )

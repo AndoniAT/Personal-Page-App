@@ -1,7 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
-import { Block, FusionElementsBlock, Section } from '../definitions';
+import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
 
 export async function createNewBlock(this:{ section_id:string, username:string}) {
@@ -39,9 +39,6 @@ export async function createElementTextBlock(this:{ section_id:string, username:
     let content = form.get('content') as string;
     let size = form.get('size') as string;
     let fusionBlocks = JSON.parse( form.get('fusionBlocks') as string ) as FusionElementsBlock;
-    console.log('content', content);
-    console.log('size', size);
-    console.log('fusionBlocks', fusionBlocks);
     
     try {
       await requiresSessionUserProperty( username );
@@ -64,6 +61,26 @@ export async function createElementTextBlock(this:{ section_id:string, username:
         colto: Math.max( fusionBlocks.from.col, fusionBlocks.to.col )
       }
 
+      let newPositionsToOcupe = getOcupedPositions( positions );
+      
+
+      // GET ELEMENTS FOR BLOCK
+      let res = await sql`SELECT * FROM ELEMENT WHERE block_id=${block_id}`;
+      
+      if( res.rowCount > 0 ) {
+        let elements = res.rows as ElementBlock[];
+        let currentOcupedPositions:{line:number, col:number}[] = [];
+        
+        elements.forEach( el => {
+          currentOcupedPositions = [ ...currentOcupedPositions, ...getOcupedPositions( el ) ];
+        } );
+        
+        let Collision = !checkNoCollisionOfElements( newPositionsToOcupe, currentOcupedPositions );
+        if( Collision ) {
+          throw new Error( 'Collision of blocks' );
+        }
+
+      }
       const defClassName = 'h-full';
       const css = `font-size: ${size}rem;`
 
@@ -113,4 +130,37 @@ export async function getBlocksSection( section_id:string ) {
     } catch( error:any ) {
         throw new Error( 'Failed to find a blocks for section: ' + error?.message );
       }
+}
+
+/**
+ * 
+ */
+function getOcupedPositions( positions:{linefrom:number, lineto:number, colfrom:number, colto:number} ) {
+  let newPositionsToOcupe:{line:number, col:number}[] = [];
+  for (let line = positions.linefrom; line <= positions.lineto; line++) {
+    for (let col = positions.colfrom; col <= positions.colto; col++) {
+      let pos = { line: line, col: col};
+      newPositionsToOcupe.push( pos );
+    }
+  }
+  return newPositionsToOcupe;
+}
+
+/**
+ * Detect a collition between two elements and avoid to create the block
+ * @param element1
+ * @param element2
+ * @returns 
+ */
+function checkNoCollisionOfElements( element1:{line:number, col:number}[], element2:{line:number, col:number}[]) {
+  let accept = true;
+  for (let i = 0; i < element2.length; i++) {
+    let pos = element2[ i ];
+    let collition = element1.some( e => e.line == pos.line && e.col == pos.col );
+    if( collition ) {
+      accept = false;
+      break;
+    }
+  }
+  return accept;
 }

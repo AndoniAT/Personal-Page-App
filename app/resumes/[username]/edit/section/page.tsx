@@ -57,36 +57,38 @@ export default async function Page(
       }
     }
 
-    const createElementInBlock = async ( type:string, block_id:string, form:FormData ) => {
-      
-    }
-
     // Create function actions for each block (adding or edit an element)
     blocks = blocks.map( block => {
       const createElement = async ( type:string , form:FormData ) => {
         'use server'
-        let fn = null;
-        switch( type ) {
-          case 'text':
-            fn = createElementTextBlock;
-            break;
-          case 'media':
-            break;
-          case 'linkvideo':
-            break;
-          case 'html':
-            break;
-        }
-
-        if ( fn ) {
-          try {
-            await fn.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, form: form } );
-            revalidatePath(`/resumes/${user.username}/edit/section`);
-          } catch( err ) {
-            console.log( 'err', err );
+        return new Promise( (resolve, reject) => {
+          let fn = null;
+          switch( type ) {
+            case 'text':
+              fn = createElementTextBlock;
+              break;
+            case 'media':
+              break;
+            case 'linkvideo':
+              break;
+            case 'html':
+              break;
+          }
+  
+          if ( fn ) {
+            fn.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, form: form } )
+            .then( () => {
+              resolve(true);
+              revalidatePath(`/resumes/${user.username}/edit/section`);
+            })
+            .catch( err => {
+              reject( err );
+            });
+          } else {
+            reject( 'No function' );
           }
 
-        }
+        })
       }
       block.actions = {
         addElement: createElement
