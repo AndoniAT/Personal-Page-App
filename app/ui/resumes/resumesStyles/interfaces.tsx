@@ -41,8 +41,12 @@ export interface BlockClient {
     numcols:number,
     defclassname:string,
     customclassname: string|null,
+    css: string|null,
     section_id:string,
     elements:ElementBlockClient[]|[]
+    actions?: {
+        addElement: Function
+    }
 }
 
 export interface ElementBlockClient {
@@ -52,5 +56,9 @@ export interface ElementBlockClient {
     colfrom: number,
     colto: number,
     defclassname: string,
-    customclassname: string
+    customclassname: string|null,
+    css: string|null,
+    content:string,
+    type:'text'|'media'|'linkvideo'|'html',
+    block_id:string
 }

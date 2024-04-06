@@ -6,7 +6,7 @@ import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 import { revalidatePath } from 'next/cache';
-import { createNewBlock, getBlocksSection } from '@/app/lib/section/actions';
+import { createElementTextBlock, createNewBlock, getBlocksSection } from '@/app/lib/section/actions';
 import { Block } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default async function Page(
 
     const home = await getHomeUserSection( username );
     const medias = await getMediasForSection( home.section_id ) as MediaClient[];
-    const blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
+    let blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
 
     let heroInMedia = medias.find( m => m.ishero );
     
@@ -56,6 +56,43 @@ export default async function Page(
         console.log( 'err', err );
       }
     }
+
+    const createElementInBlock = async ( type:string, block_id:string, form:FormData ) => {
+      
+    }
+
+    // Create function actions for each block (adding or edit an element)
+    blocks = blocks.map( block => {
+      const createElement = async ( type:string , form:FormData ) => {
+        'use server'
+        let fn = null;
+        switch( type ) {
+          case 'text':
+            fn = createElementTextBlock;
+            break;
+          case 'media':
+            break;
+          case 'linkvideo':
+            break;
+          case 'html':
+            break;
+        }
+
+        if ( fn ) {
+          try {
+            await fn.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, form: form } );
+            revalidatePath(`/resumes/${user.username}/edit/section`);
+          } catch( err ) {
+            console.log( 'err', err );
+          }
+
+        }
+      }
+      block.actions = {
+        addElement: createElement
+      }
+      return block;
+    })
 
     const sendData = {
       user: {

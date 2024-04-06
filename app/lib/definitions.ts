@@ -56,7 +56,8 @@ export interface Block {
     numlines:number,
     numcols:number,
     defclassName:string,
-    customclassname: string,
+    customclassname: string|null,
+    css: string|null,
     section_id: string,
     place:number,
     elements?:Element[]
@@ -69,8 +70,20 @@ export interface ElementBlock {
     colfrom: number,
     colto: number,
     defclassname: string,
-    customclassname: string,
+    customclassname: string|null,
+    css: string|null,
     content:string
-    type:'text'|'media'|'youtube',
+    type:'text'|'media'|'linkvideo'|'html',
     block_id:string
 }
+
+export interface Positions {
+    line:number,
+    col:number,
+    indexArr:number
+  }
+  
+export interface FusionBlocks {
+    from:Positions|null, 
+    to:Positions|null
+  }

@@ -214,6 +214,7 @@ async function createBlock( client ) {
           numcols INT DEFAULT 12,
           defclassName TEXT NOT NULL,
           customclassname TEXT,
+          css TEXT,
 
           section_id UUID NOT NULL
         );
@@ -233,7 +234,7 @@ async function createElement( client ) {
       
       // Create the "USERS" table if it doesn't exist
       await client.sql`DROP TYPE type_element;`;
-      await client.sql`CREATE TYPE type_element AS ENUM ('text', 'media', 'youtube');`
+      await client.sql`CREATE TYPE type_element AS ENUM ('text', 'media', 'linkvideo', 'html');`
 
       const createTable = await client.sql`
         CREATE TABLE IF NOT EXISTS ELEMENT (
@@ -244,9 +245,9 @@ async function createElement( client ) {
           colto INT NOT NULL,
           defclassname TEXT NOT NULL,
           customclassname TEXT,
+          css TEXT,
           content TEXT,
           type type_element,
-          place INT,
 
           block_id UUID NOT NULL,
           media_id UUID
