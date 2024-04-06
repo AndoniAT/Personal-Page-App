@@ -1,7 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
-import { Block, FusionBlocks, Section } from '../definitions';
+import { Block, FusionElementsBlock, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
 
 export async function createNewBlock(this:{ section_id:string, username:string}) {
@@ -38,7 +38,7 @@ export async function createElementTextBlock(this:{ section_id:string, username:
     let { section_id, username, block_id, form } = this;
     let content = form.get('content') as string;
     let size = form.get('size') as string;
-    let fusionBlocks = JSON.parse( form.get('fusionBlocks') as string ) as FusionBlocks;
+    let fusionBlocks = JSON.parse( form.get('fusionBlocks') as string ) as FusionElementsBlock;
     console.log('content', content);
     console.log('size', size);
     console.log('fusionBlocks', fusionBlocks);

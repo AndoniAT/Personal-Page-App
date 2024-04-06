@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../resumesStyles/interfaces";
 import clsx from "clsx";
 import { AcceptFussion, ChooseTypeFusion, TextElementType } from "./modals";
-import { FusionBlocks, Positions } from "@/app/lib/definitions";
+import { FusionElementsBlock, Positions } from "@/app/lib/definitions";
 
 const STEPS = {
   NONE: 0,
@@ -21,138 +21,10 @@ const STEPS = {
  * @param blocks 
  * @returns 
  */
-export function BuildBlocks( { blocks }:{ blocks:BlockClient[] } ) {
-    const [fusionBlocks, setFusionBlocks] = useState<FusionBlocks>({from:null, to:null})
-    const [typeSelected, setTypeSelected] = useState<string>('')
-    const [step, setStep] = useState<number>(STEPS.NONE);
-
-    let blocksElements =  blocks.map( ( block:BlockClient ) => {
-      let totLines = block.numlines;
-      let totCols = block.numcols;
-
-      let elements = block.elements ?? [];
-
-      let handlerFusion = ( element:Positions ) => {
-        let newFussion = { from:null, to:null } as fusionBlocks;
-
-        if( !fusionBlocks.from ) {
-          newFussion = {
-            from: {
-              line: element.line,
-              col: element.col,
-              indexArr: element.indexArr
-            },
-            to: fusionBlocks.to
-          }
-        } else if( fusionBlocks.from.col == element.col && fusionBlocks.from.line == element.line ) {
-          // Doing nothing (null values)
-        } else {
-          newFussion = {
-            from: fusionBlocks.from,
-            to: {
-              line: element.line,
-              col: element.col,
-              indexArr: element.indexArr
-            }
-          }
-        }
-        setFusionBlocks( newFussion );
-
-        if( newFussion.from && newFussion.to  ) {
-          setStep( STEPS.ASK_FUSION );
-        }
-
-      }
-
-      let acceptFusion = () => {
-        setStep( STEPS.ASK_ELEM_TYPE );
-      };
-
-      let cancelFusion = () => {
-        let newFussion = { from:null, to:null};
-        setFusionBlocks( newFussion );
-        setStep( STEPS.NONE );
-      };
-
-      let chooseElementType = ( type:string ) => {
-        switch( type ) {
-          case 'text':
-            setTypeSelected('text');
-            setStep( STEPS.SET_ELEM_VALUE );
-            break;
-          case 'media':
-            setTypeSelected('media');
-            setStep( STEPS.SET_ELEM_VALUE );
-            break;
-          case 'linkvideo': 
-            setTypeSelected('linkvideo');
-            setStep( STEPS.SET_ELEM_VALUE );
-            break;
-          case 'html':
-            setTypeSelected('html');
-            setStep( STEPS.SET_ELEM_VALUE );
-            break;
-          default:
-            let newFussion = { from:null,  to:null } as FusionBlocks;
-            setFusionBlocks( newFussion );
-            setStep( STEPS.NONE );
-            break;
-        }
-      }
-
-      let blockElements = buildElementsForBlock( elements, totLines, totCols, handlerFusion, fusionBlocks );
-
-      async function SubmitCreateTextElementBlock(event: FormEvent<HTMLFormElement>) {
-        event.preventDefault()
-     
-        const formData = new FormData( event.currentTarget )
-        if( block.actions?.addElement ) {
-          formData.set( 'fusionBlocks', JSON.stringify( fusionBlocks ) );
-          let newBloc = await block.actions.addElement( 'text', formData );
-          let newFussion = { from:null,  to:null } as FusionBlocks;
-          setFusionBlocks( newFussion );
-          setStep( STEPS.NONE );
-        }
-      }
-      
-      return ( 
-        <>
-          <div key={`blk1`} className={clsx({
-          "w-full min-h-80 h-fit grid": true,
-          [`grid-rows-${totLines}`]: true,
-          [`grid-cols-${totCols} pb-2`]: true
-        })
-        }
-        >
-          {
-            blockElements
-          }
-  
-        </div>
-        {
-          ( step == STEPS.ASK_FUSION ) ?
-            <AcceptFussion acceptFusion={acceptFusion} cancelFusion={cancelFusion}/>
-          : <></>
-        }
-        {
-          ( step == STEPS.ASK_ELEM_TYPE ) ? 
-          <ChooseTypeFusion chooseElementType={chooseElementType}/>
-          :
-          <></>
-        }
-        {
-          ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'text' ) ?
-        <TextElementType handler={SubmitCreateTextElementBlock}></TextElementType>
-          : 
-        <></>
-        }
-        </>
-      )
-    } );
-  
+export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
     return (<>
       {
-        blocksElements
+        blocks.map( ( block:BlockClient ) => <Block block={block} /> )
       }
     </>)
   }
@@ -164,7 +36,7 @@ export function BuildBlocks( { blocks }:{ blocks:BlockClient[] } ) {
    * @param totCols
    * @param handlerFusion
    */
-  function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:number, totCols:number, handlerFusion:Function, fusionBlocks:FusionBlocks ) {
+function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:number, totCols:number, handlerFusion:Function, fusionBlocks:FusionElementsBlock ) {
 
     let elementsList:any = [];
     elementsList.length = totLines * totCols;
@@ -216,7 +88,137 @@ export function BuildBlocks( { blocks }:{ blocks:BlockClient[] } ) {
     /// Filter ocuped positions by one
     elementsList = elementsList.filter( ( e:any ) => e != 1 );
     return elementsList;
+}
+
+export function Block({
+  block
+}: Readonly<{
+  block:BlockClient
+}>){
+  const [fusionElements, setFusionElements] = useState<FusionElementsBlock>({from:null, to:null})
+  const [typeSelected, setTypeSelected] = useState<string>('')
+  const [step, setStep] = useState<number>(STEPS.NONE);
+
+  let totLines = block.numlines;
+  let totCols = block.numcols;
+
+  let elements = block.elements ?? [];
+
+  let handlerFusion = ( element:Positions ) => {
+    let newFussion = { from:null, to:null } as fusionBlocks;
+
+    if( !fusionElements.from ) {
+      newFussion = {
+        from: {
+          line: element.line,
+          col: element.col,
+          indexArr: element.indexArr
+        },
+        to: fusionElements.to
+      }
+    } else if( fusionElements.from.col == element.col && fusionElements.from.line == element.line ) {
+      // Doing nothing (null values)
+    } else {
+      newFussion = {
+        from: fusionElements.from,
+        to: {
+          line: element.line,
+          col: element.col,
+          indexArr: element.indexArr
+        }
+      }
+    }
+    setFusionElements( newFussion );
+
+    if( newFussion.from && newFussion.to  ) {
+      setStep( STEPS.ASK_FUSION );
+    }
   }
+
+  let acceptFusion = () => {
+    setStep( STEPS.ASK_ELEM_TYPE );
+  };
+
+  let cancelFusion = () => {
+    let newFussion = { from:null, to:null};
+    setFusionElements( newFussion );
+    setStep( STEPS.NONE );
+  };
+
+  let chooseElementType = ( type:string ) => {
+    switch( type ) {
+      case 'text':
+        setTypeSelected('text');
+        setStep( STEPS.SET_ELEM_VALUE );
+        break;
+      case 'media':
+        setTypeSelected('media');
+        setStep( STEPS.SET_ELEM_VALUE );
+        break;
+      case 'linkvideo': 
+        setTypeSelected('linkvideo');
+        setStep( STEPS.SET_ELEM_VALUE );
+        break;
+      case 'html':
+        setTypeSelected('html');
+        setStep( STEPS.SET_ELEM_VALUE );
+        break;
+      default:
+        let newFussion = { from:null,  to:null } as FusionElementsBlock;
+        setFusionElements( newFussion );
+        setStep( STEPS.NONE );
+        break;
+    }
+  }
+
+  let blockElements = buildElementsForBlock( elements, totLines, totCols, handlerFusion, fusionElements )
+  async function SubmitCreateTextElementBlock(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+     
+    const formData = new FormData( event.currentTarget )
+    if( block.actions?.addElement ) {
+      formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );
+      let newBloc = await block.actions.addElement( 'text', formData );
+      let newFussion = { from:null,  to:null } as FusionElementsBlock;
+      setFusionElements( newFussion );
+      setStep( STEPS.NONE );
+    }
+  }
+
+  return ( 
+    <>
+      <div key={`blk1`} className={clsx({
+      "w-full min-h-80 h-fit grid": true,
+      [`grid-rows-${totLines}`]: true,
+      [`grid-cols-${totCols} pb-2`]: true
+    })
+    }
+    >
+      {
+        blockElements
+      }
+  
+    </div>
+    {
+      ( step == STEPS.ASK_FUSION ) ?
+        <AcceptFussion acceptFusion={acceptFusion} cancelFusion={cancelFusion}/>
+      : <></>
+    }
+    {
+      ( step == STEPS.ASK_ELEM_TYPE ) ? 
+      <ChooseTypeFusion chooseElementType={chooseElementType}/>
+      :
+      <></>
+    }
+    {
+      ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'text' ) ?
+    <TextElementType handler={SubmitCreateTextElementBlock}></TextElementType>
+      : 
+    <></>
+    }
+    </>
+  )
+} 
 
 export function EmptyElement({
   handler,
@@ -225,7 +227,7 @@ export function EmptyElement({
 }: {
   position:Positions,
   handler:Function,
-  fusionBlocks:FusionBlocks
+  fusionBlocks:FusionElementsBlock
 }) {
 
   const [color, setColor] = useState<string>('bg-slate-200');

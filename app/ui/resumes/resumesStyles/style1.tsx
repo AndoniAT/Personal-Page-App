@@ -182,44 +182,6 @@ export function Style1EditView(
     }
   }, [heroPhoto, hero]);
 
-  /*let block = {
-    block_id: '1',
-    numLines: 12,
-    numcols: 12,
-    defClassName: 'w-full min-h-80 h-fit grid grid-rows-12 grid-cols-12',
-    customClassName: '',
-    section_id:'',
-    elements: [
-      {
-        element_id:'3',
-        lineFrom: 1,
-        lineTo:1,
-        colFrom:6,
-        colTo:11,
-        defClassName: 'h-full hover:scale-102',
-        customClassName: 'bg-slate-200 border-solid border-2 border-sky-500'
-      },
-      {
-        element_id:'4',
-        lineFrom: 2,
-        lineTo:2,
-        colFrom:2,
-        colTo:11,
-        defClassName: 'h-full hover:scale-102',
-        customClassName: 'bg-slate-200 border-solid border-2 border-sky-500'
-      },
-      {
-        element_id:'5',
-        lineFrom: 1,
-        lineTo:12,
-        colFrom:1,
-        colTo:1,
-        defClassName: 'h-full hover:scale-102',
-        customClassName: 'bg-slate-200 border-solid border-2 border-sky-500 bg-red-200'
-      }
-    ]
-  } as BlockClient;*/
-
   let handlerCreateSection = async () => {
     home?.actions?.addBlock();
   }

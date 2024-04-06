@@ -83,7 +83,7 @@ export interface Positions {
     indexArr:number
   }
   
-export interface FusionBlocks {
+export interface FusionElementsBlock {
     from:Positions|null, 
     to:Positions|null
   }
