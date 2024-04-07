@@ -58,7 +58,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
   
           if( !elementSet ) {
             // If the element has not been set, save it in its first position
-            elementsList[ setPosition ] = <CustomElement element={element}></CustomElement>,
+            elementsList[ setPosition ] = <CustomElement key={element.element_id} element={element}></CustomElement>,
             elementSet = true;
           } else {
             // If the element has already been set, mark this case as ocuped
@@ -74,7 +74,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
         let positionTable = index + 1;
         let line = Math.ceil(positionTable/totLines);
         let col = positionTable - ( totCols * ( line - 1 ) );
-        elementsList[index] = <EmptyElement position={ { line:line, col:col, indexArr: index } } handler={handlerFusion} fusionBlocks={fusionBlocks}/>
+        elementsList[index] = <EmptyElement key={index} position={ { line:line, col:col, indexArr: index } } handler={handlerFusion} fusionBlocks={fusionBlocks}/>
       }
       
     }

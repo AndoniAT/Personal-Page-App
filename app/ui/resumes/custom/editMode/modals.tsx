@@ -120,7 +120,7 @@ export function TextElementType({
 }:{
     handler:Function,
     cancel:Function,
-    element:ElementBlockClient
+    element:ElementBlockClient|null
 }) {
     let [ content, setContent ] = useState<string>('');
     let [ size, setSize ] = useState<number|null>(null);
