@@ -17,7 +17,7 @@ const STEPS = {
 }
 
 /**
- * Construct customed blocks to show in the  page
+ * Construct customed blocks to show in page
  * @param blocks 
  * @returns 
  */
@@ -42,15 +42,15 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
     elementsList.length = totLines * totCols;
 
     // Set blocks in their position in array
-    blockElements.forEach( b => {
-      let linefrom = b.linefrom;
-      let colfrom = b.colfrom;
+    blockElements.forEach( element => {
+      let linefrom = element.linefrom;
+      let colfrom = element.colfrom;
   
       let elementSet = false;
   
       // - 1 because of the index in array
-      for(let line = linefrom; line <= b.lineto; line++ ) {
-        for(let col = colfrom; col <= b.colto; col++ ) {
+      for(let line = linefrom; line <= element.lineto; line++ ) {
+        for(let col = colfrom; col <= element.colto; col++ ) {
           let idxLine = line - 1;
           let idxCol = col-1;
           let setInLine = ( totCols * idxLine );
@@ -58,13 +58,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
   
           if( !elementSet ) {
             // If the element has not been set, save it in its first position
-            let spanRow = b.lineto - b.linefrom + 1;
-            let spanCol = b.colto - b.colfrom + 1;
-            elementsList[ setPosition ] = <div style={{
-              gridRow: `span ${spanRow} / span ${spanRow}`,
-              gridColumn: `span ${spanCol} / span ${spanCol}`
-            }} className={`${b.defclassname} ${b.customclassname}`}/>,
-  
+            elementsList[ setPosition ] = <CustomElement element={element}></CustomElement>,
             elementSet = true;
           } else {
             // If the element has already been set, mark this case as ocuped
@@ -261,4 +255,42 @@ export function EmptyElement({
         />
   
    );
+}
+
+export function CustomElement({
+  element
+}:{
+  element:ElementBlockClient
+}) {
+  switch(element.type) {
+    case 'text':
+      return <ElementText element={element}></ElementText>
+  }
+}
+
+export function ElementText({
+  element
+}:{
+  element:ElementBlockClient
+}) {
+
+  let spanRow = element.lineto - element.linefrom + 1;
+  let spanCol = element.colto - element.colfrom + 1;
+  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
+  let css = {
+    ...{
+      gridRow: `span ${spanRow} / span ${spanRow}`,
+      gridColumn: `span ${spanCol} / span ${spanCol}`,
+    },
+    ...myCss
+  }  
+  let customClass = element.customclassname ?? 'cuss';
+
+  return (
+    <div style={css}
+     className={`${element.defclassname} ${customClass}`}
+    >
+      <p>{element.content}</p>
+    </div>
+  )
 }

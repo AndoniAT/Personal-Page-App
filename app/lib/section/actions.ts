@@ -82,7 +82,7 @@ export async function createElementTextBlock(this:{ section_id:string, username:
 
       }
       const defClassName = 'h-full';
-      const css = `font-size: ${size}rem;`
+      const css = `{"fontSize": "${size}rem"}`
 
       await sql`INSERT INTO ELEMENT(
         linefrom,
