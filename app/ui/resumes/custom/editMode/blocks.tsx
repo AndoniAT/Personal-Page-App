@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { BlockClient, ElementBlockClient } from "../resumesStyles/interfaces";
+import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
 import clsx from "clsx";
 import { AcceptFussion, ChooseTypeFusion, ErrorModal, TextElementType } from "./modals";
 import { FusionElementsBlock, Positions } from "@/app/lib/definitions";
@@ -21,13 +21,13 @@ const STEPS = {
  * @param blocks 
  * @returns 
  */
-export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
+export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
     return (<>
       {
         blocks.map( ( block:BlockClient ) => <Block key={block.block_id} block={block} /> )
       }
     </>)
-  }
+}
   
   /**
    * 

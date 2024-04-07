@@ -119,12 +119,13 @@ export async function getBlocksSection( section_id:string ) {
         let res = await sql`SELECT * FROM BLOCK WHERE section_id = ${section_id}`;
         let blocks = res.rows as Block[]|[]
 
-        blocks.forEach( async ( block ) => {
+        for (let index = 0; index < blocks.length; index++) {
+          const block = blocks[index];
+         
             let res = await sql`SELECT * FROM ELEMENT WHERE
                                     block_id = ${block.block_id}`;
             block.elements = res.rows as Element[];
-        } );
-
+        };
         return blocks;
 
     } catch( error:any ) {

@@ -1,11 +1,12 @@
 'use client'
-import { UserClient, SectionsClient, BlockClient, ElementBlockClient } from './interfaces'
+import { UserClient, SectionsClient, BlockClient } from './interfaces'
 import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation'
 import Image from 'next/image';
 import { PlusCircleIcon } from '@heroicons/react/24/outline';
-import { BuildBlocks } from '../custom/blocks';
+import { BuildBlocksEditMode } from '../custom/editMode/blocks';
+import { BuildBlocksVisualMode } from '../custom/visualMode/blocks';
 
 const styles = {
   hero: {
@@ -49,6 +50,7 @@ export function Style1Wrapper(
   const home = data.section;
   const hero = home.medias.find(m => m.ishero);
   const [photoProfile, setPhotoProfile] = useState<string | undefined>(undefined);
+  let blocks = home.blocks as BlockClient[];
 
   useEffect(() => {
     if (user.photo_profile && !photoProfile) {
@@ -58,7 +60,8 @@ export function Style1Wrapper(
 
   return (
     <div style={{ backgroundColor: home.backgroundcolor }} className={clsx({
-      ['w-full h-screen']: true
+      ['w-full min-h-screen']: true,
+      ['h-fit pb-10']: true,
     })} id='resumePageStyle1'>
       <div>
         <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
@@ -108,7 +111,11 @@ export function Style1Wrapper(
             </div>
           </div>
         </div>
+        <div className='p-5'>
+          { <BuildBlocksVisualMode blocks={blocks}></BuildBlocksVisualMode> }
+        </div>
         {/* dangerouslySetInnerHTML={{ __html: '<div class="checkingMyBg">Hello</div>' }}> */}
+
       </div>
     </div>
   );
@@ -278,7 +285,7 @@ export function Style1EditView(
         </div>
             <div className='p-5'>
               {
-                  <BuildBlocks blocks={blocks}/>
+                  <BuildBlocksEditMode blocks={blocks}/>
               }
             </div>
         {

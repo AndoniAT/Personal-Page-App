@@ -109,7 +109,7 @@ async function createSideNav( paramsSend : {
                   <form action={goToMyresume}>
                     <button className="sessionIconsNavBar">
                       <UserCircleIcon className="w-6" />
-                      <div className="text-blue-600 text-sm font-medium">My resume</div>
+                      <div className="text-blue-600 text-sm font-medium">My page</div>
                     </button>
                   </form>
                 </div>
