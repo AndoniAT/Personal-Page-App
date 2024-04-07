@@ -1,7 +1,14 @@
-import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
-import { HTMLMotionProps, motion, useDragControls } from 'framer-motion';
+import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3BottomLeftIcon, Bars3BottomRightIcon,
+    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon
+ } from '@heroicons/react/24/outline';
+import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../resumesStyles/interfaces';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useDebouncedCallback }from 'use-debounce';
+
+const inputValueClass = "w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500";
+const labelClass = "block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2";
 
 export function AcceptFussion({
         acceptFusion,
@@ -117,35 +124,220 @@ export function TextElementType({
     handler,
     cancel,
     element,
-}:{
+}:Readonly<{
     handler:Function,
     cancel:Function,
     element:ElementBlockClient|null
-}) {
-    let [ content, setContent ] = useState<string>('');
-    let [ size, setSize ] = useState<number|null>(null);
+}>) {
+    let [tailwindClass, setTailwindClass] = useState<string|null>(null);
+    let [transparent, setTransparent] = useState<boolean>(true);
+
     const isEdit = !!element;
+
+    /* Colors refs */ 
+    const colorBgInputRef = useRef<HTMLInputElement>(null);
+    const colorTextInputRef = useRef<HTMLInputElement>(null);
+    const colorBorderInputRef = useRef<HTMLInputElement>(null);
     
     let myCss = ( isEdit && element.css && typeof element.css == 'string' ) ? JSON.parse( element.css ) : {};
     
-    let sizeElement = ( isEdit && myCss.fontSize ) ? parseFloat( myCss.fontSize.split('rem')[0] ) : 1.0;
-    let contentElement = ( isEdit && element.content ) ? element.content : '';
+    let size = ( isEdit && myCss.fontSize ) ? parseFloat( myCss.fontSize.split('rem')[0] ) : 1.0;
+    // Pading
+    let paddingLeft = ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0;
+    let paddingTop = ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0;
+    let paddingRight = ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0;
+    let paddingBottom = ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0;
+    
+    // Border
+    let borderTopLeftRadius = ( isEdit && myCss.borderTopLeftRadius ) ? parseFloat( myCss.borderTopLeftRadius.split('rem')[0] ) : 0.0;
+    let borderBottomLeftRadius = ( isEdit && myCss.borderBottomLeftRadius ) ? parseFloat( myCss.borderBottomLeftRadius.split('rem')[0] ) : 0.0;
+    let borderTopRightRadius = ( isEdit && myCss.borderTopRightRadius ) ? parseFloat( myCss.borderTopRightRadius.split('rem')[0] ) : 0.0;
+    let borderBottomRightRadius = ( isEdit && myCss.borderBottomRightRadius ) ? parseFloat( myCss.borderBottomRightRadius.split('rem')[0] ) : 0.0;
+
+    let borderWidth = ( isEdit && myCss.borderWidth ) ? parseFloat( myCss.borderWidth.split('rem')[0] ) : 0.0;
+
+    let backgroundColor = ( isEdit && myCss.backgroundColor && typeof myCss.backgroundColor == 'string' ) ? myCss.backgroundColor : '0';
+    let textColor = ( isEdit && myCss.color && typeof myCss.color == 'string' ) ? myCss.color : '0';
+    let borderColor = ( isEdit && myCss.borderColor && typeof myCss.borderColor == 'string' ) ? myCss.borderColor : '0';
+
+    let content = ( isEdit && element.content ) ? element.content : '';
+    let transparentElement = ( isEdit && !myCss.backgroundColor || typeof myCss.backgroundColor == 'string' && myCss.backgroundColor == '');
+    
+    /* HANDLERS */ 
+
+    const handlerText = useDebouncedCallback(
+        (value) => {
+          
+            if ( isEdit ) {
+                let f = new FormData();
+                let target = 'content';
+                f.set( target, value );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+
+        },
+        200
+    );
+
+    const handlerSize = useDebouncedCallback(
+        (value) => {
+            if( isEdit ) {
+                let f = new FormData();
+                let target = 'fontSize';
+                f.set( target, value );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    const handlerPadding = useDebouncedCallback(
+        (direction, value) => {
+            if( isEdit ) {
+                let f = new FormData();
+                let target = 'padding'+direction;
+                f.set( target, value );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    const handlerBorder = useDebouncedCallback(
+        (attr, value) => {
+            if( isEdit ) {
+                let f = new FormData();
+                let target = 'border'+attr;
+                f.set( target, value );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    /*let tailwindClassElement = ( isEdit && element.customclassname ) ? element.customclassname : '';
 
     useEffect(() => {
-        if( content == '' && contentElement != '' ) {
-            setContent(contentElement);
+        if( tailwindClass == null ) {
+            setTailwindClass(tailwindClassElement);
         }
-    }, [content, contentElement])
+    }, [tailwindClass, tailwindClassElement])*/
+
+    
+    /* Colors Handlers */ 
+
+    const handleColorBgClick = () => {
+        if (colorBgInputRef.current) {
+            colorBgInputRef.current.click();
+        }
+    };
+    
+    const handleColorTextClick = () => {
+        if (colorTextInputRef.current) colorTextInputRef.current.click();
+    };
+    
+    const handleColorBorderClick = () => {
+        if (colorBorderInputRef.current) {
+            colorBorderInputRef.current.click();
+        }
+    };
+    const handleColorBgChange = useDebouncedCallback(
+        () => {
+            if( isEdit && colorBgInputRef?.current ) {
+                let newColor = colorBgInputRef.current.value;
+                let f = new FormData();
+                let target = 'backgroundColor';
+                f.set( target, newColor );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    const handleColorTextChange = useDebouncedCallback(
+        () => {
+            if( isEdit && colorTextInputRef?.current ) {
+                let newColor = colorTextInputRef.current.value;
+                let f = new FormData();
+                let target = 'textColor';
+                f.set( target, newColor );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    const handleColorBorderChange = useDebouncedCallback(
+        () => {
+            if( isEdit && colorBorderInputRef?.current ) {
+                let newColor = colorBorderInputRef.current.value;
+                let f = new FormData();
+                let target = 'borderColor';
+                f.set( target, newColor );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+    /* ===============  */
+
+    const handleJustify = useDebouncedCallback(
+        ( value ) => {
+            if( isEdit  ) {
+                let f = new FormData();
+                let target = 'justifyContent';
+                f.set( target, value );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    const handleAlign = useDebouncedCallback(
+        ( value ) => {
+            if( isEdit  ) {
+                let f = new FormData();
+                let target = 'alignItems';
+                f.set( target, value );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
+
+    const handleTransparency = useDebouncedCallback(
+        ( transp ) => {
+            if( isEdit ) {
+                let newColor = '';
+                
+                if( !transp && colorBgInputRef?.current) {
+                    newColor = colorBgInputRef.current.value;
+                }
+
+                let f = new FormData();
+                let target = 'bg';
+                f.set( target, newColor );
+                f.set( 'target', target );
+                element.actions?.updateElement( f );
+            }
+        },
+        200
+    );
 
     useEffect(() => {
-        if( size == null ) {
-            setSize(sizeElement);
-        }
-    }, [size, sizeElement])
+        setTransparent( transparentElement );
+    }, [ transparent, transparentElement ])
 
     return (
-        <>
-   
         <motion.div
         drag
         dragTransition={{ bounceStiffness: 600, bounceDamping: 10 }}
@@ -178,41 +370,317 @@ export function TextElementType({
                             handler( event );
                             }}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
-                                <div className="col-span-1 sm:col-span-1">
-                                    <label htmlFor="size" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Size</label>
-                                    <input type="number" name="size" id="size" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                                    value={size ? size :0}
+                                {
+                                    ( isEdit ) ? 
+                                        <div className="col-span-1 sm:col-span-1">
+                                            <label htmlFor="size" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Size</label>
+                                            <input type="number" name="size" id="size" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                            defaultValue={size ? size :0}
+                                            onChange={ ( e ) => {
+                                                handlerSize( e.target.value );
+                                            }}
+                                            />
+                                        </div>
+                                    :<></>
+                                }
+                                {
+
+                                /* Tailwind function desactivated because of problems of dinamic classes generation
+                                <div className="col-span-2">
+                                    <label htmlFor="tailwind" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customize your own style with Tailwind</label>
+                                    <input type="text" name="tailwind" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                    defaultValue={tailwindClass ? tailwindClass : ''}
                                     onChange={ ( e ) => {
-                                        setSize(parseFloat( e.target.value ));
-                                        if( isEdit ) {
+                                        //debounced( e.target.value );
+
+                                        if( isEdit && element != null ) {
+
                                             let f = new FormData();
-                                            let target = 'size';
+                                            let target = 'customclassname';
                                             f.set( target, e.target.value );
                                             f.set( 'target', target );
                                             element.actions?.updateElement( f );
+                                            //alert('edit');
                                         }
                                     }}
                                     />
+                                    <div>
+                                        <span className='text-white text-sm'> You don&apos;t know Tailwind? </span>
+                                        <Link
+                                        href="https://tailwindcss.com/docs"
+                                        className="mt-4 text-sm text-blue transition-colors text-blue-500"
+                                        target="_blank"
+                                    >
+                                        Discover here
+                                    </Link>
+                                    </div>
                                 </div>
+                                */
+                                }
+
+                                {
+                                    ( isEdit ) ? 
+                                        <div className='col-span-3'>
+                                            { /* Background */ }
+                                            <div className='w-full flex'>
+                                                <span>Background</span>
+                                                <div
+                                                    style={{ backgroundColor: backgroundColor }} 
+                                                    className='h-5 w-5 border border-gray-600 self-center rounded-full ml-2' onClick={handleColorBgClick}></div>
+                                                <input 
+                                                ref={colorBgInputRef}
+                                                type="color"
+                                                id='colorBg'
+                                                name="colorBg"
+                                                onChange={handleColorBgChange}
+                                                defaultValue={backgroundColor}
+                                                className='w-5 -ml-5 invisible'
+                                                />
+                                            </div>
+                                            <div className="flex items-center mb-4">
+                                                    <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Transparent</label>
+                                                    <input 
+                                                    type="checkbox" 
+                                                    value="" 
+                                                    checked={transparent}
+                                                    onChange={() => {
+                                                        let newTransp = !transparent;
+                                                        setTransparent(newTransp);
+                                                        handleTransparency(newTransp);
+                                                    }}
+                                                    className="ml-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
+                                            </div>
+                                        </div>
+                                    :<></>
+                                }
+
                                 <div className="col-span-2">
                                     <label htmlFor="txt-content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Text</label>
                                     <textarea name="content" id="txt-content" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="Write your text here"
-                                    value={content}
+                                    defaultValue={content}
                                     onChange={ ( e ) => {
-                                        setContent(e.target.value);
-                                        if ( isEdit ) {
-                                            let f = new FormData();
-                                            let target = 'content';
-                                            f.set( target, e.target.value );
-                                            f.set( 'target', target );
-                                            element.actions?.updateElement( f );
-                                        }
-                                        
+                                        handlerText( e.target.value );
                                     }
                                 }
                                     >
                                     </textarea>
+
+                                    {
+                                        ( isEdit ) ? 
+                                            <>
+                                                { /* TEXT COLOR */}
+                                                <div className='grid grid-cols-1 mt-5'>
+                                                    <div className='w-full flex m-2'>
+                                                        <span>Color Text</span>
+                                                        <div
+                                                            style={{ backgroundColor: textColor }} 
+                                                            className='h-5 w-5 border border-gray-600 self-center rounded-full ml-2' onClick={handleColorTextClick}></div>
+                                                        <input 
+                                                        ref={colorTextInputRef}
+                                                        type="color"
+                                                        id='colorText'
+                                                        name="colorText"
+                                                        onChange={handleColorTextChange}
+                                                        defaultValue={textColor}
+                                                        className='w-5 -ml-5 invisible'
+                                                        />
+                                                    </div>
+                                                </div>
+                                                { /* JUSTIFY CONTENT */}
+                                                <div className='grid grid-rows-1 grid-cols-5 mt-5'>
+                                                    <div className='flex justify-center flex-col text-center'>
+                                                        <Bars3BottomLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                        onClick={() => {
+                                                            handleJustify('left');
+                                                        }}
+                                                        ></Bars3BottomLeftIcon>
+                                                        <span>Left</span>
+                                                    </div>
+                                                    <div className='flex justify-center flex-col text-center'>
+                                                        <Bars3Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                        onClick={() => {
+                                                            handleJustify('center');
+                                                        }}
+                                                        ></Bars3Icon>
+                                                        <span>Center</span>
+                                                    </div>
+                                                    <div className='flex justify-center flex-col text-center'>
+                                                        <Bars3BottomRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                        onClick={() => {
+                                                            handleJustify('right');
+                                                        }}
+                                                        ></Bars3BottomRightIcon>
+                                                        <span>Right</span>
+                                                    </div>
+                                                </div>
+                                                { /* ALIGN ITEMS*/}
+                                                <div className='grid grid-rows-1 grid-cols-5 mt-5'>
+                                                <div className='flex justify-center flex-col text-center'>
+                                                        <BarsArrowDownIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                        onClick={() => {
+                                                            handleAlign('flex-end');
+                                                        }}
+                                                        ></BarsArrowDownIcon>
+                                                        <span>End</span>
+                                                    </div>
+                                                    <div className='flex justify-center flex-col text-center'>
+                                                            <Bars2Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                            onClick={() => {
+                                                                handleAlign('center');
+                                                            }}
+                                                            ></Bars2Icon>
+                                                            <span>Center</span>
+                                                    </div>
+                                                    <div className='flex justify-center flex-col text-center'>
+                                                            <BarsArrowUpIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                            onClick={() => {
+                                                                handleAlign('flex-start');
+                                                            }}
+                                                            ></BarsArrowUpIcon>
+                                                            <span>Top</span>
+                                                    </div>
+                                                </div>
+
+                                                { /* Padding */}
+                                                <div className='mt-5'>
+                                                    <span>Padding</span>
+                                                    <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
+                                                        <div className="flex flex-col">
+                                                            <input type="number" name="paddingleft" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                            defaultValue={paddingLeft}
+                                                            onChange={ ( e ) => {
+                                                                handlerPadding( 'Left', e.target.value );
+                                                            }}
+                                                            />
+                                                            <label htmlFor="paddingleft" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
+                                                                Left
+                                                            </label>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <input type="number" name="paddingTop" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                            defaultValue={paddingTop}
+                                                            onChange={ ( e ) => {
+                                                                handlerPadding( 'Top', e.target.value );
+                                                            }}
+                                                            />
+                                                            <label htmlFor="paddingTop" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
+                                                                Top
+                                                            </label>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <input type="number" name="paddingRight" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                            defaultValue={paddingRight}
+                                                            onChange={ ( e ) => {
+                                                                handlerPadding( 'Right', e.target.value );
+                                                            }}
+                                                            />
+                                                            <label htmlFor="paddingRight" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
+                                                                Right
+                                                            </label>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <input type="number" name="paddingBottom" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                            defaultValue={paddingBottom}
+                                                            onChange={ ( e ) => {
+                                                                handlerPadding( 'Bottom', e.target.value );
+                                                            }}
+                                                            />
+                                                            <label htmlFor="paddingBottom" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
+                                                                Bottom
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                { /* Border */}
+                                                <div className='mt-5'>
+                                                    <span>Border</span>
+                                                    <div className='mt-5 ml-10'>
+                                                        <span>Radius</span>
+                                                        <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="borderTopLeft" className={inputValueClass} required min={0.1} step={0.1}
+                                                                defaultValue={borderTopLeftRadius}
+                                                                onChange={ ( e ) => {
+                                                                    handlerBorder( 'TopLeftRadius', e.target.value );
+                                                                }}
+                                                                />
+                                                                <label htmlFor="borderTopLeft" className={labelClass}>
+                                                                    Left Top
+                                                                </label>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="borderBottomLeft" className={inputValueClass} required min={0.1} step={0.1}
+                                                                defaultValue={borderBottomLeftRadius}
+                                                                onChange={ ( e ) => {
+                                                                    handlerBorder( 'BottomLeftRadius', e.target.value );
+                                                                }}
+                                                                />
+                                                                <label htmlFor="borderBottomLeft" className={labelClass}>
+                                                                    Left Bottom
+                                                                </label>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="borderTopRight" className={inputValueClass} required min={0.1} step={0.1}
+                                                                defaultValue={borderTopRightRadius}
+                                                                onChange={ ( e ) => {
+                                                                    handlerBorder( 'TopRightRadius', e.target.value );
+                                                                }}
+                                                                />
+                                                                <label htmlFor="borderTopRight" className={labelClass}>
+                                                                    Right Top
+                                                                </label>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="borderRightBottom" className={inputValueClass} required min={0.1} step={0.1}
+                                                                defaultValue={borderBottomRightRadius}
+                                                                onChange={ ( e ) => {
+                                                                    handlerBorder( 'BottomRightRadius', e.target.value );
+                                                                }}
+                                                                />
+                                                                <label htmlFor="borderRightBottom" className={labelClass}>
+                                                                    Right Bottom
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div className='mt-5 ml-10'>
+                                                        <span>Stroke</span>
+                                                        <div className="flex flex-col">
+                                                            <input type="number" name="borderWidth" className={inputValueClass} required min={0.1} step={0.1}
+                                                            defaultValue={borderWidth}
+                                                            onChange={ ( e ) => {
+                                                                handlerBorder( 'Width', e.target.value );
+                                                            }}
+                                                            />
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    <div className='mt-5 ml-10'>
+                                                        <div className='col-span-3'>
+                                                        <div className='w-full flex'>
+                                                            <span>Color</span>
+                                                            <div
+                                                                style={{ backgroundColor: borderColor }} 
+                                                                className='h-5 w-5 border border-gray-600 self-center rounded-full ml-2' onClick={handleColorBorderClick}></div>
+                                                            <input 
+                                                            ref={colorBorderInputRef}
+                                                            type="color"
+                                                            id='colorBorder'
+                                                            name="colorBg"
+                                                            onChange={handleColorBorderChange}
+                                                            defaultValue={borderColor}
+                                                            className='w-5 -ml-5 invisible'
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </>
+
+                                        :<></>
+                                    }
                                 </div>
                             </div>
                             {
@@ -222,23 +690,21 @@ export function TextElementType({
                                     </button>
                                 :
                                 <></>
-
                             }
                         </form>
                     </div>
             </div>
         </motion.div>
-        </>
     )
 }
 
 export function ErrorModal({
     message,
     accept
-}: {
+}: Readonly<{
     message:string,
     accept:Function
-}) {
+}>) {
     return ( 
         <div id="progress-modal" tabIndex={-1} aria-hidden="true" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex">
             <div className="relative p-4 w-full max-w-md max-h-full">

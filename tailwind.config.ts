@@ -18,6 +18,9 @@ const config: Config = {
       }
     },
   },
+  /*safelist: [{ pattern: /./ }],*/
+  safelist: ['w-full', 'min-h-80', 'h-fit', 'grid', 'grid-rows-12', 'grid-cols-12', 'h-full'],
+  /*mode: 'jit',*/
   plugins: [],
 };
 export default config;

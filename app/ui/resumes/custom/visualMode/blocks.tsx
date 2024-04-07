@@ -130,16 +130,26 @@ export function ElementText({
     ...{
       gridRow: `span ${spanRow} / span ${spanRow}`,
       gridColumn: `span ${spanCol} / span ${spanCol}`,
-    },
-    ...myCss
+    }
   }  
+
+  myCss = {
+    ...{
+      'width': '100%',
+      'height': '100%'
+    },
+    ...myCss,
+  }
+
   let customClass = element.customclassname ?? 'cuss';
 
   return (
     <div style={css}
      className={`${element.defclassname} ${customClass}`}
     >
-      <p>{element.content}</p>
+      <div
+      style={myCss}
+      >{element.content}</div>
     </div>
   )
 }

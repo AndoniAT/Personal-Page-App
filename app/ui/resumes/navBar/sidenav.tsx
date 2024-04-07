@@ -109,14 +109,14 @@ async function createSideNav( paramsSend : {
                         await signOut();
                       }}
                     >
-                      <button className="sessionIconsNavBar">
-                        <PowerIcon className="w-6" />
+                      <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
+                        <PowerIcon className="w-6 text-blue-600 mr-5" />
                         <div className="text-blue-600 text-sm font-medium">Sign Out</div>
                       </button>
                   </form>
                   <form action={goToMyresume}>
-                    <button className="sessionIconsNavBar">
-                      <UserCircleIcon className="w-6" />
+                    <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
+                      <UserCircleIcon className="w-6 text-blue-600 mr-5" />
                       <div className="text-blue-600 text-sm font-medium">My page</div>
                     </button>
                   </form>
@@ -125,14 +125,14 @@ async function createSideNav( paramsSend : {
           (
             <div className='grid grid-cols-2'>
               <form action={goToLogin}>
-                <button className="sessionIconsNavBar">
-                  <PowerIcon className="w-6" />
+                <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
+                  <PowerIcon className="w-6 text-blue-600 mr-5" />
                   <div className="text-blue-600 text-sm font-medium">Login</div>
                 </button>
               </form>
               <form action={goToCreateAccount}>
-                <button className="sessionIconsNavBar">
-                  <UserCircleIcon className="w-6" />
+                <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
+                  <UserCircleIcon className="w-6 text-blue-600 mr-5" />
                   <div className="text-blue-600 text-sm font-medium">Create an account</div>
                 </button>
               </form>

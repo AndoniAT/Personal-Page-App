@@ -3,6 +3,8 @@ import { requiresSessionUserProperty } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
 import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
+import { Config } from 'tailwindcss';
+const fsp = require('fs').promises
 
 const TYPESELEMENT = {
   text: 'text',
@@ -89,7 +91,8 @@ export async function createElementTextBlock(this:{ section_id:string, username:
 
       }
       const defClassName = 'h-full';
-      const css = `{"fontSize": "${size}rem", "wordWrap": "break-word"}`
+      //const css = `{"fontSize": "${size}rem", "wordWrap": "break-word"}`
+      const css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex"}`
 
       await sql`INSERT INTO ELEMENT(
         linefrom,
@@ -215,16 +218,70 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
         await sql`UPDATE ELEMENT
         SET content = ${content}
         WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
+        break;
       }
-      case 'size': {
-        let newSize = form.get('size') as string;
-        let css = ( element.css ) ? JSON.parse( element.css ) : {};
-        css.fontSize = `${newSize}rem`;
-        css = JSON.stringify(css);
-        await sql`UPDATE ELEMENT
-        SET css = ${css}
-        WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
+      case 'fontSize':
+      case 'backgroundColor':
+      case 'textColor':
+      case 'borderColor':
+      case 'justifyContent':
+      case 'alignItems':
+        await getAndUpdateFormAttribute( target, block_id, element, form, '' );
+        break;
+      case 'paddingLeft':
+      case 'paddingTop':
+      case 'paddingRight':
+      case 'paddingBottom':
+      case 'borderTopLeftRadius':
+      case 'borderBottomLeftRadius':
+      case 'borderTopRightRadius':
+      case 'borderBottomRightRadius':
+      case 'borderWidth':
+        await getAndUpdateFormAttribute( target, block_id, element, form, 'rem' );
+        break;
+      case 'customclassname': {
+        let newCustomClass = form.get('customclassname') as string;
+        console.log('new custom', newCustomClass + 'j');
+
+        const regex =  /^[a-zA-Z0-9- ]+$/;
         
+        if (regex.test(newCustomClass)) {
+          await sql`UPDATE ELEMENT
+          SET customclassname = ${newCustomClass}
+          WHERE block_id = ${block_id} AND element_id = ${element.element_id}`; 
+        } else {
+          throw new Error('No valid expression')
+        }
+        break;
       }
   }
+}
+
+/**
+ * 
+ * @param attr 
+ * @param block_id 
+ * @param element 
+ * @param form 
+ * @param unity 
+ * @returns 
+ */
+function getAndUpdateFormAttribute( attr:string, block_id:string, element:ElementBlock, form:FormData, unity:string ) {
+  let attributeValue = form.get(attr) as string;
+  let css = ( element.css ) ? JSON.parse( element.css ) : {};
+  css[ attr ] = attributeValue+unity;
+  css = JSON.stringify(css);
+  return updateBlockCss( block_id, element.element_id, css );
+}
+/**
+ * 
+ * @param block_id 
+ * @param element_id 
+ * @param newcss
+ * @returns 
+ */
+function updateBlockCss( block_id:string, element_id:string, newcss:string ) {
+  return sql`UPDATE ELEMENT
+        SET css = ${newcss}
+        WHERE block_id = ${block_id} AND element_id = ${element_id}`; 
 }

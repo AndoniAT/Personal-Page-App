@@ -262,6 +262,8 @@ export function CustomElement({
 }:{
   element:ElementBlockClient,
 }) {
+  element.customclassname = element.customclassname + "            ";
+  if( element.customclassname == null || element.customclassname == '') alert('nooo');
   switch(element.type) {
     case 'text':
       return <ElementText element={element}></ElementText>
@@ -270,22 +272,28 @@ export function CustomElement({
 
 export function ElementText({
   element
-}:{
+}:Readonly<{
   element:ElementBlockClient,
-}) {
+}>) {
   let [editElement, setEditElement] = useState<boolean>(false);
 
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
   let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let css = {
+  let gridCss = {
     ...{
       gridRow: `span ${spanRow} / span ${spanRow}`,
       gridColumn: `span ${spanCol} / span ${spanCol}`,
-    },
-    ...myCss
+    }
   }  
-  let customClass = element.customclassname ?? 'cuss';
+
+  myCss = {
+    ...{
+      'width': '100%',
+      'height': '100%'
+    },
+    ...myCss,
+  }
 
   let submitEditTextElementBlock = async function (event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -309,13 +317,24 @@ export function ElementText({
     }
   }
 
+  let customClass = element.customclassname ?? '';
   return (
     <>
-      <div style={css}
-      className={`${element.defclassname} ${customClass} hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700`}
+      <div style={gridCss}
+      className={clsx({
+        [element.defclassname]:true,
+        /*['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,*/
+        ['hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700']:true ,
+      })
+    }
       onClick={() => { setEditElement(true)}}
       >
-        <p>{element.content}</p>
+        <div 
+        style={myCss}
+        className={clsx({
+          /*[customClass]: (!!element.customclassname)*/
+        })}
+        >{element.content}</div>
       </div>
       {
         editElement ? 
