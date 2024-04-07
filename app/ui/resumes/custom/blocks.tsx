@@ -215,7 +215,7 @@ export function Block({
     }
     {
       ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'text' ) ?
-    <TextElementType handler={SubmitCreateTextElementBlock}></TextElementType>
+    <TextElementType handler={SubmitCreateTextElementBlock} cancel={finishProcess}></TextElementType>
       : 
     <></>
     }

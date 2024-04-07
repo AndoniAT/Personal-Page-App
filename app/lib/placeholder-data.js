@@ -33,7 +33,7 @@ const RESUME = [
 ];
 
 const SECTION = [
-    {
+    /*{
         section_id:'11111111-1111-1111-1111-111111111113',
         name: 'My Projects',
         created: '2024-03-23T17:15:57.508Z',
@@ -68,7 +68,7 @@ const SECTION = [
         backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
-    },
+    },*/
     {
         section_id:'11111111-1111-1111-1111-111111111126',
         name: 'My Home',
