@@ -60,5 +60,8 @@ export interface ElementBlockClient {
     css: string|null,
     content:string,
     type:'text'|'media'|'linkvideo'|'html',
-    block_id:string
+    block_id:string,
+    actions?: {
+        updateElement: Function
+    }
 }

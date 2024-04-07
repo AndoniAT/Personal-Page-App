@@ -28,7 +28,7 @@ export default function EditModeNavBar(  {
     const handleColorChange = async () => {
       if ( colorInputRef?.current && currentSection?.background?.update && username ) {
         let newColor = colorInputRef.current.value;
-        await currentSection.background.update( currentSection.id, newColor, username )
+        currentSection.background.update( currentSection.id, newColor, username )
       }
     };
 
@@ -54,6 +54,7 @@ export default function EditModeNavBar(  {
             id='colorBg'
             name="colorBg"
             onChange={handleColorChange}
+            value={currentSection ? currentSection.background.color : 0}
             className='w-5 -ml-5 invisible'
             />
           </div>

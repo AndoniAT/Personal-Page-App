@@ -4,6 +4,13 @@ import { getSectionByIdForUser } from '../user/actions';
 import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
 
+const TYPESELEMENT = {
+  text: 'text',
+  media: 'media',
+  linkvideo: 'linkvideo',
+  html: 'html'
+}
+
 export async function createNewBlock(this:{ section_id:string, username:string}) {
     'use server'
     noStore();
@@ -82,7 +89,7 @@ export async function createElementTextBlock(this:{ section_id:string, username:
 
       }
       const defClassName = 'h-full';
-      const css = `{"fontSize": "${size}rem"}`
+      const css = `{"fontSize": "${size}rem", "wordWrap": "break-word"}`
 
       await sql`INSERT INTO ELEMENT(
         linefrom,
@@ -109,6 +116,39 @@ export async function createElementTextBlock(this:{ section_id:string, username:
     }
     
 
+}
+
+export async function updateElementBlock(this:{ section_id:string, username:string, block_id:string, element_id:string, form:FormData } ) {
+  'use server'
+  noStore();
+  let { section_id, username, block_id, element_id, form } = this;
+
+  try {
+    await requiresSessionUserProperty( username );
+
+    // Select section
+    let section = await getSectionByIdForUser( username, section_id ) as Section|undefined;
+
+    if( !section ) {
+      throw new Error( 'Section not found for user' );
+    }
+
+    let element_res = await sql`SELECT * FROM ELEMENT WHERE element_id = ${element_id}`;
+    let element = element_res.rows[ 0 ] as ElementBlock;
+
+    if( element ) {
+      switch( element.type ) {
+      case TYPESELEMENT.text : {
+          await updateElementText( block_id, element, form );
+          break;
+        }
+      }
+    }
+
+  } catch( error:any ) {
+      throw new Error( 'Failed to update the element for block : ' + error?.message );
+  }
+  
 }
 
 export async function getBlocksSection( section_id:string ) {
@@ -164,4 +204,27 @@ function checkNoCollisionOfElements( element1:{line:number, col:number}[], eleme
     }
   }
   return accept;
+}
+
+async function updateElementText( block_id:string, element:ElementBlock, form:FormData ) {
+  let target = form.get('target') as string;
+
+  switch( target ) {
+      case 'content': {    
+        let content = form.get('content') as string;
+        await sql`UPDATE ELEMENT
+        SET content = ${content}
+        WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
+      }
+      case 'size': {
+        let newSize = form.get('size') as string;
+        let css = ( element.css ) ? JSON.parse( element.css ) : {};
+        css.fontSize = `${newSize}rem`;
+        css = JSON.stringify(css);
+        await sql`UPDATE ELEMENT
+        SET css = ${css}
+        WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
+        
+      }
+  }
 }

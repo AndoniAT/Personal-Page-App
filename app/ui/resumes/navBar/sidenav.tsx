@@ -10,6 +10,7 @@ import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import { redirect } from 'next/dist/server/api-utils';
 import EditModeNavBar from './editModeNavBar';
 import { changeBackgroundSection } from '@/app/lib/data';
+import { revalidatePath } from 'next/cache';
 
 export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit'|never, currentSection:Section|null } ) {
 
@@ -65,8 +66,15 @@ async function createSideNav( paramsSend : {
   }
 
   let editModeNavBar = () => {
-    if( currentSection )
-    currentSection.background.update = currentSection ? changeBackgroundSection : currentSection
+    if( currentSection ) {
+      let changeBg = async ( id:string, color:string, username:string ) => {
+        'use server'
+        await changeBackgroundSection(id, color, username);
+        revalidatePath(`/resumes/${username}/edit/section`);
+      }
+
+      currentSection.background.update = currentSection ? changeBg : currentSection
+    }
     return <EditModeNavBar data={ { username:user?.username || '', currentSection: currentSection } }></EditModeNavBar>
   };
 

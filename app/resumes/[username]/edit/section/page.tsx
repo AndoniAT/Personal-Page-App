@@ -6,7 +6,7 @@ import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 import { revalidatePath } from 'next/cache';
-import { createElementTextBlock, createNewBlock, getBlocksSection } from '@/app/lib/section/actions';
+import { createElementTextBlock, createNewBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
 import { Block } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
@@ -59,7 +59,7 @@ export default async function Page(
 
     // Create function actions for each block (adding or edit an element)
     blocks = blocks.map( block => {
-      const createElement = async ( type:string , form:FormData ) => {
+      const createElement = async ( type:string, form:FormData ) => {
         'use server'
         return new Promise( (resolve, reject) => {
           let fn = null;
@@ -90,6 +90,35 @@ export default async function Page(
 
         })
       }
+
+      block.elements = block.elements.map( element => {
+        // Create update function for elements
+        let updateElement = async ( form:FormData ) => {
+          'use server'
+          return new Promise( (resolve, reject) => {
+            let fn = updateElementBlock;
+    
+            if ( fn ) {
+              fn.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id, form: form } )
+              .then( () => {
+                resolve(true);
+                revalidatePath(`/resumes/${user.username}/edit/section`);
+              })
+              .catch( err => {
+                reject( err );
+              });
+            } else {
+              reject( 'No function' );
+            }
+  
+          });
+        }
+        element.actions = {
+          updateElement: updateElement
+        }
+        return element;
+      });
+
       block.actions = {
         addElement: createElement
       }

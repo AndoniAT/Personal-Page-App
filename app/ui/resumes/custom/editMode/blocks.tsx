@@ -164,7 +164,7 @@ export function Block({
     }
   }
 
-  let blockElements = buildElementsForBlock( elements, totLines, totCols, handlerFusion, fusionElements )
+  let blockElements = buildElementsForBlock( elements, totLines, totCols, handlerFusion, fusionElements );
   async function SubmitCreateTextElementBlock(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
      
@@ -209,7 +209,7 @@ export function Block({
     }
     {
       ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'text' ) ?
-    <TextElementType handler={SubmitCreateTextElementBlock} cancel={finishProcess}></TextElementType>
+    <TextElementType handler={SubmitCreateTextElementBlock} cancel={finishProcess} element={null}></TextElementType>
       : 
     <></>
     }
@@ -258,9 +258,9 @@ export function EmptyElement({
 }
 
 export function CustomElement({
-  element
+  element,
 }:{
-  element:ElementBlockClient
+  element:ElementBlockClient,
 }) {
   switch(element.type) {
     case 'text':
@@ -271,8 +271,9 @@ export function CustomElement({
 export function ElementText({
   element
 }:{
-  element:ElementBlockClient
+  element:ElementBlockClient,
 }) {
+  let [editElement, setEditElement] = useState<boolean>(false);
 
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
@@ -286,11 +287,41 @@ export function ElementText({
   }  
   let customClass = element.customclassname ?? 'cuss';
 
+  let submitEditTextElementBlock = async function (event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+     
+    const formData = new FormData( event.currentTarget )
+    if( element.actions?.updateElement ) {
+      try {
+        await element.actions.updateElement( formData );
+      } catch ( err ) {
+        console.log('Error', err);
+      }
+      /*formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );
+      try {
+        await block.actions.addElement( 'text', formData );
+        finishProcess();
+      } catch( e:any ) {
+        console.log('Error :', e?.message);
+        setError( e?.message );
+        finishProcess();
+      }*/
+    }
+  }
+
   return (
-    <div style={css}
-     className={`${element.defclassname} ${customClass}`}
-    >
-      <p>{element.content}</p>
-    </div>
+    <>
+      <div style={css}
+      className={`${element.defclassname} ${customClass} hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700`}
+      onClick={() => { setEditElement(true)}}
+      >
+        <p>{element.content}</p>
+      </div>
+      {
+        editElement ? 
+        <TextElementType handler={submitEditTextElementBlock} cancel={() => { setEditElement(false) }} element={element}></TextElementType>
+        : <></>
+      }
+    </>
   )
 }

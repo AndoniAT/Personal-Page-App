@@ -86,8 +86,8 @@ async function createSection( client ) {
             public BOOLEAN DEFAULT TRUE,
             type VARCHAR(20) CHECK (type IN ('Projects', 'Gallery', 'Custom', 'Home')),
             style INT DEFAULT 1,
-            backgroundColor VARCHAR(7) DEFAULT '#FFFFFF',
-            backgroundImage VARCHAR(255),
+            backgroundcolor VARCHAR(7) DEFAULT '#FFFFFF',
+            backgroundimage VARCHAR(255),
             
             resume_id UUID
           );
@@ -138,7 +138,7 @@ async function createMedia( client ) {
             filename TEXT NOT NULL,
             key TEXT NOT NULL,
             url TEXT NOT NULL,
-            contentType VARCHAR(255) NOT NULL,
+            contenttype VARCHAR(255) NOT NULL,
             size INT NOT NULL,
 
             position INT NOT NULL,
