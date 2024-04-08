@@ -1,14 +1,19 @@
 import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3BottomLeftIcon, Bars3BottomRightIcon,
-    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon
+    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon, ArrowDownLeftIcon,
+    ArrowUpLeftIcon,
+    ArrowUpRightIcon,
+    ArrowDownRightIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    ArrowUpIcon,
+    ArrowDownIcon,
  } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../resumesStyles/interfaces';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useDebouncedCallback }from 'use-debounce';
-
-const inputValueClass = "w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500";
-const labelClass = "block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2";
+import { inputValueNumberClass } from '@/app/ui/cssComponents/styles';
 
 export function AcceptFussion({
         acceptFusion,
@@ -488,108 +493,118 @@ export function TextElementType({
                                                         />
                                                     </div>
                                                 </div>
-                                                { /* JUSTIFY CONTENT */}
-                                                <div className='grid grid-rows-1 grid-cols-5 mt-5'>
-                                                    <div className='flex justify-center flex-col text-center'>
-                                                        <Bars3BottomLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                        onClick={() => {
-                                                            handleJustify('left');
-                                                        }}
-                                                        ></Bars3BottomLeftIcon>
-                                                        <span>Left</span>
-                                                    </div>
-                                                    <div className='flex justify-center flex-col text-center'>
-                                                        <Bars3Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                        onClick={() => {
-                                                            handleJustify('center');
-                                                        }}
-                                                        ></Bars3Icon>
-                                                        <span>Center</span>
-                                                    </div>
-                                                    <div className='flex justify-center flex-col text-center'>
-                                                        <Bars3BottomRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                        onClick={() => {
-                                                            handleJustify('right');
-                                                        }}
-                                                        ></Bars3BottomRightIcon>
-                                                        <span>Right</span>
-                                                    </div>
-                                                </div>
-                                                { /* ALIGN ITEMS*/}
-                                                <div className='grid grid-rows-1 grid-cols-5 mt-5'>
-                                                <div className='flex justify-center flex-col text-center'>
-                                                        <BarsArrowDownIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                        onClick={() => {
-                                                            handleAlign('flex-end');
-                                                        }}
-                                                        ></BarsArrowDownIcon>
-                                                        <span>End</span>
-                                                    </div>
-                                                    <div className='flex justify-center flex-col text-center'>
-                                                            <Bars2Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                            onClick={() => {
-                                                                handleAlign('center');
-                                                            }}
-                                                            ></Bars2Icon>
-                                                            <span>Center</span>
-                                                    </div>
-                                                    <div className='flex justify-center flex-col text-center'>
-                                                            <BarsArrowUpIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                            onClick={() => {
-                                                                handleAlign('flex-start');
-                                                            }}
-                                                            ></BarsArrowUpIcon>
-                                                            <span>Top</span>
+                                                
+                                                { /* ALIGN TEXT*/}
+                                                <div className='mt-5'>
+                                                    <span>Align text</span>
+                                                    
+                                                    <div className='mt-5 ml-10'>
+                                                        { /* JUSTIFY CONTENT */}
+                                                        <div className='grid grid-rows-1 grid-cols-5 mt-5'>
+                                                            <div className='flex justify-center flex-col text-center'>
+                                                                <Bars3BottomLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                                onClick={() => {
+                                                                    handleJustify('left');
+                                                                }}
+                                                                ></Bars3BottomLeftIcon>
+                                                                <span>Left</span>
+                                                            </div>
+                                                            <div className='flex justify-center flex-col text-center'>
+                                                                <Bars3Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                                onClick={() => {
+                                                                    handleJustify('center');
+                                                                }}
+                                                                ></Bars3Icon>
+                                                                <span>Center</span>
+                                                            </div>
+                                                            <div className='flex justify-center flex-col text-center'>
+                                                                <Bars3BottomRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                                onClick={() => {
+                                                                    handleJustify('right');
+                                                                }}
+                                                                ></Bars3BottomRightIcon>
+                                                                <span>Right</span>
+                                                            </div>
+                                                        </div>
+                                                        { /* ALIGN ITEMS*/}
+                                                        <div className='grid grid-rows-1 grid-cols-5 mt-5'>
+                                                        <div className='flex justify-center flex-col text-center'>
+                                                                <BarsArrowDownIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                                onClick={() => {
+                                                                    handleAlign('flex-end');
+                                                                }}
+                                                                ></BarsArrowDownIcon>
+                                                                <span>End</span>
+                                                            </div>
+                                                            <div className='flex justify-center flex-col text-center'>
+                                                                    <Bars2Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        handleAlign('center');
+                                                                    }}
+                                                                    ></Bars2Icon>
+                                                                    <span>Center</span>
+                                                            </div>
+                                                            <div className='flex justify-center flex-col text-center'>
+                                                                    <BarsArrowUpIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        handleAlign('flex-start');
+                                                                    }}
+                                                                    ></BarsArrowUpIcon>
+                                                                    <span>Top</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                                 { /* Padding */}
                                                 <div className='mt-5'>
                                                     <span>Padding</span>
-                                                    <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
-                                                        <div className="flex flex-col">
-                                                            <input type="number" name="paddingleft" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                                                            defaultValue={paddingLeft}
-                                                            onChange={ ( e ) => {
-                                                                handlerPadding( 'Left', e.target.value );
-                                                            }}
-                                                            />
-                                                            <label htmlFor="paddingleft" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
-                                                                Left
-                                                            </label>
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <input type="number" name="paddingTop" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                                                            defaultValue={paddingTop}
-                                                            onChange={ ( e ) => {
-                                                                handlerPadding( 'Top', e.target.value );
-                                                            }}
-                                                            />
-                                                            <label htmlFor="paddingTop" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
-                                                                Top
-                                                            </label>
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <input type="number" name="paddingRight" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                                                            defaultValue={paddingRight}
-                                                            onChange={ ( e ) => {
-                                                                handlerPadding( 'Right', e.target.value );
-                                                            }}
-                                                            />
-                                                            <label htmlFor="paddingRight" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
-                                                                Right
-                                                            </label>
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <input type="number" name="paddingBottom" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                                                            defaultValue={paddingBottom}
-                                                            onChange={ ( e ) => {
-                                                                handlerPadding( 'Bottom', e.target.value );
-                                                            }}
-                                                            />
-                                                            <label htmlFor="paddingBottom" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2">
-                                                                Bottom
-                                                            </label>
+                                                    <div className='mt-5 ml-10'>
+                                                        <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="paddingleft" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                                defaultValue={paddingLeft}
+                                                                onChange={ ( e ) => {
+                                                                    handlerPadding( 'Left', e.target.value );
+                                                                }}
+                                                                />
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="paddingTop" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                                defaultValue={paddingTop}
+                                                                onChange={ ( e ) => {
+                                                                    handlerPadding( 'Top', e.target.value );
+                                                                }}
+                                                                />
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowUpIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="paddingRight" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                                defaultValue={paddingRight}
+                                                                onChange={ ( e ) => {
+                                                                    handlerPadding( 'Right', e.target.value );
+                                                                }}
+                                                                />
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <input type="number" name="paddingBottom" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
+                                                                defaultValue={paddingBottom}
+                                                                onChange={ ( e ) => {
+                                                                    handlerPadding( 'Bottom', e.target.value );
+                                                                }}
+                                                                />
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowDownIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -600,48 +615,48 @@ export function TextElementType({
                                                         <span>Radius</span>
                                                         <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
                                                             <div className="flex flex-col">
-                                                                <input type="number" name="borderTopLeft" className={inputValueClass} required min={0.1} step={0.1}
+                                                                <input type="number" name="borderTopLeft" className={inputValueNumberClass} required min={0.1} step={0.1}
                                                                 defaultValue={borderTopLeftRadius}
                                                                 onChange={ ( e ) => {
                                                                     handlerBorder( 'TopLeftRadius', e.target.value );
                                                                 }}
                                                                 />
-                                                                <label htmlFor="borderTopLeft" className={labelClass}>
-                                                                    Left Top
-                                                                </label>
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowUpLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <input type="number" name="borderBottomLeft" className={inputValueClass} required min={0.1} step={0.1}
+                                                                <input type="number" name="borderBottomLeft" className={inputValueNumberClass} required min={0.1} step={0.1}
                                                                 defaultValue={borderBottomLeftRadius}
                                                                 onChange={ ( e ) => {
                                                                     handlerBorder( 'BottomLeftRadius', e.target.value );
                                                                 }}
                                                                 />
-                                                                <label htmlFor="borderBottomLeft" className={labelClass}>
-                                                                    Left Bottom
-                                                                </label>
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowDownLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <input type="number" name="borderTopRight" className={inputValueClass} required min={0.1} step={0.1}
+                                                                <input type="number" name="borderTopRight" className={inputValueNumberClass} required min={0.1} step={0.1}
                                                                 defaultValue={borderTopRightRadius}
                                                                 onChange={ ( e ) => {
                                                                     handlerBorder( 'TopRightRadius', e.target.value );
                                                                 }}
                                                                 />
-                                                                <label htmlFor="borderTopRight" className={labelClass}>
-                                                                    Right Top
-                                                                </label>
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowUpRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <input type="number" name="borderRightBottom" className={inputValueClass} required min={0.1} step={0.1}
+                                                                <input type="number" name="borderRightBottom" className={inputValueNumberClass} required min={0.1} step={0.1}
                                                                 defaultValue={borderBottomRightRadius}
                                                                 onChange={ ( e ) => {
                                                                     handlerBorder( 'BottomRightRadius', e.target.value );
                                                                 }}
                                                                 />
-                                                                <label htmlFor="borderRightBottom" className={labelClass}>
-                                                                    Right Bottom
-                                                                </label>
+                                                                <div className='w-12 text-center flex mt-3 justify-center'>
+                                                                    <ArrowDownRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
+                                                                </div>
                                                             </div>
                                                         </div>
 
@@ -649,7 +664,7 @@ export function TextElementType({
                                                     <div className='mt-5 ml-10'>
                                                         <span>Stroke</span>
                                                         <div className="flex flex-col">
-                                                            <input type="number" name="borderWidth" className={inputValueClass} required min={0.1} step={0.1}
+                                                            <input type="number" name="borderWidth" className={inputValueNumberClass} required min={0.1} step={0.1}
                                                             defaultValue={borderWidth}
                                                             onChange={ ( e ) => {
                                                                 handlerBorder( 'Width', e.target.value );

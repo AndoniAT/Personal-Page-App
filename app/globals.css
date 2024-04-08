@@ -66,3 +66,7 @@ body {
 .sessionIconsNavBar .text-session-btn {
   @apply text-blue-600 text-xs 2xl:text-sm font-medium
 }
+
+.labelFormClass {
+  @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2
+}
