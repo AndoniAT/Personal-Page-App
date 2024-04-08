@@ -316,6 +316,7 @@ export function TextElementType({
 
     const handleTransparency = useDebouncedCallback(
         ( transp ) => {
+            console.log('set transp', transp);
             if( isEdit ) {
                 let newColor = '';
                 
@@ -324,7 +325,7 @@ export function TextElementType({
                 }
 
                 let f = new FormData();
-                let target = 'bg';
+                let target = 'backgroundColor';
                 f.set( target, newColor );
                 f.set( 'target', target );
                 element.actions?.updateElement( f );
@@ -335,7 +336,7 @@ export function TextElementType({
 
     useEffect(() => {
         setTransparent( transparentElement );
-    }, [ transparent, transparentElement ])
+    }, [ transparentElement ] )
 
     return (
         <motion.div
