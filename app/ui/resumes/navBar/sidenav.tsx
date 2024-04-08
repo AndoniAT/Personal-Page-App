@@ -79,67 +79,69 @@ async function createSideNav( paramsSend : {
   };
 
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
-      <Link
-        className="mb-2 flex h-20 items-end justify-start rounded-md bg-slate-800 p-4 md:h-30"
-        href="/"
-      >
-        <div className="w-32 text-white md:w-60">
-          <AcmeLogo />
-        </div>
-      </Link>
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-        <NavLinks params={paramsSend}/>
-        {
-          (isUsersSessionProfile) ? 
-            ( 
-              (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
-            )
-          :
-           <></>
-        }
+    <div className="w-full flex-none md:w-60 lg:w-60 2xl:w-80">
+      <div className="flex h-full flex-col px-3 py-4 md:px-2">
+        <Link
+          className="mb-2 flex h-20 items-end justify-start rounded-md bg-slate-800 p-4 md:h-30"
+          href="/"
+        >
+          <div className="w-32 text-white md:w-60">
+            <AcmeLogo />
+          </div>
+        </Link>
+        <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+          <NavLinks params={paramsSend}/>
+          {
+            (isUsersSessionProfile) ? 
+              ( 
+                (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
+              )
+            :
+            <></>
+          }
 
-        <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
-        {
-          session?.user ? (
-                <div className='grid grid-cols-2'>
-                    <form
-                      action={async () => {
-                        'use server';
-                        await signOut();
-                      }}
-                    >
-                      <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
-                        <PowerIcon className="w-6 text-blue-600 mr-5" />
-                        <div className="text-blue-600 text-sm font-medium">Sign Out</div>
+          <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
+          {
+            session?.user ? (
+                  <div className='grid grid-cols-2'>
+                      <form
+                        action={async () => {
+                          'use server';
+                          await signOut();
+                        }}
+                      >
+                        <button className="sessionIconsNavBar">
+                          <PowerIcon className="w-6 text-blue-600 mr-5" />
+                          <div className="text-session-btn">Sign Out</div>
+                        </button>
+                    </form>
+                    <form action={goToMyresume}>
+                      <button className="sessionIconsNavBar">
+                        <UserCircleIcon className="w-6 text-blue-600 mr-5" />
+                        <div className="text-session-btn">My page</div>
                       </button>
-                  </form>
-                  <form action={goToMyresume}>
-                    <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
-                      <UserCircleIcon className="w-6 text-blue-600 mr-5" />
-                      <div className="text-blue-600 text-sm font-medium">My page</div>
-                    </button>
-                  </form>
-                </div>
-          ) : 
-          (
-            <div className='grid grid-cols-2'>
-              <form action={goToLogin}>
-                <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
-                  <PowerIcon className="w-6 text-blue-600 mr-5" />
-                  <div className="text-blue-600 text-sm font-medium">Login</div>
-                </button>
-              </form>
-              <form action={goToCreateAccount}>
-                <button className="sessionIconsNavBar flex flex-row p-2 rounded hover:bg-blue-300">
-                  <UserCircleIcon className="w-6 text-blue-600 mr-5" />
-                  <div className="text-blue-600 text-sm font-medium">Create an account</div>
-                </button>
-              </form>
-            </div>
-          )
-        }
-        
+                    </form>
+                  </div>
+            ) : 
+            (
+              <div className='grid grid-cols-2'>
+                <form action={goToLogin}>
+                  <button className="sessionIconsNavBar">
+                    <PowerIcon className="w-6 text-blue-600 mr-5" />
+                    <div className="text-session-btn">Login</div>
+                  </button>
+                </form>
+                <form action={goToCreateAccount}>
+                  <button className="sessionIconsNavBar">
+                    <UserCircleIcon className="w-10 text-blue-600 mr-5" />
+                    <div className="text-session-btn">Create an account</div>
+                  </button>
+                </form>
+              </div>
+            )
+          }
+          
+        </div>
       </div>
     </div>
   );

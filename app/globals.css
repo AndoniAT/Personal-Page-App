@@ -57,3 +57,12 @@ body {
 .checkingMyBg {
   @apply bg-slate-200
 }
+
+.sessionIconsNavBar  {
+  align-items: center;
+  @apply flex flex-row p-2 rounded hover:bg-blue-300
+}
+
+.sessionIconsNavBar .text-session-btn {
+  @apply text-blue-600 text-xs 2xl:text-sm font-medium
+}
