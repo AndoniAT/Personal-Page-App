@@ -63,5 +63,6 @@ export interface ElementBlockClient {
     block_id:string,
     actions?: {
         updateElement: Function
+        deleteElement: Function
     }
 }

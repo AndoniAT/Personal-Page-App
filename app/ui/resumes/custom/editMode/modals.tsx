@@ -7,6 +7,7 @@ import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3B
     ArrowRightIcon,
     ArrowUpIcon,
     ArrowDownIcon,
+    TrashIcon,
  } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../resumesStyles/interfaces';
@@ -169,57 +170,17 @@ export function TextElementType({
     let transparentElement = ( isEdit && !myCss.backgroundColor || typeof myCss.backgroundColor == 'string' && myCss.backgroundColor == '');
     
     /* HANDLERS */ 
+    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), 200 );
+    const handlerSize = useDebouncedCallback( (value) => sendFormDataForElement( 'fontSize', value, element), 200 );
+    const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element), 200 );
+    const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), 200 );
+    const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), 200 );
+    const handleAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), 200 );
 
-    const handlerText = useDebouncedCallback(
-        (value) => {
-          
-            if ( isEdit ) {
-                let f = new FormData();
-                let target = 'content';
-                f.set( target, value );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-
-        },
-        200
-    );
-
-    const handlerSize = useDebouncedCallback(
-        (value) => {
-            if( isEdit ) {
-                let f = new FormData();
-                let target = 'fontSize';
-                f.set( target, value );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
-
-    const handlerPadding = useDebouncedCallback(
-        (direction, value) => {
-            if( isEdit ) {
-                let f = new FormData();
-                let target = 'padding'+direction;
-                f.set( target, value );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
-
-    const handlerBorder = useDebouncedCallback(
-        (attr, value) => {
-            if( isEdit ) {
-                let f = new FormData();
-                let target = 'border'+attr;
-                f.set( target, value );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
+    const handleTransparency = useDebouncedCallback(
+        ( transp ) => {
+            let newColor = ( !transp && colorBgInputRef?.current) ? colorBgInputRef.current.value : '';
+            sendFormDataForElement( 'backgroundColor', newColor, element )
         },
         200
     );
@@ -234,110 +195,15 @@ export function TextElementType({
 
     
     /* Colors Handlers */ 
-
-    const handleColorBgClick = () => {
-        if (colorBgInputRef.current) {
-            colorBgInputRef.current.click();
-        }
-    };
+    const handleColorBgClick = () => (colorBgInputRef.current) ? colorBgInputRef.current.click() : '';
+    const handleColorTextClick = () => (colorTextInputRef.current) ? colorTextInputRef.current.click() : '';
+    const handleColorBorderClick = () => (colorBorderInputRef.current) ? colorBorderInputRef.current.click() : '';
     
-    const handleColorTextClick = () => {
-        if (colorTextInputRef.current) colorTextInputRef.current.click();
-    };
     
-    const handleColorBorderClick = () => {
-        if (colorBorderInputRef.current) {
-            colorBorderInputRef.current.click();
-        }
-    };
-    const handleColorBgChange = useDebouncedCallback(
-        () => {
-            if( isEdit && colorBgInputRef?.current ) {
-                let newColor = colorBgInputRef.current.value;
-                let f = new FormData();
-                let target = 'backgroundColor';
-                f.set( target, newColor );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
-
-    const handleColorTextChange = useDebouncedCallback(
-        () => {
-            if( isEdit && colorTextInputRef?.current ) {
-                let newColor = colorTextInputRef.current.value;
-                let f = new FormData();
-                let target = 'textColor';
-                f.set( target, newColor );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
-
-    const handleColorBorderChange = useDebouncedCallback(
-        () => {
-            if( isEdit && colorBorderInputRef?.current ) {
-                let newColor = colorBorderInputRef.current.value;
-                let f = new FormData();
-                let target = 'borderColor';
-                f.set( target, newColor );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
+    const handleColorBgChange = useDebouncedCallback( () => ( isEdit && colorBgInputRef?.current ) ? sendFormDataForElement( 'backgroundColor', colorBgInputRef.current.value, element) : '', 200);
+    const handleColorTextChange = useDebouncedCallback( () => ( isEdit && colorTextInputRef?.current ) ? sendFormDataForElement( 'color', colorTextInputRef.current.value, element) : '', 200 );
+    const handleColorBorderChange = useDebouncedCallback( () => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', 200 );
     /* ===============  */
-
-    const handleJustify = useDebouncedCallback(
-        ( value ) => {
-            if( isEdit  ) {
-                let f = new FormData();
-                let target = 'justifyContent';
-                f.set( target, value );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
-
-    const handleAlign = useDebouncedCallback(
-        ( value ) => {
-            if( isEdit  ) {
-                let f = new FormData();
-                let target = 'alignItems';
-                f.set( target, value );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
-
-    const handleTransparency = useDebouncedCallback(
-        ( transp ) => {
-            console.log('set transp', transp);
-            if( isEdit ) {
-                let newColor = '';
-                
-                if( !transp && colorBgInputRef?.current) {
-                    newColor = colorBgInputRef.current.value;
-                }
-
-                let f = new FormData();
-                let target = 'backgroundColor';
-                f.set( target, newColor );
-                f.set( 'target', target );
-                element.actions?.updateElement( f );
-            }
-        },
-        200
-    );
 
     useEffect(() => {
         setTransparent( transparentElement );
@@ -693,6 +559,20 @@ export function TextElementType({
                                                     </div>
                                                     </div>
                                                 </div>
+
+                                                { /* DELETE */}
+                                                <div className='mt-5'>
+                                                    <div className='w-12 text-center flex mt-3 justify-center p-2'>
+                                                        <TrashIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer 
+                                                        hover:bg-red-300"
+                                                        onClick={async () => {
+                                                            if( isEdit ) {
+                                                                await element.actions?.deleteElement();
+                                                                cancel();
+                                                            }
+                                                        }}/>
+                                                    </div>
+                                                </div>
                                             </>
 
                                         :<></>
@@ -745,4 +625,19 @@ export function ErrorModal({
         </div>
 
     )
+}
+
+/**
+ * 
+ * @param attr 
+ * @param element 
+ */
+function sendFormDataForElement( attr:string, value:any, element:ElementBlockClient|null ) {
+    if( element ) {
+        let f = new FormData();
+        let target = attr;
+        f.set( target, value );
+        f.set( 'target', target );
+        element.actions?.updateElement( f );
+    }
 }

@@ -154,6 +154,30 @@ export async function updateElementBlock(this:{ section_id:string, username:stri
   
 }
 
+export async function deleteElementBlock(this:{ section_id:string, username:string, block_id:string, element_id:string } ) {
+  'use server'
+  noStore();
+  let { section_id, username, block_id, element_id } = this;
+
+  try {
+    await requiresSessionUserProperty( username );
+
+    // Select section
+    let section = await getSectionByIdForUser( username, section_id ) as Section|undefined;
+
+    if( !section ) {
+      throw new Error( 'Section not found for user' );
+    }
+    
+    let res = await sql`DELETE FROM ELEMENT WHERE element_id = ${element_id} AND
+    block_id = ${block_id}`;
+    return res;
+
+  } catch( error:any ) {
+    throw new Error( 'Failed to delete the element for block : ' + error?.message );
+  }
+}
+
 export async function getBlocksSection( section_id:string ) {
     'use server'
     noStore();
@@ -220,14 +244,14 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
         WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
         break;
       }
-      case 'fontSize':
       case 'backgroundColor':
-      case 'textColor':
+      case 'color':
       case 'borderColor':
       case 'justifyContent':
       case 'alignItems':
         await getAndUpdateFormAttribute( target, block_id, element, form, '' );
         break;
+      case 'fontSize':
       case 'paddingLeft':
       case 'paddingTop':
       case 'paddingRight':

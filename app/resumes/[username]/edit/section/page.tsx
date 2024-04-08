@@ -6,7 +6,7 @@ import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 import { revalidatePath } from 'next/cache';
-import { createElementTextBlock, createNewBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
+import { createElementTextBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
 import { Block } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
@@ -113,8 +113,24 @@ export default async function Page(
   
           });
         }
+
+        let deleteElement = async () => {
+          'use server'
+          return new Promise( (resolve, reject) => {
+            deleteElementBlock.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id } )
+            .then( () => {
+              resolve(true);
+              revalidatePath(`/resumes/${user.username}/edit/section`);
+            })
+            .catch( err => {
+              reject( err );
+            });
+          });
+        }
+
         element.actions = {
-          updateElement: updateElement
+          updateElement: updateElement,
+          deleteElement: deleteElement
         }
         return element;
       });
