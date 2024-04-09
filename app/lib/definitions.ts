@@ -29,8 +29,6 @@ export type Media = {
     url: string,
     contenttype: string,
     size:number,
-
-    position: number
     ishero: boolean
 
     section_id: string

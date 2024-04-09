@@ -70,3 +70,17 @@ body {
 .labelFormClass {
   @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2
 }
+
+#customImageModal .no-image {
+  @apply h-32 col-span-12 bg-slate-400 border rounded-xl mb-5 cursor-pointer
+}
+
+#customImageModal .no-image .Imageelement {
+  position: unset;
+  object-fit: cover;
+  @apply hover:scale-105
+}
+
+.loading:hover {
+  @apply cursor-progress
+}

@@ -1,9 +1,11 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
-import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
+import { Block, ElementBlock, FusionElementsBlock, Media, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
 import { Config } from 'tailwindcss';
+import { utapi } from '@/server/uploadthing';
+import { insertMedia } from '@/app/api/medias/route';
 const fsp = require('fs').promises
 
 const TYPESELEMENT = {
@@ -41,17 +43,15 @@ export async function createNewBlock(this:{ section_id:string, username:string})
     }
 }
 
-export async function createElementTextBlock(this:{ section_id:string, username:string, block_id:string, form:FormData } ) {
+export async function createElementBlock(this:{ section_id:string, username:string, block_id:string, form:FormData, type:string } ) {
   'use server'
     noStore();
-    let { section_id, username, block_id, form } = this;
-    let content = form.get('content') as string;
-    let size = form.get('size') as string;
+    let { section_id, username, block_id, form, type } = this;
     let fusionBlocks = JSON.parse( form.get('fusionBlocks') as string ) as FusionElementsBlock;
     
     try {
       await requiresSessionUserProperty( username );
-
+      
       // Select section
       let section = await getSectionByIdForUser( username, section_id ) as Section|undefined;
 
@@ -71,7 +71,6 @@ export async function createElementTextBlock(this:{ section_id:string, username:
       }
 
       let newPositionsToOcupe = getOcupedPositions( positions );
-      
 
       // GET ELEMENTS FOR BLOCK
       let res = await sql`SELECT * FROM ELEMENT WHERE block_id=${block_id}`;
@@ -90,9 +89,26 @@ export async function createElementTextBlock(this:{ section_id:string, username:
         }
 
       }
+
+      let content = form.get('content') as string;
       const defClassName = 'h-full';
+      let css = `{}`
+      let media_id = null;
+      switch( type ) {
+        case TYPESELEMENT.text:
+          /*let size = form.get('size') as string;*/
+          css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex"}`
+          break;
+        case TYPESELEMENT.media:
+          /*css = `{"position": "unset", "objectFit": "cover" }`;*/
+          media_id = await insertMedia(section_id, form ) as string;
+          break;
+        default: {
+          throw new Error('Not recognized type');
+        }
+      }
+
       //const css = `{"fontSize": "${size}rem", "wordWrap": "break-word"}`
-      const css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex"}`
 
       await sql`INSERT INTO ELEMENT(
         linefrom,
@@ -103,15 +119,17 @@ export async function createElementTextBlock(this:{ section_id:string, username:
         css,
         content,
         type,
-        block_id
+        block_id,
+        media_id
       ) VALUES ( 
         ${positions.linefrom}, ${positions.lineto}, 
         ${positions.colfrom}, ${positions.colto},
         ${defClassName},
         ${css},
         ${content},
-        ${'text'},
-        ${block_id}
+        ${type},
+        ${block_id},
+        ${media_id}
       )`
 
     } catch( error:any ) {
@@ -140,12 +158,13 @@ export async function updateElementBlock(this:{ section_id:string, username:stri
     let element = element_res.rows[ 0 ] as ElementBlock;
 
     if( element ) {
-      switch( element.type ) {
+      await updateElementText( block_id, element, form );
+      /*switch( element.type ) {
       case TYPESELEMENT.text : {
-          await updateElementText( block_id, element, form );
+      case TYPESELEMENT.media : {
           break;
         }
-      }
+      }*/
     }
 
   } catch( error:any ) {
@@ -261,6 +280,7 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
       case 'borderTopRightRadius':
       case 'borderBottomRightRadius':
       case 'borderWidth':
+        console.log('check', element);
         await getAndUpdateFormAttribute( target, block_id, element, form, 'rem' );
         break;
       case 'customclassname': {
@@ -297,6 +317,7 @@ function getAndUpdateFormAttribute( attr:string, block_id:string, element:Elemen
   css = JSON.stringify(css);
   return updateBlockCss( block_id, element.element_id, css );
 }
+
 /**
  * 
  * @param block_id 

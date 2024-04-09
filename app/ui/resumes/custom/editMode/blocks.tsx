@@ -1,8 +1,9 @@
 import { FormEvent, useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
 import clsx from "clsx";
-import { AcceptFussion, ChooseTypeFusion, ErrorModal, TextElementType } from "./modals";
-import { FusionElementsBlock, Positions } from "@/app/lib/definitions";
+import { AcceptFussion, ChooseTypeFusion, ErrorModal, MediaElementType, TextElementType } from "./modals";
+import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
+import Image from "next/image";
 
 const STEPS = {
   NONE: 0,
@@ -14,6 +15,13 @@ const STEPS = {
   ASK_FUSION:number,
   ASK_ELEM_TYPE:number,
   SET_ELEM_VALUE:number
+}
+
+export const TYPES_TO_CHOOSE = {
+  text: 'text',
+  image: 'media',
+  video: 'linkvideo',
+  html: 'html'
 }
 
 /**
@@ -142,20 +150,11 @@ export function Block({
 
   let chooseElementType = ( type:string ) => {
     switch( type ) {
-      case 'text':
-        setTypeSelected('text');
-        setStep( STEPS.SET_ELEM_VALUE );
-        break;
-      case 'media':
-        setTypeSelected('media');
-        setStep( STEPS.SET_ELEM_VALUE );
-        break;
-      case 'linkvideo': 
-        setTypeSelected('linkvideo');
-        setStep( STEPS.SET_ELEM_VALUE );
-        break;
-      case 'html':
-        setTypeSelected('html');
+      case TYPES_TO_CHOOSE.text:
+      case TYPES_TO_CHOOSE.image:
+      case TYPES_TO_CHOOSE.video: 
+      case TYPES_TO_CHOOSE.html:
+        setTypeSelected(type);
         setStep( STEPS.SET_ELEM_VALUE );
         break;
       default:
@@ -165,14 +164,15 @@ export function Block({
   }
 
   let blockElements = buildElementsForBlock( elements, totLines, totCols, handlerFusion, fusionElements );
-  async function SubmitCreateTextElementBlock(event: FormEvent<HTMLFormElement>) {
+
+  async function SubmitCreateElementBlock(event: FormEvent<HTMLFormElement>, type:string) {
     event.preventDefault()
      
     const formData = new FormData( event.currentTarget )
     if( block.actions?.addElement ) {
       formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );
       try {
-        await block.actions.addElement( 'text', formData );
+        await block.actions.addElement( type, formData );
         finishProcess();
       } catch( e:any ) {
         console.log('Error :', e?.message);
@@ -207,12 +207,21 @@ export function Block({
       :
       <></>
     }
+    { /* Step 3 => Create the type showing the modal to insert content */}
     {
       ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'text' ) ?
-    <TextElementType handler={SubmitCreateTextElementBlock} cancel={finishProcess} element={null}></TextElementType>
+    <TextElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></TextElementType>
       : 
     <></>
     }
+    {
+      ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'media' ) ?
+      <MediaElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null} block_id={block.block_id}></MediaElementType>
+      : 
+    <></>
+    }
+
+    { /* Error modal handler */}
     {
       ( error.length > 0 ) ?
       <ErrorModal message={error} accept={() => { setError('') } }/>
@@ -265,8 +274,10 @@ export function CustomElement({
   element.customclassname = element.customclassname + "            ";
   if( element.customclassname == null || element.customclassname == '') alert('nooo');
   switch(element.type) {
-    case 'text':
+    case TYPES_TO_CHOOSE.text:
       return <ElementText element={element}></ElementText>
+    case TYPES_TO_CHOOSE.image:
+      return <ElementImage element={element}></ElementImage>
   }
 }
 
@@ -339,6 +350,92 @@ export function ElementText({
       {
         editElement ? 
         <TextElementType handler={submitEditTextElementBlock} cancel={() => { setEditElement(false) }} element={element}></TextElementType>
+        : <></>
+      }
+    </>
+  )
+}
+
+export function ElementImage({
+  element
+}:Readonly<{
+  element:ElementBlockClient,
+}>) {
+  let [editElement, setEditElement] = useState<boolean>(false);
+  let [image, setImage] = useState<string>('');
+
+  let spanRow = element.lineto - element.linefrom + 1;
+  let spanCol = element.colto - element.colfrom + 1;
+  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
+  let gridCss = {
+    ...{
+      gridRow: `span ${spanRow} / span ${spanRow}`,
+      gridColumn: `span ${spanCol} / span ${spanCol}`,
+      position: 'relative'
+    }
+  }  
+
+  myCss = {
+    ...{
+      'width': '100%',
+      'height': '100%'
+    },
+    ...myCss,
+  }
+
+  useEffect(() => {
+    fetch(`/api/medias/${element.media_id}`)
+    .then( res => res.json() 
+    )
+    .then( res => {
+      let media = res.media as Media
+      console.log('check media', media);
+      setImage(media.url);
+    })
+    .catch( err => {
+
+    });
+  }, [ image ] );
+
+  let submitEditImageElementBlock = async function (event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+     
+    const formData = new FormData( event.currentTarget )
+    if( element.actions?.updateElement ) {
+      try {
+        await element.actions.updateElement( formData );
+      } catch ( err ) {
+        console.log('Error', err);
+      }
+    }
+  }
+
+  let customClass = element.customclassname ?? '';
+
+  return (
+    <>
+        <div style={gridCss}
+            className={clsx({
+              [element.defclassname]:true,
+              ['hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700']:true ,
+            })
+          }
+            onClick={() => { setEditElement(true)}}
+            >
+        <Image
+          style={myCss}
+          className={clsx({
+            /*[customClass]: (!!element.customclassname)*/
+          })}
+          src={image}
+          layout='fill'
+          objectFit='cover'
+          alt="ImageBlock"
+        />
+      </div>
+      {
+        editElement ? 
+        <MediaElementType handler={submitEditImageElementBlock} cancel={() => { setEditElement(false) }} element={element} imageUrl={image}></MediaElementType>
         : <></>
       }
     </>

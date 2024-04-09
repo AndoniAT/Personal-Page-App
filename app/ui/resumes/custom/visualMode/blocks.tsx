@@ -1,5 +1,9 @@
+import { useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
 import clsx from "clsx";
+import Image from "next/image";
+import { TYPES_TO_CHOOSE } from "../editMode/blocks";
+import { Media } from "@/app/lib/definitions";
 
 /**
  * Construct customed blocks to show in page
@@ -112,8 +116,10 @@ export function CustomElement({
   element:ElementBlockClient
 }) {
   switch(element.type) {
-    case 'text':
+    case TYPES_TO_CHOOSE.text:
       return <ElementText element={element}></ElementText>
+    case TYPES_TO_CHOOSE.image:
+      return <ElementImage element={element}></ElementImage>
   }
 }
 
@@ -150,6 +156,66 @@ export function ElementText({
       <div
       style={myCss}
       >{element.content}</div>
+    </div>
+  )
+}
+
+export function ElementImage({
+  element
+}:{
+  element:ElementBlockClient
+}) {
+  let [image, setImage] = useState<string>('');
+
+  useEffect(() => {
+    fetch(`/api/medias/${element.media_id}`)
+    .then( res => res.json() 
+    )
+    .then( res => {
+      let media = res.media as Media
+      console.log('check media', media);
+      setImage(media.url);
+    })
+    .catch( err => {
+
+    });
+  }, [ image ] );
+
+  let spanRow = element.lineto - element.linefrom + 1;
+  let spanCol = element.colto - element.colfrom + 1;
+  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
+  let css = {
+    ...{
+      gridRow: `span ${spanRow} / span ${spanRow}`,
+      gridColumn: `span ${spanCol} / span ${spanCol}`,
+      position: 'relative'
+    }
+  }  
+
+  myCss = {
+    ...{
+      'width': '100%',
+      'height': '100%'
+    },
+    ...myCss,
+  }
+
+  let customClass = element.customclassname ?? 'cuss';
+
+  return (
+    <div style={css}
+     className={`${element.defclassname} ${customClass}`}
+    >
+      <Image
+          style={myCss}
+          className={clsx({
+            /*[customClass]: (!!element.customclassname)*/
+          })}
+          src={image}
+          layout='fill'
+          objectFit='cover'
+          alt="ImageBlock"
+        />
     </div>
   )
 }

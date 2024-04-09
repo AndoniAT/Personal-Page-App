@@ -149,13 +149,12 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
         size,
         contentType,
 
-        position,
         isHero,
 
         section_id,
         project_id )
 
-        VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, 1, TRUE, ${home.section_id}, null )
+        VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, TRUE, ${home.section_id}, null )
         ON CONFLICT ( media_id ) DO NOTHING;`
         revalidatePath(`/resumes/${username}/edit/section`);
         return image?.url;
@@ -204,12 +203,10 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
         key,
         url,
         size,
-        contentType,
-
-        position
+        contentType
         )
 
-        VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, 0)
+        VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type})
         RETURNING media_id;`;
 
       let photoMedia = inserted.rows[ 0 ] as Media;

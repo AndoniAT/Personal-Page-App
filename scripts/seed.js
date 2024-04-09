@@ -140,8 +140,6 @@ async function createMedia( client ) {
             url TEXT NOT NULL,
             contenttype VARCHAR(255) NOT NULL,
             size INT NOT NULL,
-
-            position INT NOT NULL,
             isHero BOOLEAN DEFAULT False,
 
             section_id UUID,

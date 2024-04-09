@@ -6,7 +6,6 @@ export interface MediaClient {
     url?: string,
     downloadurl?: string,
     contenttype?: string
-    position?: number
     ishero?: boolean
     section_id?: string
     project_id?: string
@@ -61,6 +60,7 @@ export interface ElementBlockClient {
     content:string,
     type:'text'|'media'|'linkvideo'|'html',
     block_id:string,
+    media_id?:string,
     actions?: {
         updateElement: Function
         deleteElement: Function

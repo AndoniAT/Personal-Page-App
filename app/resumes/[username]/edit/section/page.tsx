@@ -6,7 +6,7 @@ import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 import { revalidatePath } from 'next/cache';
-import { createElementTextBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
+import { createElementBlock, createElementTextBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
 import { Block } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
@@ -62,32 +62,14 @@ export default async function Page(
       const createElement = async ( type:string, form:FormData ) => {
         'use server'
         return new Promise( (resolve, reject) => {
-          let fn = null;
-          switch( type ) {
-            case 'text':
-              fn = createElementTextBlock;
-              break;
-            case 'media':
-              break;
-            case 'linkvideo':
-              break;
-            case 'html':
-              break;
-          }
-  
-          if ( fn ) {
-            fn.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, form: form } )
-            .then( () => {
-              resolve(true);
-              revalidatePath(`/resumes/${user.username}/edit/section`);
-            })
-            .catch( err => {
-              reject( err );
-            });
-          } else {
-            reject( 'No function' );
-          }
-
+          createElementBlock.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, form: form, type:type } )
+          .then( () => {
+            resolve(true);
+            revalidatePath(`/resumes/${user.username}/edit/section`);
+          })
+          .catch( err => {
+            reject( err );
+          });
         })
       }
 
