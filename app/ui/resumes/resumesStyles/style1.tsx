@@ -223,7 +223,7 @@ export function Style1EditView(
                       />
                     </div>
 
-                    : <div className={styles.hero.imageContainer}>
+                    : <div className={styles.hero.imageContainer + ' border border-slate-950'}>
                     </div>
                 }
                 <input
@@ -262,7 +262,7 @@ export function Style1EditView(
                     <div className='h-full p-1 w-full flex justify-center  items-center	'>
                       <div className={clsx({
                         [styles.edit.hover]: !loading,
-                        ['bg-gray-300 rounded-full size-4/6']: true,
+                        ['bg-gray-300 rounded-full size-4/6  border border-slate-950']: true,
 
                       })} onClick={handleProfileClick}>
                       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
 import clsx from "clsx";
 import Image from "next/image";
@@ -120,6 +120,8 @@ export function CustomElement({
       return <ElementText element={element}></ElementText>
     case TYPES_TO_CHOOSE.image:
       return <ElementImage element={element}></ElementImage>
+    case TYPES_TO_CHOOSE.html:
+      return <ElementHtml element={element}></ElementHtml>
   }
 }
 
@@ -132,27 +134,23 @@ export function ElementText({
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
   let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let css = {
+  let gridCss = {
     ...{
       gridRow: `span ${spanRow} / span ${spanRow}`,
       gridColumn: `span ${spanCol} / span ${spanCol}`,
+      width: '100%',
+      height: '100%'
     }
   }  
 
   myCss = {
-    ...{
-      'width': '100%',
-      'height': '100%'
-    },
-    ...myCss,
+    ...myCss
   }
 
-  let customClass = element.customclassname ?? '';
+  //let customClass = element.customclassname ?? '';
 
   return (
-    <div style={css}
-     className={`${element.defclassname} ${customClass}`}
-    >
+    <div style={gridCss}>
       <div
         className={clsx({ [element.defclassname]:true
           //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
@@ -225,4 +223,58 @@ export function ElementImage({
         />
     </div>
   )
+}
+
+export function ElementHtml({
+  element
+}:Readonly<{
+  element:ElementBlockClient,
+}>) {
+  let [editElement, setEditElement] = useState<boolean>(false);
+
+  let spanRow = element.lineto - element.linefrom + 1;
+  let spanCol = element.colto - element.colfrom + 1;
+  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
+  let gridCss = {
+    ...{
+      gridRow: `span ${spanRow} / span ${spanRow}`,
+      gridColumn: `span ${spanCol} / span ${spanCol}`,
+      width: '100%',
+      height: '100%'
+    }
+  }  
+
+  myCss = {
+    ...myCss,
+    width: '100%',
+    height: '100%'
+  }
+
+  let submitEditHTMLElementBlock = async function (event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+     
+    const formData = new FormData( event.currentTarget )
+    if( element.actions?.updateElement ) {
+      try {
+        await element.actions.updateElement( formData );
+      } catch ( err ) {
+        console.log('Error', err);
+      }
+    }
+  }
+
+  let customClass = element.customclassname ?? '';
+  return (
+    <>
+      <div style={gridCss}>
+        <div style={myCss} 
+        className={clsx({ [element.defclassname]:true})}
+        dangerouslySetInnerHTML={createHTML( element.content )} />
+      </div>
+    </>
+  )
+}
+
+function createHTML( str:string ) {
+  return {__html: str };
 }

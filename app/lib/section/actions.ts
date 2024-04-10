@@ -97,11 +97,14 @@ export async function createElementBlock(this:{ section_id:string, username:stri
       switch( type ) {
         case TYPESELEMENT.text:
           /*let size = form.get('size') as string;*/
-          css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex"}`
+          css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex", "height": "100%", "width":"100%"}`;
           break;
         case TYPESELEMENT.media:
           /*css = `{"position": "unset", "objectFit": "cover" }`;*/
           media_id = await insertMedia(section_id, form ) as string;
+          break;
+        case TYPESELEMENT.html:
+          css = `{"height": "100%"}`;
           break;
         default: {
           throw new Error('Not recognized type');
@@ -189,9 +192,10 @@ export async function deleteElementBlock(this:{ section_id:string, username:stri
     }
     
     let { media_id } = (await sql`SELECT media_id FROM ELEMENT WHERE element_id=${element_id}`).rows[ 0 ];
-    let { key } = (await sql`SELECT key FROM MEDIA WHERE media_id=${media_id}`).rows[ 0 ];
-    
-    if( media_id && key ) {
+    let media = (await sql`SELECT key FROM MEDIA WHERE media_id=${media_id}`).rows[ 0 ];
+
+    if( media ) {
+      let { key } = media;
       // DELETE media releated
       await sql`DELETE FROM MEDIA WHERE media_id = ${media_id}`; // From database
       await utapi.deleteFiles([key]); // From uploadthing

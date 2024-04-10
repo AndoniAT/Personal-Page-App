@@ -71,15 +71,25 @@ body {
   @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white pr-2 pt-2
 }
 
-#customImageModal .no-image {
-  @apply h-32 col-span-12 bg-slate-400 border rounded-xl mb-5 cursor-pointer
+#customImageModal .no-image, #customImageModal .image-found {
+  @apply h-32 col-span-12 bg-slate-400 border rounded-xl mb-5
 }
 
-#customImageModal .no-image .Imageelement {
+#customImageModal .no-image .Imageelement,
+#customImageModal .image-found .Imageelement {
   position: unset;
   object-fit: cover;
+}
+
+#customImageModal .image-new .Imageelement {
   @apply hover:scale-105
 }
+
+#customImageModal .no-image,
+#customImageModal .image-new {
+  @apply hover:scale-105 cursor-pointer
+}
+
 
 .loading:hover {
   @apply cursor-progress

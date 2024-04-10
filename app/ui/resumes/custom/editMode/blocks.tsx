@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
 import clsx from "clsx";
-import { AcceptFussion, ChooseTypeFusion, ErrorModal, MediaElementType, TextElementType } from "./modals";
+import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, TextElementType } from "./modals";
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import Image from "next/image";
 
@@ -186,7 +186,8 @@ export function Block({
     <>
       <div key={`blk1`} className={clsx({
       "w-full min-h-80 h-fit grid": true,
-      [`grid-rows-[repeat(${totLines}, auto)]`]: true,
+      /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
+      [`grid-rows-${totLines}`]: true,
       [`grid-cols-${totCols} pb-2`]: true
     })
     }
@@ -209,17 +210,24 @@ export function Block({
     }
     { /* Step 3 => Create the type showing the modal to insert content */}
     {
-      ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'text' ) ?
-    <TextElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></TextElementType>
-      : 
-    <></>
+      step == STEPS.SET_ELEM_VALUE ? 
+      <>
+        {
+            ( typeSelected == TYPES_TO_CHOOSE.text ) ?
+            <TextElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></TextElementType>
+              : 
+            ( typeSelected == TYPES_TO_CHOOSE.image ) ?
+            <MediaElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></MediaElementType>
+            :
+            ( typeSelected == TYPES_TO_CHOOSE.html ) ?
+            <HtmlElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></HtmlElementType>
+            :
+            <></>
+        }
+      </>
+      :<></>
     }
-    {
-      ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'media' ) ?
-      <MediaElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></MediaElementType>
-      : 
-    <></>
-    }
+    
 
     { /* Error modal handler */}
     {
@@ -280,6 +288,8 @@ export function CustomElement({
       return <ElementText element={element}></ElementText>
     case TYPES_TO_CHOOSE.image:
       return <ElementImage element={element}></ElementImage>
+    case TYPES_TO_CHOOSE.html:
+      return <ElementHtml element={element}></ElementHtml>
   }
 }
 
@@ -297,14 +307,12 @@ export function ElementText({
     ...{
       gridRow: `span ${spanRow} / span ${spanRow}`,
       gridColumn: `span ${spanCol} / span ${spanCol}`,
+      width: '100%',
+      height: '100%'
     }
   }  
 
   myCss = {
-    ...{
-      'width': '100%',
-      'height': '100%'
-    },
     ...myCss,
   }
 
@@ -337,14 +345,15 @@ export function ElementText({
           ['min-h-8 border-2 rounded hover:border-slate-700 h-fit']: true,
           ['hover:scale-105 cursor-pointer hover:border-solid']:true 
         })
-      }>
+      }
+      onClick={() => { setEditElement(true)}}
+      >
         {
           <div 
             className={clsx({ [element.defclassname]:true
                 //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
             })}
             style={myCss} 
-            onClick={() => { setEditElement(true)}}
           >
             {element.content}
           </div>
@@ -445,4 +454,74 @@ export function ElementImage({
       }
     </>
   )
+}
+
+export function ElementHtml({
+  element
+}:Readonly<{
+  element:ElementBlockClient,
+}>) {
+  let [editElement, setEditElement] = useState<boolean>(false);
+
+  let spanRow = element.lineto - element.linefrom + 1;
+  let spanCol = element.colto - element.colfrom + 1;
+  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
+  let gridCss = {
+    ...{
+      gridRow: `span ${spanRow} / span ${spanRow}`,
+      gridColumn: `span ${spanCol} / span ${spanCol}`,
+      width: '100%',
+      height: '100%'
+    }
+  }  
+
+  myCss = {
+    ...myCss,
+    width: '100%',
+    height: '100%'
+  }
+
+  let submitEditHTMLElementBlock = async function (event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+     
+    const formData = new FormData( event.currentTarget )
+    if( element.actions?.updateElement ) {
+      try {
+        await element.actions.updateElement( formData );
+      } catch ( err ) {
+        console.log('Error', err);
+      }
+    }
+  }
+
+  let customClass = element.customclassname ?? '';
+  return (
+    <>
+      <div style={gridCss} className={clsx({
+          ['min-h-full border-2 rounded hover:border-slate-700 h-fit']: true,
+          ['hover:scale-105 cursor-pointer hover:border-solid']:true 
+        })
+      }
+      onClick={() => { setEditElement(true)}}
+      >
+        {
+          <div style={myCss}
+              className={clsx({ [element.defclassname]:true})}
+              dangerouslySetInnerHTML={createHTML( element.content )} 
+          />
+          
+        }
+        
+      </div>
+          {
+            editElement ? 
+              <HtmlElementType handler={submitEditHTMLElementBlock} cancel={() => { setEditElement(false) }} element={element}></HtmlElementType>
+            : <></>
+          }
+    </>
+  )
+}
+
+function createHTML( str:string ) {
+  return {__html: str };
 }
