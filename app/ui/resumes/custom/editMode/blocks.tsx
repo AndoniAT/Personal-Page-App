@@ -186,7 +186,7 @@ export function Block({
     <>
       <div key={`blk1`} className={clsx({
       "w-full min-h-80 h-fit grid": true,
-      [`grid-rows-${totLines}`]: true,
+      [`grid-rows-[repeat(${totLines}, auto)]`]: true,
       [`grid-cols-${totCols} pb-2`]: true
     })
     }
@@ -257,11 +257,13 @@ export function EmptyElement({
 
 
   return  ( 
-    <div className={`col-span-1 h-full ${color} border-solid border-2 rounded border-slate-700 hover:scale-105`}
-        onClick={() => {
-          handler(position);
-        }}
-        />
+    <div className="h-fit">
+      <div className={`col-span-1 min-h-8 ${color} border-solid border-2 rounded border-slate-700 hover:scale-105`}
+          onClick={() => {
+            handler(position);
+          }}
+          />
+    </div>
   
    );
 }
@@ -331,27 +333,29 @@ export function ElementText({
   let customClass = element.customclassname ?? '';
   return (
     <>
-      <div style={gridCss}
-      className={clsx({
-        [element.defclassname]:true,
-        /*['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,*/
-        ['hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700']:true ,
-      })
-    }
-      onClick={() => { setEditElement(true)}}
-      >
-        <div 
-        style={myCss}
-        className={clsx({
-          /*[customClass]: (!!element.customclassname)*/
-        })}
-        >{element.content}</div>
+      <div style={gridCss} className={clsx({
+          ['min-h-8 border-2 rounded hover:border-slate-700 h-fit']: true,
+          ['hover:scale-105 cursor-pointer hover:border-solid']:true 
+        })
+      }>
+        {
+          <div 
+            className={clsx({ [element.defclassname]:true
+                //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
+            })}
+            style={myCss} 
+            onClick={() => { setEditElement(true)}}
+          >
+            {element.content}
+          </div>
+        }
+        
       </div>
-      {
-        editElement ? 
-        <TextElementType handler={submitEditTextElementBlock} cancel={() => { setEditElement(false) }} element={element}></TextElementType>
-        : <></>
-      }
+          {
+            editElement ? 
+              <TextElementType handler={submitEditTextElementBlock} cancel={() => { setEditElement(false) }} element={element}></TextElementType>
+            : <></>
+          }
     </>
   )
 }
@@ -417,6 +421,7 @@ export function ElementImage({
         <div style={gridCss}
             className={clsx({
               [element.defclassname]:true,
+              ['min-h-10']:true,
               ['hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700']:true ,
             })
           }

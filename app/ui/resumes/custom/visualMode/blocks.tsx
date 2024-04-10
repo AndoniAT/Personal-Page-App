@@ -89,7 +89,7 @@ export function Block({
     <>
       <div key={`blk1`} className={clsx({
       "w-full min-h-80 h-fit grid": true,
-      [`grid-rows-${totLines}`]: true,
+      [`grid-rows-[repeat(${totLines}, auto)]`]: true,
       [`grid-cols-${totCols} pb-2`]: true
     })
     }
@@ -147,15 +147,20 @@ export function ElementText({
     ...myCss,
   }
 
-  let customClass = element.customclassname ?? 'cuss';
+  let customClass = element.customclassname ?? '';
 
   return (
     <div style={css}
      className={`${element.defclassname} ${customClass}`}
     >
       <div
-      style={myCss}
-      >{element.content}</div>
+        className={clsx({ [element.defclassname]:true
+          //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
+        })}
+        style={myCss}
+      >
+        {element.content}
+      </div>
     </div>
   )
 }
@@ -184,7 +189,7 @@ export function ElementImage({
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
   let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let css = {
+  let gridCss = {
     ...{
       gridRow: `span ${spanRow} / span ${spanRow}`,
       gridColumn: `span ${spanCol} / span ${spanCol}`,
@@ -203,8 +208,10 @@ export function ElementImage({
   let customClass = element.customclassname ?? 'cuss';
 
   return (
-    <div style={css}
-     className={`${element.defclassname} ${customClass}`}
+    <div style={gridCss}
+     className={clsx({
+      [`${element.defclassname} ${customClass} min-h-10`]:true
+    })}
     >
       <Image
           style={myCss}
