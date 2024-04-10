@@ -1,11 +1,10 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
-import { Block, ElementBlock, FusionElementsBlock, Media, Section } from '../definitions';
+import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
-import { Config } from 'tailwindcss';
-import { utapi } from '@/server/uploadthing';
-import { insertMedia } from '@/app/api/medias/route';
+import { insertMedia } from '@/app/lib/media/actions';
+
 const fsp = require('fs').promises
 
 const TYPESELEMENT = {

@@ -6,8 +6,7 @@ import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
 import { revalidatePath } from 'next/cache';
-import { createElementBlock, createElementTextBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
-import { Block } from '@/app/lib/definitions';
+import { createElementBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
 
 export const metadata: Metadata = {
   title: 'Edit User\'s Section',

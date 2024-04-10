@@ -216,7 +216,7 @@ export function Block({
     }
     {
       ( step == STEPS.SET_ELEM_VALUE && typeSelected == 'media' ) ?
-      <MediaElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null} block_id={block.block_id}></MediaElementType>
+      <MediaElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></MediaElementType>
       : 
     <></>
     }
@@ -373,7 +373,7 @@ export function ElementImage({
       gridColumn: `span ${spanCol} / span ${spanCol}`,
       position: 'relative'
     }
-  }  
+  } as React.CSSProperties;
 
   myCss = {
     ...{
@@ -381,7 +381,7 @@ export function ElementImage({
       'height': '100%'
     },
     ...myCss,
-  }
+  } as React.CSSProperties;
 
   useEffect(() => {
     fetch(`/api/medias/${element.media_id}`)
@@ -395,7 +395,7 @@ export function ElementImage({
     .catch( err => {
 
     });
-  }, [ image ] );
+  }, [ image, element.media_id ] );
 
   let submitEditImageElementBlock = async function (event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

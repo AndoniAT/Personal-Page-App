@@ -484,7 +484,7 @@ export function MediaElementType({
     handler:Function,
     cancel:Function,
     element:ElementBlockClient|null,
-    imageUrl:string|null
+    imageUrl?:string|null
 }>) {
     const isEdit = !!element;
     const [image, setImage] = useState<string>('');

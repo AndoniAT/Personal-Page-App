@@ -179,7 +179,7 @@ export function ElementImage({
     .catch( err => {
 
     });
-  }, [ image ] );
+  }, [ image, element.media_id ] );
 
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
@@ -190,7 +190,7 @@ export function ElementImage({
       gridColumn: `span ${spanCol} / span ${spanCol}`,
       position: 'relative'
     }
-  }  
+  } as React.CSSProperties;
 
   myCss = {
     ...{
@@ -198,7 +198,7 @@ export function ElementImage({
       'height': '100%'
     },
     ...myCss,
-  }
+  } as React.CSSProperties;
 
   let customClass = element.customclassname ?? 'cuss';
 

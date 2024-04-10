@@ -5,6 +5,7 @@ import { utapi } from "@/server/uploadthing";
 import { sql } from "@vercel/postgres";
 import { Block, Media, Section } from "@/app/lib/definitions";
 import { NextApiRequest } from "next";
+import { insertMedia } from "@/app/lib/media/actions";
 
 export async function POST( req: Request, context:any ) {
   noStore();
@@ -34,7 +35,7 @@ export async function POST( req: Request, context:any ) {
     let section = res.rows[ 0 ] as Section;
     if( !section ) throw new Error('No block found in section for user!');
 
-    let media_id = await insertMedia( section.section_id, data );
+    let media_id = await insertMedia( section.section_id, data ) as string;
 
   } catch ( e:any ) {
     console.log('Error!', e);
@@ -50,40 +51,3 @@ export async function POST( req: Request, context:any ) {
   return NextResponse.json( { url: media_url } )
 
 }
-
-/**
- * 
- * @param section_id 
- * @param formData 
- * @returns 
- */
-export async function insertMedia( section_id:string, formData: FormData ) {
-    'use server'
-    noStore();
-  
-    const imageFile = formData.get('image') as File;
-    const response = await utapi.uploadFiles([imageFile]);
-    const image = response[ 0 ].data;
-  
-    try {
-      let id = await sql`INSERT INTO MEDIA (
-          filename,
-          key,
-          url,
-          size,
-          contentType,
-          isHero,
-  
-          section_id,
-          project_id )
-  
-          VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, FALSE, ${section_id}, null )
-          RETURNING media_id;`;
-        let media = id.rows[ 0 ] as Media;
-        console.log('checking media', media);
-        return media.media_id
-    } catch ( error ) {
-      console.error( 'Failed set new photo hero home:', error );
-      throw new Error( 'Failed set new photo hero home:' );
-    }
-  }
