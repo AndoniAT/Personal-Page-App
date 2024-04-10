@@ -4,6 +4,7 @@ import { getSectionByIdForUser } from '../user/actions';
 import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
 import { insertMedia } from '@/app/lib/media/actions';
+import { utapi } from '@/server/uploadthing';
 
 const fsp = require('fs').promises
 
@@ -187,6 +188,15 @@ export async function deleteElementBlock(this:{ section_id:string, username:stri
       throw new Error( 'Section not found for user' );
     }
     
+    let { media_id } = (await sql`SELECT media_id FROM ELEMENT WHERE element_id=${element_id}`).rows[ 0 ];
+    let { key } = (await sql`SELECT key FROM MEDIA WHERE media_id=${media_id}`).rows[ 0 ];
+    
+    if( media_id && key ) {
+      // DELETE media releated
+      await sql`DELETE FROM MEDIA WHERE media_id = ${media_id}`; // From database
+      await utapi.deleteFiles([key]); // From uploadthing
+    }
+
     let res = await sql`DELETE FROM ELEMENT WHERE element_id = ${element_id} AND
     block_id = ${block_id}`;
     return res;

@@ -1,4 +1,4 @@
-import { ArrowDownIcon, ArrowDownLeftIcon, ArrowDownRightIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, ArrowUpLeftIcon, ArrowUpRightIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, ArrowDownLeftIcon, ArrowDownRightIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, ArrowUpLeftIcon, ArrowUpRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { inputValueNumberClass } from '@/app/ui/cssComponents/styles';
 import { useRef } from "react";
 
@@ -179,5 +179,23 @@ export function BorderButtons({
                 </div>
             </div>
         </>
+    )
+}
+
+export function TrashButton({
+    deleteElement,
+    cancel
+}: Readonly<{
+    deleteElement:Function,
+    cancel:Function
+}>) {
+    return (
+        <div className='w-12 text-center flex mt-3 justify-center p-2'>
+            <TrashIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer hover:bg-red-300"
+                onClick={async () => {
+                await deleteElement();
+                cancel();
+                }}/>
+        </div>
     )
 }

@@ -1,13 +1,5 @@
 import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3BottomLeftIcon, Bars3BottomRightIcon,
-    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon, ArrowDownLeftIcon,
-    ArrowUpLeftIcon,
-    ArrowUpRightIcon,
-    ArrowDownRightIcon,
-    ArrowLeftIcon,
-    ArrowRightIcon,
-    ArrowUpIcon,
-    ArrowDownIcon,
-    TrashIcon,
+    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon, TrashIcon,
  } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../resumesStyles/interfaces';
@@ -19,7 +11,7 @@ import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation'
 import clsx from 'clsx';
-import { BorderButtons, PaddingButtons } from './customButtons';
+import { BorderButtons, PaddingButtons, TrashButton } from './customButtons';
 
 
 export function AcceptFussion({
@@ -442,18 +434,14 @@ export function TextElementType({
                                                 </div>
 
                                                 { /* DELETE */}
-                                                <div className='mt-5'>
-                                                    <div className='w-12 text-center flex mt-3 justify-center p-2'>
-                                                        <TrashIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer 
-                                                        hover:bg-red-300"
-                                                        onClick={async () => {
-                                                            if( isEdit ) {
-                                                                await element.actions?.deleteElement();
-                                                                cancel();
-                                                            }
-                                                        }}/>
+                                                {
+                                                    (element.actions?.deleteElement) ?
+                                                    <div className='mt-5'>
+                                                        <TrashButton cancel={cancel} deleteElement={element.actions.deleteElement}></TrashButton>
                                                     </div>
-                                                </div>
+                                                    : <></>
+
+                                                }
                                             </>
 
                                         :<></>
@@ -631,6 +619,16 @@ export function MediaElementType({
                                             <div className='mt-5'>
                                                 <BorderButtons defaults={DefaultsBorder} handleColorBorderChange={handleColorBorderChange} handlerBorder={handlerBorder}/>
                                             </div>
+
+                                            { /* DELETE */}
+                                                {
+                                                    (element.actions?.deleteElement) ?
+                                                    <div className='mt-5'>
+                                                        <TrashButton cancel={cancel} deleteElement={element.actions.deleteElement}></TrashButton>
+                                                    </div>
+                                                    : <></>
+
+                                                }
                                         </>
                                             : <></>
                                 }
