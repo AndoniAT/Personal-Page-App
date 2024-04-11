@@ -427,16 +427,22 @@ export function ElementImage({
           }
             onClick={() => { setEditElement(true)}}
             >
-        <Image
-          style={myCss}
-          className={clsx({
-            /*[customClass]: (!!element.customclassname)*/
-          })}
-          src={image}
-          layout='fill'
-          objectFit='cover'
-          alt="ImageBlock"
-        />
+            {
+              image ? 
+                    <Image
+                style={myCss}
+                className={clsx({
+                  /*[customClass]: (!!element.customclassname)*/
+                })}
+                src={image}
+                layout='fill'
+                objectFit='cover'
+                alt="ImageBlock"
+              />
+              :
+              <></>
+            }
+        
       </div>
       {
         editElement ? 

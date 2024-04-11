@@ -288,6 +288,7 @@ export function Style1EditView(
                   <BuildBlocksEditMode blocks={blocks}/>
               }
             </div>
+           
         {
         }
         {

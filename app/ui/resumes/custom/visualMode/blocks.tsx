@@ -222,16 +222,21 @@ export function ElementImage({
       ['min-h-10']:true
     })}
     >
-      <Image
-          style={myCss}
-          className={clsx({
-            //[customClass]: (!!element.customclassname)
-          })}
-          src={image}
-          layout='fill'
-          objectFit='cover'
-          alt="ImageBlock"
+      {
+        image ? 
+        <Image
+            style={myCss}
+            className={clsx({
+              //[customClass]: (!!element.customclassname)
+            })}
+            src={image}
+            layout='fill'
+            objectFit='cover'
+            alt="ImageBlock"
         />
+        : 
+        <></>
+      }
     </div>
   )
 }
