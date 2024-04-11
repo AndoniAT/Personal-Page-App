@@ -201,6 +201,7 @@ export async function deleteElementBlock(this:{ section_id:string, username:stri
       let { key } = media;
       // DELETE media releated
       await sql`DELETE FROM MEDIA WHERE media_id = ${media_id}`; // From database
+      console.log('delete file', key);
       await utapi.deleteFiles([key]); // From uploadthing
     }
 

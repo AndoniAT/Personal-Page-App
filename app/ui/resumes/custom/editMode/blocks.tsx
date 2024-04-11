@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, TextElementType, VideoElementType } from "./modals";
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import Image from "next/image";
+import { TrashButton } from "./customButtons";
 
 const STEPS = {
   NONE: 0,
@@ -30,9 +31,37 @@ export const TYPES_TO_CHOOSE = {
  * @returns 
  */
 export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
+  const [allBlocks, setAllBlocks] = useState<BlockClient[]>([])
+
+  useEffect(() => {
+    setAllBlocks( blocks );
+  }, [ blocks ]);
+
     return (<>
       {
-        blocks.map( ( block:BlockClient ) => <Block key={block.block_id} block={block} /> )
+        allBlocks.map( ( block:BlockClient ) => {
+
+          let deleteBlock = () => {
+            fetch(`/api/blocks/${block.block_id}` ,
+              {
+                method: 'DELETE'
+              }
+            ).then( () => {
+              let newBlocks = allBlocks.filter( b => b.block_id != block.block_id );
+              setAllBlocks( newBlocks );
+            })
+            .catch( err => {
+              console.log(err);
+            });
+          }
+
+          return ( 
+          <div key={`blockContainer${block.block_id}`}>
+            <Block key={block.block_id} block={block} /> 
+            <TrashButton key={`trash_${block.block_id}`} deleteElement={deleteBlock} cancel={() => {}}></TrashButton>
+          </div>
+        )
+        })
       }
     </>)
 }
