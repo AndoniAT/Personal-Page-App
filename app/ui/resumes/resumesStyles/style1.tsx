@@ -8,6 +8,7 @@ import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { BuildBlocksEditMode } from '../custom/editMode/blocks';
 import { BuildBlocksVisualMode } from '../custom/visualMode/blocks';
 
+
 const styles = {
   hero: {
     withProfilePhoto: 'col-span-12 xl:col-span-9 max-h-48 min-h-48 2xl:min-h-64',
@@ -288,7 +289,7 @@ export function Style1EditView(
                   <BuildBlocksEditMode blocks={blocks}/>
               }
             </div>
-           
+
         {
         }
         {

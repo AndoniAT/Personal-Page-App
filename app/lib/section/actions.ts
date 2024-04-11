@@ -106,6 +106,9 @@ export async function createElementBlock(this:{ section_id:string, username:stri
         case TYPESELEMENT.html:
           css = `{"height": "100%"}`;
           break;
+        case TYPESELEMENT.linkvideo:
+          // doing nothing
+          break;
         default: {
           throw new Error('Not recognized type');
         }
