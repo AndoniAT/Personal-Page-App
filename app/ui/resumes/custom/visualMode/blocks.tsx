@@ -88,9 +88,11 @@ export function Block({
   return ( 
     <>
       <div key={`blk1`} className={clsx({
-      "w-full min-h-80 h-fit grid": true,
-      [`grid-rows-[repeat(${totLines}, auto)]`]: true,
-      [`grid-cols-${totCols} pb-2`]: true
+      ['w-full min-h-80 h-fit grid']: true,
+      /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
+      [`grid-rows-${totLines}`]: true,
+      [`grid-cols-${totCols}`]: true
+      /*['pb-2']:true*/
     })
     }
     >
@@ -106,7 +108,13 @@ export function Block({
 export function EmptyElement() {
 
   return  ( 
-    <div className={`col-span-1 h-full`} />
+    <div className="h-fit col-span-1">
+      <div className={clsx({
+        ['min-h-8']:true,
+        /*['bg-slate-200']:true,
+        ['border-solid border-2 rounded border-slate-700 hover:scale-105']:true*/
+      })}/>
+    </div>
    );
 }
 
@@ -150,7 +158,9 @@ export function ElementText({
   //let customClass = element.customclassname ?? '';
 
   return (
-    <div style={gridCss}>
+    <div style={gridCss} className={clsx({
+      ['min-h-8 h-fit']:true
+    })}>
       <div
         className={clsx({ [element.defclassname]:true
           //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
@@ -203,18 +213,19 @@ export function ElementImage({
     ...myCss,
   } as React.CSSProperties;
 
-  let customClass = element.customclassname ?? 'cuss';
+  let customClass = element.customclassname ?? '';
 
   return (
     <div style={gridCss}
      className={clsx({
-      [`${element.defclassname} ${customClass} min-h-10`]:true
+      [element.defclassname]:true,
+      ['min-h-10']:true
     })}
     >
       <Image
           style={myCss}
           className={clsx({
-            /*[customClass]: (!!element.customclassname)*/
+            //[customClass]: (!!element.customclassname)
           })}
           src={image}
           layout='fill'

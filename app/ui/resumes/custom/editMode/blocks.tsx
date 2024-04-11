@@ -185,10 +185,11 @@ export function Block({
   return ( 
     <>
       <div key={`blk1`} className={clsx({
-      "w-full min-h-80 h-fit grid": true,
+      ['w-full min-h-80 h-fit grid']: true,
       /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
       [`grid-rows-${totLines}`]: true,
-      [`grid-cols-${totCols} pb-2`]: true
+      [`grid-cols-${totCols}`]: true
+      /*['pb-2']:true*/
     })
     }
     >
@@ -253,20 +254,21 @@ export function EmptyElement({
   const [color, setColor] = useState<string>('bg-slate-200');
 
   useEffect(() => {
-    if( fusionBlocks.from && position.indexArr == fusionBlocks.from?.indexArr ||
+    let isSelectedBlock = ( fusionBlocks.from && position.indexArr == fusionBlocks.from?.indexArr ||
       fusionBlocks.to && position.indexArr == fusionBlocks.to?.indexArr
-    ) {
-      setColor('bg-slate-500')
-    } else {
-      setColor('bg-slate-200')
-    }
-  }, [ color, fusionBlocks, position ])
-  
-
+    );
+    let col = ( isSelectedBlock ) ? 'bg-slate-500' : 'bg-slate-200';
+    setColor(col)
+  }, [ fusionBlocks, position ])
 
   return  ( 
-    <div className="h-fit">
-      <div className={`col-span-1 min-h-8 ${color} border-solid border-2 rounded border-slate-700 hover:scale-105`}
+    <div className="h-fit col-span-1">
+      <div className={clsx({
+        ['min-h-8']:true,
+        [color]:true,
+        ['border-solid border-2 rounded border-slate-700 hover:scale-105']:true
+      })
+      }
           onClick={() => {
             handler(position);
           }}
@@ -326,15 +328,6 @@ export function ElementText({
       } catch ( err ) {
         console.log('Error', err);
       }
-      /*formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );
-      try {
-        await block.actions.addElement( 'text', formData );
-        finishProcess();
-      } catch( e:any ) {
-        console.log('Error :', e?.message);
-        setError( e?.message );
-        finishProcess();
-      }*/
     }
   }
 
@@ -342,23 +335,21 @@ export function ElementText({
   return (
     <>
       <div style={gridCss} className={clsx({
-          ['min-h-8 border-2 rounded hover:border-slate-700 h-fit']: true,
+          ['min-h-8 h-fit']:true,
+          ['rounded hover:border-slate-700']: true,
           ['hover:scale-105 cursor-pointer hover:border-solid']:true 
         })
       }
       onClick={() => { setEditElement(true)}}
       >
-        {
-          <div 
-            className={clsx({ [element.defclassname]:true
-                //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
-            })}
-            style={myCss} 
-          >
-            {element.content}
-          </div>
-        }
-        
+        <div 
+          className={clsx({ [element.defclassname]:true
+              //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
+          })}
+          style={myCss} 
+        >
+          {element.content}
+        </div>
       </div>
           {
             editElement ? 
