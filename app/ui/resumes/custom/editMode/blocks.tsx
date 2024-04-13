@@ -173,9 +173,7 @@ export function Block({
     }
   }
 
-  let acceptFusion = () => {
-    setStep( STEPS.ASK_ELEM_TYPE );
-  };
+  let acceptFusion = () => setStep( STEPS.ASK_ELEM_TYPE )
 
   let chooseElementType = ( type:string ) => {
     switch( type ) {
