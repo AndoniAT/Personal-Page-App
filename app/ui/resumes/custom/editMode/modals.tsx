@@ -1,15 +1,13 @@
 import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3BottomLeftIcon, Bars3BottomRightIcon,
-    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon, TrashIcon,
+    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon
  } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../resumesStyles/interfaces';
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useDebouncedCallback }from 'use-debounce';
-import { inputValueNumberClass } from '@/app/ui/cssComponents/styles';
 import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import clsx from 'clsx';
 import { BorderButtons, PaddingButtons, TrashButton } from './customButtons';
 

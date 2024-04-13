@@ -1,7 +1,8 @@
 'use client';
 
 import {
-  HomeIcon, ClipboardDocumentCheckIcon, UserCircleIcon
+  HomeIcon, ClipboardDocumentCheckIcon, UserCircleIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
@@ -34,7 +35,7 @@ export default function NavLinks( { params } : Readonly<{ params: ParamsProps }>
   let username = null;
   let homeLink = null;
   if( home ) {
-    const homeObj = { name: home.name, href: `${pathname}/${home.type}/${home.id}`, icon: HomeIcon }
+    const homeObj = { name: home.name, href: `${pathname}/`, icon: HomeIcon }
     homeLink = makeLink( homeObj );
 
     username = pathname.split('/')[ 2 ];
@@ -43,7 +44,7 @@ export default function NavLinks( { params } : Readonly<{ params: ParamsProps }>
   let sectionsLinks = null;
   if( sections.length > 0 ) {
     const sectionsObj = sections.map( s => {
-      return { name: s.name, href: `${pathname}/${s.type}/${s.id}`, icon: HomeIcon }
+      return { name: s.name, href: `${pathname}/${s.id}`, icon: Squares2X2Icon }
     } );
     sectionsLinks = sectionsObj.map( section => makeLink( section ) );
   }

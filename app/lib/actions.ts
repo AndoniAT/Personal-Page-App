@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { notFound, redirect, RedirectType } from 'next/navigation'
 import { getUserByEmail, getUserByUsername } from './data';
+import { revalidateTag } from 'next/cache';
 
 export async function goToLogin() {
     'use server'
@@ -52,4 +53,9 @@ export async function requiresLogin() {
         throw new Error('You are not login');
     }
     return session;
+}
+
+export async function customRevalidateTag(tag: string) {
+    'use server'
+    revalidateTag( tag );
 }

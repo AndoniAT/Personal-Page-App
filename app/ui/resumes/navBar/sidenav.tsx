@@ -6,7 +6,7 @@ import { Section, User } from '../../../lib/definitions';
 import AcmeLogo from '@/app/ui/acme-logo';
 import { PowerIcon, UserCircleIcon, PencilSquareIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
-import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
+import { customRevalidateTag, goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import { redirect } from 'next/dist/server/api-utils';
 import EditModeNavBar from './editModeNavBar';
 import { changeBackgroundSection } from '@/app/lib/data';
@@ -75,7 +75,7 @@ async function createSideNav( paramsSend : {
 
       currentSection.background.update = currentSection ? changeBg : currentSection
     }
-    return <EditModeNavBar data={ { username:user?.username || '', currentSection: currentSection } }></EditModeNavBar>
+    return <EditModeNavBar data={ { username:user?.username || '', currentSection: currentSection, customRevalidateTag: customRevalidateTag } }></EditModeNavBar>
   };
 
   return (

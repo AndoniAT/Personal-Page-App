@@ -189,7 +189,7 @@ export function Style1EditView(
     }
   }, [heroPhoto, hero]);
 
-  let handlerCreateSection = async () => {
+  let handlerCreateBlock = async () => {
     home?.actions?.addBlock();
   }
 
@@ -288,15 +288,10 @@ export function Style1EditView(
                   <BuildBlocksEditMode blocks={blocks}/>
               }
             </div>
-
-        {
-        }
-        {
-        }
       </div>
       <div className='grid grid-cols-12 grid-rows-1 h-20'>
         <div className='col-start-6 col-span-2 text-center flex justify-center'>
-          <PlusCircleIcon onClick={handlerCreateSection} className='h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5'></PlusCircleIcon>
+          <PlusCircleIcon onClick={handlerCreateBlock} className='h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5'></PlusCircleIcon>
         </div>
       </div>
     </div>

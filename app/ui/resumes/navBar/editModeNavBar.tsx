@@ -1,24 +1,27 @@
 'use client'
 import { SectionsNavBar } from "@/app/resumes/[username]/interfaces";
-import { EyeIcon } from "@heroicons/react/24/outline";
+import { EyeIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { User } from "next-auth";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
-import { useRef } from "react"
+import { useRef, useState } from "react"
+import { CreateSectionModal } from "./modals";
 
 export default function EditModeNavBar(  {
     data 
   } : Readonly<{
     data : {
         username:string
-        currentSection: SectionsNavBar|null
+        currentSection: SectionsNavBar|null,
+        customRevalidateTag:Function
       }
     }>) 
     {
     let { currentSection } = data;
     const username = data?.username;
+    const [ showCreateSection, setShowCreateSection] = useState<boolean>(false);
 
     const colorInputRef = useRef<HTMLInputElement>(null);
-
     const handleColorClick = () => {
       if (colorInputRef.current) {
         colorInputRef.current.click();
@@ -58,6 +61,20 @@ export default function EditModeNavBar(  {
             className='w-5 -ml-5 invisible'
             />
           </div>
+
+          <div className='w-full flex mt-5'>
+            <span>New Section</span>
+              <div className='text-center flex justify-center'>
+                <PlusCircleIcon onClick={() => { setShowCreateSection(true)}}  className='h-5 cursor-pointer stroke-white hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-1 ml-3'></PlusCircleIcon>
+              </div>
+          </div>
+
+          { 
+            showCreateSection ?
+            <CreateSectionModal customRevalidateTag={data.customRevalidateTag} cancel={() => {setShowCreateSection(false)}}></CreateSectionModal>
+            :
+            <></>
+          }
         </div>
       </div>
     )

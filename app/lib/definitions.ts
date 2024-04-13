@@ -9,6 +9,12 @@ export type User = {
     photo_profile_id: string;
 };
 
+export type Resume = {
+    resume_id: string,
+    created:string
+    user_id:string
+}
+
 export type SectionType = 'Projects' | 'Gallery' | 'Custom' | 'Home';
 
 export type Section = {
@@ -50,7 +56,7 @@ export type MediaEditMode = {
 }
 
 export interface Block {
-    block_id:number,
+    block_id:string,
     numlines:number,
     numcols:number,
     defclassName:string,
