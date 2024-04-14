@@ -16,6 +16,7 @@ export async function goToCreateAccount() {
 export async function goToMyresume() {
     'use server'
     let session = await requiresLogin();
+
     if( session?.user?.email ) {
         let { username } = await getUserByEmail( session.user?.email);
         redirect(`/resumes/${username}`);

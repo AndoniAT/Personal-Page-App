@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, TextElementType, VideoElementType } from "./modals";
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import Image from "next/image";
-import { TrashButton } from "./customButtons";
+import TrashButton from "@/app/ui/components/trash-button";
 
 const STEPS = {
   NONE: 0,

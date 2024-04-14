@@ -5,7 +5,7 @@ import { AuthError } from 'next-auth';
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { string, z } from 'zod';
-import { getUserByEmail, getUserByUsername } from './data';
+import { getUserByEmail, getUserByUsername } from '../data';
 import bcrypt from 'bcrypt';
 
 const FormSchema = z.object({
@@ -22,7 +22,7 @@ const FormSchema = z.object({
     invalid_type_error: 'Please enter your email.',
   }).email(),
   password: z.string({
-    invalid_type_error: 'Please select an invoice status.',
+    invalid_type_error: 'Please enter a password.',
   }).min(6, { message: "Enter a password of at least 6 characters" }),
   confirm: z.string({
     invalid_type_error: 'Please confirm your password.',
@@ -148,4 +148,4 @@ export async function createAccount(
       };*/
       redirect(`/login`);
 
-  }
+}

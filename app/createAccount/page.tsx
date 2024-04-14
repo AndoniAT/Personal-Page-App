@@ -1,4 +1,4 @@
-import CreateAccountForm from '../ui/session/create-account-form';
+import CreateAccountForm from '../ui/user/session/create-account-form';
  
 export default function CreateAccountPage() {
   return (

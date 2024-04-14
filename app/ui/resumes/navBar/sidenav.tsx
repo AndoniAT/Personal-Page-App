@@ -1,26 +1,24 @@
 import Link from 'next/link';
-import NavLinks from '@/app/ui/resumes/nav-links';
+import NavLinks from '@/app/ui/resumes/navBar/nav-links';
 import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
 import { Section, User } from '../../../lib/definitions'; 
-import AcmeLogo from '@/app/ui/acme-logo';
-import { PowerIcon, UserCircleIcon, PencilSquareIcon, EyeIcon } from '@heroicons/react/24/outline';
+import AcmeLogo from '@/app/ui/components/acme-logo';
+import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 import { customRevalidateTag, goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
-import { redirect } from 'next/dist/server/api-utils';
-import EditModeNavBar from './editModeNavBar';
+import EditModeNavBar from './client/editModeNavBar';
 import { changeBackgroundSection } from '@/app/lib/data';
-import { revalidatePath } from 'next/cache';
 
-export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit'|never, currentSection:Section|null } ) {
-
-  if( sections.length == 0 || !user || !currentSection ) {
-    return await createSideNav({ home:null, sections:[], user:null, currentSection:null });
-  }
+export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit', currentSection:Section|null } ) {
 
   const home = sections.find( s => s.type == 'Home' );
-  if( !home ) throw new Error('No home page');
-
+  
+  if( sections.length == 0 || !user || !currentSection || !home ) {
+    return await createSideNav({ home:null, sections:[], user:null, currentSection:null });
+  }
+  
+  
   // Other sections
   sections = sections.filter( s => s.section_id != home.section_id ).filter( s => s.public );
 
@@ -46,6 +44,7 @@ async function createSideNav( paramsSend : {
   mode?: 'edit',
   currentSection: SectionsNavBar|null
 }) {
+
   let { user, mode, currentSection } = paramsSend;
 
   let session = await auth();
@@ -81,17 +80,18 @@ async function createSideNav( paramsSend : {
   return (
     <div className="w-full flex-none md:w-60 lg:w-60 2xl:w-80">
       <div className="flex h-full flex-col px-3 py-4 md:px-2">
-        <Link
-          className="mb-2 flex h-20 items-end justify-start rounded-md bg-slate-800 p-4 md:h-30"
-          href="/"
-        >
-          <div className="w-32 text-white md:w-60">
-            <AcmeLogo />
-          </div>
-        </Link>
+        {
+          /* Top link logo */
+          <Link className="mb-2 flex h-20 items-end justify-start rounded-md bg-slate-800 p-4 md:h-30" href="/" >
+            <div className="w-32 text-white md:w-60">
+              <AcmeLogo />
+            </div>
+          </Link>
+        }
         <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
           <NavLinks params={paramsSend}/>
-          {
+
+          { /* Edit or visual section mode */
             (isUsersSessionProfile) ? 
               ( 
                 (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
@@ -101,13 +101,13 @@ async function createSideNav( paramsSend : {
           }
 
           <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
-          {
+          { /* Nav bar footer */
             session?.user ? (
                   <div className='grid grid-cols-2'>
                       <form
                         action={async () => {
                           'use server';
-                          await signOut();
+                          await signOut({ redirect: true, redirectTo:'/'} );
                         }}
                       >
                         <button className="sessionIconsNavBar">

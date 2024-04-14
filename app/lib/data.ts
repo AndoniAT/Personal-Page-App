@@ -1,11 +1,9 @@
 import { sql } from '@vercel/postgres';
 import { User, Section, Media } from './definitions';
 import { revalidatePath } from 'next/cache';
-import { notFound, redirect } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from './actions';
 import { utapi } from "@/server/uploadthing";
-import { getSectionByIdForUser } from './user/actions';
 
 export async function getUserByUsername( username: string ) {
   noStore();

@@ -290,6 +290,7 @@ async function createTables( client ) {
 
 async function createForeignKeys( client ) {
   try {
+
     await client.sql`ALTER TABLE USERS
       ADD CONSTRAINT fk_users_media FOREIGN KEY (photo_profile_id) REFERENCES MEDIA(media_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
     
@@ -314,6 +315,9 @@ async function createForeignKeys( client ) {
     await client.sql`ALTER TABLE BLOCK
       ADD CONSTRAINT fk_block_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
 
+      await client.sql`ALTER TABLE ELEMENT
+      ADD CONSTRAINT fk_element_block FOREIGN KEY (block_id) REFERENCES BLOCK(block_id) ON UPDATE CASCADE ON DELETE CASCADE,
+      ADD CONSTRAINT fk_element_media FOREIGN KEY (media_id) REFERENCES MEDIA(media_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
   } catch( e ) {
     console.log('Error generating foreign keys', e);
     throw new Error( e );

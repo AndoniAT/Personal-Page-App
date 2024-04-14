@@ -9,7 +9,8 @@ import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import clsx from 'clsx';
-import { BorderButtons, PaddingButtons, TrashButton } from './customButtons';
+import { BorderButtons, PaddingButtons } from './customButtons';
+import TrashButton from '@/app/ui/components/trash-button';
 
 
 export function AcceptFussion({

@@ -1,6 +1,6 @@
 import { lusitana } from '@/app/ui/fonts';
 import { Suspense } from 'react';
-import MenuResumeSkeleton from '@/app/ui/skeletons';
+import MenuResumeSkeleton from '@/app/ui/components/skeletons';
 import CardUserWrapper from '@/app/ui/resumes/cardsUser';
 
 import { Metadata } from 'next';

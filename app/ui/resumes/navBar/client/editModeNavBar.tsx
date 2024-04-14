@@ -1,8 +1,6 @@
 'use client'
 import { SectionsNavBar } from "@/app/resumes/[username]/interfaces";
 import { EyeIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import { User } from "next-auth";
-import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { useRef, useState } from "react"
 import { CreateSectionModal } from "./modals";
@@ -22,6 +20,7 @@ export default function EditModeNavBar(  {
     const [ showCreateSection, setShowCreateSection] = useState<boolean>(false);
 
     const colorInputRef = useRef<HTMLInputElement>(null);
+
     const handleColorClick = () => {
       if (colorInputRef.current) {
         colorInputRef.current.click();
