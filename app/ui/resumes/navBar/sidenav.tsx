@@ -70,7 +70,7 @@ async function createSideNav( paramsSend : {
       let changeBg = async ( id:string, color:string, username:string ) => {
         'use server'
         await changeBackgroundSection(id, color, username);
-        revalidatePath(`/resumes/${username}/edit/section`);
+        customRevalidateTag('edit');
       }
 
       currentSection.background.update = currentSection ? changeBg : currentSection
