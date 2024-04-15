@@ -6,7 +6,7 @@ const USERS = [
         lastname: 'Alonso Tort',
         password: 'User123?',
         photo: null,
-        email: 'example@example.com'
+        email: 'example@example.com',
     },
     {
         user_id:'11111111-1111-1111-1111-111111111555',

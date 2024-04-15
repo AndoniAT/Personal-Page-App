@@ -7,6 +7,7 @@ export type User = {
     photo: string;
     email: string;
     photo_profile_id: string;
+    showheader:boolean;
 };
 
 export type Resume = {

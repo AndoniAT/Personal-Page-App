@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-import { Media, Section } from '../definitions';
+import { Section } from '../definitions';
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { utapi } from '@/server/uploadthing';
@@ -22,6 +22,20 @@ export async function getSectionByIdForUser(username:string, section_id:string) 
             reject( err );
         })
     })
+}
+
+export async function changeShowHeader( username:string, show:boolean ) {
+    noStore();
+    try {
+        await requiresSessionUserProperty( username );
+
+       let res = ( await sql`UPDATE USERS
+       SET showheader = ${show}
+       WHERE username = ${username}`).rowCount;
+       return res;
+    } catch( error:any ) {
+        throw new Error( 'Failed to set showHeader: ' + error?.message );
+    }
 }
 
 export async function deleteUserByUsername( username:string ) {

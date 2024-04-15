@@ -64,53 +64,57 @@ export function Style1Wrapper(
       ['h-fit pb-10']: true,
     })} id='resumePageStyle1'>
       <div>
-        <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
-          <div className="grid grid-cols-1 gap-4 h-full">
-            <div className="grid grid-cols-12 h-full">
-              { /* Hero */}
-              <div className={clsx({
-                [styles.hero.gral]: true,
-                [styles.hero.withProfilePhoto]: !!photoProfile,
-                [styles.hero.withoutProfilePhoto]: !photoProfile
-              })}>
-                {
-                  (hero?.url) ?
-                    <div className={styles.hero.imageContainer}>
-                      <Image
-                        src={hero.url}
-                        layout='fill'
-                        alt="Hero"
-                        className={styles.hero.image}
-                      />
-                    </div>
-
-                    : <div className={styles.hero.noImage}></div>
-                }
-              </div>
-
-
-              { /* Profile photo */}
-              {
-                photoProfile ?
-                  <div className={styles.profilePhoto.principalContainer}>
-                    <div className="flex h-full w-full">
-                      <div className={styles.profilePhoto.imageContainer}>
+        {
+          ( user.showheader ) ?
+          <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
+            <div className="grid grid-cols-1 gap-4 h-full">
+              <div className="grid grid-cols-12 h-full">
+                { /* Hero */}
+                <div className={clsx({
+                  [styles.hero.gral]: true,
+                  [styles.hero.withProfilePhoto]: !!photoProfile,
+                  [styles.hero.withoutProfilePhoto]: !photoProfile
+                })}>
+                  {
+                    (hero?.url) ?
+                      <div className={styles.hero.imageContainer}>
                         <Image
-                          src={photoProfile}
-                          width={500}
-                          height={500}
-                          alt="Profile"
-                          className={styles.profilePhoto.image}
+                          src={hero.url}
+                          layout='fill'
+                          alt="Hero"
+                          className={styles.hero.image}
                         />
                       </div>
+
+                      : <div className={styles.hero.noImage}></div>
+                  }
+                </div>
+
+
+                { /* Profile photo */}
+                {
+                  photoProfile ?
+                    <div className={styles.profilePhoto.principalContainer}>
+                      <div className="flex h-full w-full">
+                        <div className={styles.profilePhoto.imageContainer}>
+                          <Image
+                            src={photoProfile}
+                            width={500}
+                            height={500}
+                            alt="Profile"
+                            className={styles.profilePhoto.image}
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  :
-                  <></>
-              }
+                    :
+                    <></>
+                }
+              </div>
             </div>
           </div>
-        </div>
+          : <></>
+        }
         <div className='p-5'>
           { <BuildBlocksVisualMode blocks={blocks}></BuildBlocksVisualMode> }
         </div>
@@ -202,87 +206,90 @@ export function Style1EditView(
         ['h-fit pb-10']: true,
       })} id='resumePageStyle1'>
       <div>
-        <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
-          <div className="grid grid-cols-1 gap-4 h-full">
-            <div className="grid grid-cols-12 h-full">
-              { /* Hero */}
-              <div className={clsx({
-                [styles.edit.hover]: !loading,
-                [styles.hero.gral]: true,
-                [styles.hero.withProfilePhoto]: true
-              })}
-                onClick={handleHeroClick}>
-                {
-                  (heroPhoto) ?
-                    <div className={styles.hero.imageContainer}>
-                      <Image
-                        src={heroPhoto}
-                        layout='fill'
-                        alt="Hero"
-                        className={styles.hero.image}
-                      />
-                    </div>
-
-                    : <div className={styles.hero.imageContainer + ' border border-slate-950'}>
-                    </div>
-                }
-                <input
-                  ref={heroInputRef}
-                  type="file"
-                  id="imageHero"
-                  name="imageHero"
-                  required
-                  onChange={handleHeroChange}
-                  style={{ display: 'none' }}
-                />
-              </div>
-              { /* Profile photo */}
-              {
-                (photoProfile) ?
-                  <div className={styles.profilePhoto.principalContainer}>
-                    <div className={clsx({
-                      ['cursor-pointer flex h-full w-full']: true,
-                      [styles.edit.hover]: true,
-                      [styles.status.loading]: loading
-                    })}
-                      onClick={handleProfileClick}>
-                      <div className={styles.profilePhoto.imageContainer}>
+        { ( user.showheader ) ?
+          <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
+            <div className="grid grid-cols-1 gap-4 h-full">
+              <div className="grid grid-cols-12 h-full">
+                { /* Hero */}
+                <div className={clsx({
+                  [styles.edit.hover]: !loading,
+                  [styles.hero.gral]: true,
+                  [styles.hero.withProfilePhoto]: true
+                })}
+                  onClick={handleHeroClick}>
+                  {
+                    (heroPhoto) ?
+                      <div className={styles.hero.imageContainer}>
                         <Image
-                          src={photoProfile}
-                          width={500}
-                          height={500}
-                          alt="Profile"
-                          className={styles.profilePhoto.image}
+                          src={heroPhoto}
+                          layout='fill'
+                          alt="Hero"
+                          className={styles.hero.image}
                         />
                       </div>
-                    </div>
-                  </div>
-                  :
-                  <div className="col-span-3 rounded-r-xl cursor-pointer">
-                    <div className='h-full p-1 w-full flex justify-center  items-center	'>
-                      <div className={clsx({
-                        [styles.edit.hover]: !loading,
-                        ['bg-gray-300 rounded-full size-4/6  border border-slate-950']: true,
 
-                      })} onClick={handleProfileClick}>
+                      : <div className={styles.hero.imageContainer + ' border border-slate-950'}>
+                      </div>
+                  }
+                  <input
+                    ref={heroInputRef}
+                    type="file"
+                    id="imageHero"
+                    name="imageHero"
+                    required
+                    onChange={handleHeroChange}
+                    style={{ display: 'none' }}
+                  />
+                </div>
+                { /* Profile photo */}
+                {
+                  (photoProfile) ?
+                    <div className={styles.profilePhoto.principalContainer}>
+                      <div className={clsx({
+                        ['cursor-pointer flex h-full w-full']: true,
+                        [styles.edit.hover]: true,
+                        [styles.status.loading]: loading
+                      })}
+                        onClick={handleProfileClick}>
+                        <div className={styles.profilePhoto.imageContainer}>
+                          <Image
+                            src={photoProfile}
+                            width={500}
+                            height={500}
+                            alt="Profile"
+                            className={styles.profilePhoto.image}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-              }
-              {
-                <input
-                  ref={profileInputRef}
-                  type="file"
-                  id="imageProfile"
-                  name="imageProfile"
-                  required
-                  onChange={handleProfileChange}
-                  style={{ display: 'none' }}
-                />
-              }
+                    :
+                    <div className="col-span-3 rounded-r-xl cursor-pointer">
+                      <div className='h-full p-1 w-full flex justify-center  items-center	'>
+                        <div className={clsx({
+                          [styles.edit.hover]: !loading,
+                          ['bg-gray-300 rounded-full size-4/6  border border-slate-950']: true,
+
+                        })} onClick={handleProfileClick}>
+                        </div>
+                      </div>
+                    </div>
+                }
+                {
+                  <input
+                    ref={profileInputRef}
+                    type="file"
+                    id="imageProfile"
+                    name="imageProfile"
+                    required
+                    onChange={handleProfileChange}
+                    style={{ display: 'none' }}
+                  />
+                }
+              </div>
             </div>
           </div>
-        </div>
+          : <></>
+        }
             <div className='p-5'>
               {
                   <BuildBlocksEditMode blocks={blocks}/>

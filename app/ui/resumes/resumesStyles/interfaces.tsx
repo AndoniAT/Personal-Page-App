@@ -18,6 +18,7 @@ export interface UserClient {
     lastname: string,
     photo: string,
     email: string,
+    showheader: boolean,
     photo_profile: MediaClient|null
 }
 

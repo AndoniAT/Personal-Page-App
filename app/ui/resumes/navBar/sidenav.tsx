@@ -7,7 +7,7 @@ import AcmeLogo from '@/app/ui/components/acme-logo';
 import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 import { customRevalidateTag, goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
-import EditModeNavBar from './client/editModeNavBar';
+import EditModeNavBar from './editModeNavBar';
 import { changeBackgroundSection } from '@/app/lib/data';
 
 export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit', currentSection:Section|null } ) {
@@ -65,16 +65,11 @@ async function createSideNav( paramsSend : {
   }
 
   let editModeNavBar = () => {
-    if( currentSection ) {
-      let changeBg = async ( id:string, color:string, username:string ) => {
-        'use server'
-        await changeBackgroundSection(id, color, username);
-        customRevalidateTag('edit');
-      }
-
-      currentSection.background.update = currentSection ? changeBg : currentSection
+    if( user ) {
+      return <EditModeNavBar data={ { user:user, currentSection: currentSection } }></EditModeNavBar>
+    } else {
+      return <></>
     }
-    return <EditModeNavBar data={ { username:user?.username || '', currentSection: currentSection, customRevalidateTag: customRevalidateTag } }></EditModeNavBar>
   };
 
   return (

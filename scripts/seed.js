@@ -41,6 +41,7 @@ async function createUsers( client ) {
             lastname VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             password TEXT NOT NULL,
+            showheader BOOLEAN DEFAULT TRUE,
             photo_profile_id UUID
             );
             `;

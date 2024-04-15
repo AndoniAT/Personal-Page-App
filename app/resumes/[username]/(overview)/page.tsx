@@ -40,6 +40,7 @@ export default async function Page(
         lastname: user.lastname,
         photo: user.photo,
         email: user.email,
+        showheader: user.showheader,
         photo_profile: photo_profile
       },
       section: {
