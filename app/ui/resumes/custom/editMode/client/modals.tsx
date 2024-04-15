@@ -1,8 +1,9 @@
+'use client'
 import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3BottomLeftIcon, Bars3BottomRightIcon,
     BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon
  } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
-import { ElementBlockClient } from '../../resumesStyles/interfaces';
+import { ElementBlockClient } from '../../interfaces';
 import { useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback }from 'use-debounce';
 import { TYPES_TO_CHOOSE } from './blocks';

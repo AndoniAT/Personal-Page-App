@@ -1,5 +1,6 @@
+'use client'
 import { FormEvent, useEffect, useState } from "react";
-import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
+import { BlockClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
 import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, TextElementType, VideoElementType } from "./modals";
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";

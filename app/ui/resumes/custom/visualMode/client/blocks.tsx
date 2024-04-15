@@ -1,8 +1,9 @@
+'use client'
 import { FormEvent, useEffect, useState } from "react";
-import { BlockClient, ElementBlockClient } from "../../resumesStyles/interfaces";
+import { BlockClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
 import Image from "next/image";
-import { TYPES_TO_CHOOSE } from "../editMode/blocks";
+import { TYPES_TO_CHOOSE } from "../../editMode/client/blocks";
 import { Media } from "@/app/lib/definitions";
 
 /**
@@ -10,7 +11,7 @@ import { Media } from "@/app/lib/definitions";
  * @param blocks 
  * @returns 
  */
-export function BuildBlocksVisualMode( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {console.log('check blocks', blocks);
+export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {console.log('check blocks', blocks);
     return (<>
       {
         blocks.map( ( block:BlockClient ) => <Block key={block.block_id} block={block} /> )
@@ -120,9 +121,9 @@ export function EmptyElement() {
 
 export function CustomElement({
   element
-}:{
+}:Readonly<{
   element:ElementBlockClient
-}) {
+}>) {
   switch(element.type) {
     case TYPES_TO_CHOOSE.text:
       return <ElementText element={element}></ElementText>
@@ -137,9 +138,9 @@ export function CustomElement({
 
 export function ElementText({
   element
-}:{
+}:Readonly<{
   element:ElementBlockClient
-}) {
+}>) {
 
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
@@ -156,8 +157,6 @@ export function ElementText({
   myCss = {
     ...myCss
   }
-
-  //let customClass = element.customclassname ?? '';
 
   return (
     <div style={gridCss} className={clsx({
@@ -177,9 +176,10 @@ export function ElementText({
 
 export function ElementImage({
   element
-}:{
+}:Readonly<{
   element:ElementBlockClient
-}) {
+}>) {
+
   let [image, setImage] = useState<string>('');
 
   useEffect(() => {
@@ -268,13 +268,11 @@ export function ElementHtml({
 
   let customClass = element.customclassname ?? '';
   return (
-    <>
-      <div style={gridCss}>
-        <div style={myCss} 
+    <div style={gridCss}>
+      <div style={myCss} 
         className={clsx({ [element.defclassname]:true})}
         dangerouslySetInnerHTML={createHTML( element.content )} />
-      </div>
-    </>
+    </div>
   )
 }
 
@@ -303,13 +301,11 @@ export function ElementVideo({
 
   let customClass = element.customclassname ?? '';
   return (
-    <>
-      <div style={gridCss}>
-        <div style={myCss} 
+    <div style={gridCss}>
+      <div style={myCss} 
         className={clsx({ [element.defclassname]:true})}
         dangerouslySetInnerHTML={createHTML( element.content )} />
-      </div>
-    </>
+    </div>
   )
 }
 

@@ -1,3 +1,4 @@
+'use client'
 import { ArrowDownIcon, ArrowDownLeftIcon, ArrowDownRightIcon, ArrowLeftIcon, ArrowRightIcon, ArrowUpIcon, ArrowUpLeftIcon, ArrowUpRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { inputValueNumberClass } from '@/app/ui/cssComponents/styles';
 import { useRef } from "react";

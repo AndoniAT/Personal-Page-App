@@ -2,9 +2,9 @@ import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHero
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
-import { Style1EditView } from '@/app/ui/resumes/resumesStyles/style1';
+import CustomEditView from '@/app/ui/resumes/custom/editMode/curstomResume';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
-import { BlockClient, MediaClient } from '@/app/ui/resumes/resumesStyles/interfaces';
+import { BlockClient, MediaClient } from '@/app/ui/resumes/custom/interfaces';
 import { revalidatePath } from 'next/cache';
 import { createElementBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
 
@@ -149,7 +149,7 @@ export default async function Page(
     return (
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>
-            <Style1EditView data={sendData}/>
+            <CustomEditView data={sendData}/>
         </Suspense>
       </main>
     );

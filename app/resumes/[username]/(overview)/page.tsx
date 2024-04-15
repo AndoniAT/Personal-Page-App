@@ -3,9 +3,9 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
-import { Style1Wrapper } from '@/app/ui/resumes/resumesStyles/style1';
+import CustomView from '@/app/ui/resumes/custom/visualMode/customResume';
 import { getBlocksSection } from '@/app/lib/section/actions';
-import { BlockClient } from '@/app/ui/resumes/resumesStyles/interfaces';
+import { BlockClient } from '@/app/ui/resumes/custom/interfaces';
 
 export const metadata: Metadata = {
   title: 'Resume User',
@@ -58,7 +58,7 @@ export default async function Page(
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>
             {
-            <Style1Wrapper data={sendData}/>
+            <CustomView data={sendData}/>
             }
         </Suspense>
       </main>
