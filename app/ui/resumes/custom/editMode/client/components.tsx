@@ -6,6 +6,7 @@ import Image from "next/image";
 import { MediaClient } from "../../interfaces";
 import clsx from "clsx";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { LoadScreen } from "@/app/ui/components/loading-modal";
 
 export function ShowHeader({
     hero,
@@ -159,5 +160,27 @@ export function ButtonPlus({
 }:Readonly<{
   handler:Function
 }>) {
-  return <PlusCircleIcon onClick={() => { handler()}} className='h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5'></PlusCircleIcon>
+  const [ loading, setLoading ] = useState<boolean>(false);
+
+  return ( 
+    <>
+      {
+      (loading) ?
+      <LoadScreen/>
+      :
+        <PlusCircleIcon 
+                onClick={ async () => { 
+                  setLoading( true );
+                  await handler();
+                  setLoading( false );
+                }
+                } 
+                className={clsx({
+                  ['h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5']:true
+                })}
+                />
+      }
+    </>
+    
+            )
 }

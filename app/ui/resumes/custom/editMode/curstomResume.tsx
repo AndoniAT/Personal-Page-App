@@ -5,6 +5,8 @@ import { BuildBlocksEditMode } from './client/blocks';
 import TrashButton from '../../../components/trash-button';
 import { ButtonPlus, ShowHeader } from './client/components';
 import CustomSection from '@/app/ui/components/custom-section';
+import { SectionType } from '@/app/lib/definitions';
+import { revalidateTag } from 'next/cache';
 
 export default function CustomEditView(
   {
@@ -16,25 +18,31 @@ export default function CustomEditView(
     }
   }>) {
   const user = data.user;
-  const home = data.section;
-  const hero = home.medias.find(m => m.ishero);
-  let blocks = home.blocks as BlockClient[];
+  const section = data.section;
+  const hero = section.medias.find(m => m.ishero);
+  let blocks = section.blocks as BlockClient[];
 
   let handlerCreateBlock = async () => {
     'use server'
-    await home?.actions?.addBlock();
+    await section?.actions?.addBlock();
+    await revalidateTag('edit');
   }
+
+  /*let deleteSection = async () => {
+    'use server'
+    console.log('delete section');
+  }*/
 
   return (
     <div>
-      <CustomSection style={{ backgroundColor: home.backgroundcolor, minHeight:'90vh' }}
+      <CustomSection style={{ backgroundColor: section.backgroundcolor, minHeight:'90vh' }}
         className={clsx({
           ['w-full']: true,
           ['h-fit pb-10']: true
         })} >
         <div>
           { 
-            ( user.showheader ) ?
+            ( user.showheader && ( section.type == 'Home' as SectionType ) ) ?
             <ShowHeader hero={hero} user_photo_profile={user?.photo_profile ?? undefined}/>
             : <></>
           }
@@ -59,6 +67,7 @@ export default function CustomEditView(
           }} 
           deleteElement={ async () => {
             'use server'
+            
           }}
           confirmation={{
             title:'Delete Section',
@@ -67,7 +76,8 @@ export default function CustomEditView(
           <label className='mt-3 flex items-center text-white'>
             Delete Section
           </label>
-        </div>   */
+        </div> 
+        */
       }
     </div>
   );

@@ -1,4 +1,4 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, getProfilePhotoForUser } from '@/app/lib/data';
+import { getUserByUsername, getHomeUserSection, getMediasForSection, getProfilePhotoForUser, getUserSection } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -8,7 +8,7 @@ import { getBlocksSection } from '@/app/lib/section/actions';
 import { BlockClient } from '@/app/ui/resumes/custom/interfaces';
 
 export const metadata: Metadata = {
-  title: 'Resume User',
+  title: 'Resume Section User',
 };
 
 export default async function Page(
@@ -16,11 +16,12 @@ export default async function Page(
     params 
   }: Readonly<{ 
     params: { 
-      username: string 
+      username: string,
+      section_id: string
     }
   }>) {
 
-    const username = params.username;
+    const { username, section_id } = params;
 
     const user = await getUserByUsername( username );
 
@@ -28,10 +29,9 @@ export default async function Page(
       notFound();
     }
 
-    const home = await getHomeUserSection( username );
-    const medias = await getMediasForSection( home.section_id );
-    let photo_profile = await getProfilePhotoForUser( user.username );
-    const blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
+    const section = await getUserSection( username, section_id );
+    const medias = await getMediasForSection( section.section_id );
+    const blocks = await getBlocksSection( section.section_id ) as BlockClient[]|[];
 
     const sendData = {
       user: {
@@ -40,14 +40,13 @@ export default async function Page(
         lastname: user.lastname,
         photo: user.photo,
         email: user.email,
-        showheader: user.showheader,
-        photo_profile: photo_profile
+        showheader: user.showheader
       },
       section: {
-        name: home.name,
-        created: home.created,
-        type: home.type,
-        backgroundcolor: home.backgroundcolor,
+        name: section.name,
+        created: section.created,
+        type: section.type,
+        backgroundcolor: section.backgroundcolor,
         medias: medias,
         blocks: blocks,
       }

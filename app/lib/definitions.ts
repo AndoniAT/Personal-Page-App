@@ -26,7 +26,6 @@ export type Section = {
     type: SectionType;
     style: number;
     backgroundcolor: string;
-    backgroundimage: string;
 };
 
 export type Media = {

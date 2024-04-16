@@ -19,7 +19,7 @@ export interface UserClient {
     photo: string,
     email: string,
     showheader: boolean,
-    photo_profile: MediaClient|null
+    photo_profile?: MediaClient
 }
 
 export interface SectionsClient {
@@ -27,7 +27,6 @@ export interface SectionsClient {
     created: Date,
     type: string,
     backgroundcolor: string,
-    backgroundimage: string,
     medias: MediaClient[]
     blocks: BlockClient[]|[]
     actions?: {

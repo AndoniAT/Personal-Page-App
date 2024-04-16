@@ -68,6 +68,24 @@ export async function getHomeUserSection( username: string) {
   }
 }
 
+export async function getUserSection( username: string, section_id: string ) {
+  noStore();
+  try {
+    const sections = await sql`SELECT * FROM SECTION
+                                  WHERE 
+                                  section_id = ${section_id} AND
+                                  resume_id IN( SELECT resume_id  FROM RESUME
+                                      WHERE user_id IN( SELECT user_id FROM USERS 
+                                        WHERE username = ${username}))`;
+    const section = sections.rows[ 0 ] as Section;
+    return section;
+
+  } catch ( error ) {
+    console.error( 'Failed to fetch section:', error );
+    throw new Error( 'Failed to fetch section.' );
+  }
+}
+
 export async function getMediasForSection( section_id: string ) {
   noStore();
 
@@ -136,7 +154,7 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
       
       await utapi.deleteFiles([media?.key]);
 
-      revalidatePath(`/resumes/${username}/edit/section`);
+      revalidatePath(`/resumes/${username}/edit/${home.section_id}`);
       return image?.url;
     } else {
       // Create Hero
@@ -154,7 +172,7 @@ export async function putHomeHeroForUser( username: string, formData: FormData )
 
         VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, TRUE, ${home.section_id}, null )
         ON CONFLICT ( media_id ) DO NOTHING;`
-        revalidatePath(`/resumes/${username}/edit/section`);
+        revalidatePath(`/resumes/${username}/edit/${home.section_id}`);
         return image?.url;
       }
   } catch ( error ) {
@@ -174,6 +192,7 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
 
   try {
     const user = await getUserByUsername( username );
+    const home = await getHomeUserSection( username );
 
     const medias = await sql`SELECT * FROM MEDIA
                                 WHERE 
@@ -192,7 +211,7 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
                 WHERE media_id = ${media.media_id};`;
 
       await utapi.deleteFiles([media?.key]);
-      revalidatePath(`/resumes/${username}/edit/section`);
+      revalidatePath(`/resumes/${username}/edit/${home.section_id}`);
       return image?.url;
     } else {
       // Create Profile Image
@@ -214,7 +233,7 @@ export async function putProfilePhotoForUser( username: string, formData: FormDa
       SET 
       photo_profile_id = ${photoMedia.media_id}
       WHERE user_id = ${user.user_id};`
-      revalidatePath(`/resumes/${username}/edit/section`);
+      revalidatePath(`/resumes/${username}/edit/${home.section_id}`);
       return image?.url;
     }
 
@@ -232,7 +251,7 @@ export async function changeBackgroundSection( id:string, color:string, username
   try {
     await sql`UPDATE SECTION
               SET backgroundcolor = ${color} WHERE section_id =${id};`;
-    revalidatePath(`/resumes/${username}/edit/section`);
+    revalidatePath(`/resumes/${username}/edit/${id}`);
     return color;
   } catch( e ) {
     throw new Error( 'Failed to change the backgorund' );

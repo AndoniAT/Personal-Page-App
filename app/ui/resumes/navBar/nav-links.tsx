@@ -8,13 +8,17 @@ interface ParamsProps {
   sections:SectionsNavBar[]|[],
   mode?: 'edit',
   user: User|null,
+  currentSection:SectionsNavBar|null
 }
 
 export default async function NavLinks( { params } : Readonly<{ params: ParamsProps }>) {
-  const sections = params.sections;
-  const home = params.home;
-  
-  let { user, mode } = params;
+  const { 
+    user,
+    mode,
+    sections, 
+    home, 
+    currentSection
+  } = params;
 
   let session = await auth();
   
@@ -31,8 +35,15 @@ export default async function NavLinks( { params } : Readonly<{ params: ParamsPr
           {<GetUsernameSection/>}
           { ( isUsersSessionProfile && isEdit ) ? <EditUserPencilLink/> : <></>}
         </div>
-        { home ? <CreateHomeLink home={home}></CreateHomeLink> : <></>}
-        { <CreateSectionsLink sections={sections}></CreateSectionsLink> }
+        {
+          ( currentSection ) ?
+            <>
+              { ( home ) ? <CreateHomeLink home={home} current={currentSection.section_id == home.section_id}></CreateHomeLink> : <></>}
+              <CreateSectionsLink sections={sections} currentSection={currentSection}></CreateSectionsLink>
+            </>
+          
+          :<></>
+        }
       </div>
     </div>
     

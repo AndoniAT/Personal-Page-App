@@ -1,4 +1,4 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, putHomeHeroForUser, putProfilePhotoForUser, getProfilePhotoForUser } from '@/app/lib/data';
+import { getUserByUsername, getMediasForSection, putHomeHeroForUser, putProfilePhotoForUser, getProfilePhotoForUser, getUserSection } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
@@ -7,6 +7,7 @@ import { requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, MediaClient } from '@/app/ui/resumes/custom/interfaces';
 import { revalidatePath } from 'next/cache';
 import { createElementBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
+import { SectionType } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
   title: 'Edit User\'s Section',
@@ -17,40 +18,47 @@ export default async function Page(
     params 
   }: Readonly<{ 
     params: { 
-      username: string 
+      username: string,
+      section_id: string
     } 
   }>) {
     await requiresSessionUserProperty( params.username );
 
-    const username = params.username;
+    const { username, section_id } = params;
     const user = await getUserByUsername( username );
 
-    const home = await getHomeUserSection( username );
-    const medias = await getMediasForSection( home.section_id ) as MediaClient[];
-    let blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
+    let section = await getUserSection( username, section_id );
+    //const home = await getHomeUserSection( username );
+
+    const medias = await getMediasForSection( section.section_id ) as MediaClient[];
+    let blocks = await getBlocksSection( section.section_id ) as BlockClient[]|[];
 
     let heroInMedia = medias.find( m => m.ishero );
     
-    if( heroInMedia ) {
-      heroInMedia.update = putHomeHeroForUser;
-    } else {
-      let hero = { update: putHomeHeroForUser, ishero:true, section_id: home.section_id } as MediaClient;
-      medias.push( hero );
+    if( section.type == "Hero" as SectionType ) {
+      if( heroInMedia ) {
+        heroInMedia.update = putHomeHeroForUser;
+      } else {
+        let hero = { update: putHomeHeroForUser, ishero:true, section_id: section.section_id } as MediaClient;
+        medias.push( hero );
+      }
     }
 
     let photo_profile = await getProfilePhotoForUser( user.username ) as MediaClient
   
-    if( photo_profile ) {
-      photo_profile.update = putProfilePhotoForUser;
-    } else {
-      photo_profile = { update: putProfilePhotoForUser  } as MediaClient;
+    if( section.type == "Hero" as SectionType ) {
+      if( photo_profile ) {
+        photo_profile.update = putProfilePhotoForUser;
+      } else {
+        photo_profile = { update: putProfilePhotoForUser  } as MediaClient;
+      }
     }
 
     const createBlockBind = async () => {
       'use server'
       try {
-        await createNewBlock.call( { section_id: home.section_id, username: user.username } );
-        revalidatePath(`/resumes/${user.username}/edit/section`);
+        await createNewBlock.call( { section_id: section.section_id, username: user.username } );
+        //revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
       } catch( err ) {
         console.log( 'err', err );
       }
@@ -61,10 +69,10 @@ export default async function Page(
       const createElement = async ( type:string, form:FormData ) => {
         'use server'
         return new Promise( (resolve, reject) => {
-          createElementBlock.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, form: form, type:type } )
+          createElementBlock.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, form: form, type:type } )
           .then( () => {
             resolve(true);
-            revalidatePath(`/resumes/${user.username}/edit/section`);
+            revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
           })
           .catch( err => {
             reject( err );
@@ -80,10 +88,10 @@ export default async function Page(
             let fn = updateElementBlock;
     
             if ( fn ) {
-              fn.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id, form: form } )
+              fn.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id, form: form } )
               .then( () => {
                 resolve(true);
-                revalidatePath(`/resumes/${user.username}/edit/section`);
+                revalidatePath(`/resumes/${user.username}/edit/${section.section_id}]`);
               })
               .catch( err => {
                 reject( err );
@@ -98,10 +106,10 @@ export default async function Page(
         let deleteElement = async () => {
           'use server'
           return new Promise( (resolve, reject) => {
-            deleteElementBlock.call( { section_id: home.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id } )
+            deleteElementBlock.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id } )
             .then( () => {
               resolve(true);
-              revalidatePath(`/resumes/${user.username}/edit/section`);
+              revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
             })
             .catch( err => {
               reject( err );
@@ -133,11 +141,10 @@ export default async function Page(
         photo_profile: photo_profile
       },
       section: {
-        name: home.name,
-        created: home.created,
-        type: home.type,
-        backgroundcolor: home.backgroundcolor,
-        backgroundimage: home.backgroundimage,
+        name: section.name,
+        created: section.created,
+        type: section.type,
+        backgroundcolor: section.backgroundcolor,
         medias: medias,
         blocks: blocks,
         actions: {

@@ -6,6 +6,7 @@ import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElem
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import Image from "next/image";
 import TrashButton from "@/app/ui/components/trash-button";
+import { LoadScreen } from "@/app/ui/components/loading-modal";
 
 const STEPS = {
   NONE: 0,
@@ -33,6 +34,7 @@ export const TYPES_TO_CHOOSE = {
  */
 export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
   const [allBlocks, setAllBlocks] = useState<BlockClient[]>([])
+ const [ loadingBlock, setLoadingBlock ] = useState<string>( null );
 
   useEffect(() => {
     setAllBlocks( blocks );
@@ -43,6 +45,7 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
         allBlocks.map( ( block:BlockClient ) => {
 
           let deleteBlock = () => {
+            setLoadingBlock( block.block_id );
             fetch(`/api/blocks/${block.block_id}` ,
               {
                 method: 'DELETE'
@@ -50,17 +53,26 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
             ).then( () => {
               let newBlocks = allBlocks.filter( b => b.block_id != block.block_id );
               setAllBlocks( newBlocks );
+              setLoadingBlock( '' );
             })
             .catch( err => {
               console.log(err);
+              setLoadingBlock( '' );
             });
           }
 
           return ( 
-          <div key={`blockContainer${block.block_id}`}>
-            <Block key={block.block_id} block={block} /> 
-            <TrashButton key={`trash_${block.block_id}`} deleteElement={deleteBlock} cancel={() => {}}></TrashButton>
-          </div>
+            <>
+              {
+                ( loadingBlock == block.block_id ) ?
+                <LoadScreen/>
+                :
+                <div key={`blockContainer${block.block_id}`}>
+                  <Block key={block.block_id} block={block} /> 
+                  <TrashButton key={`trash_${block.block_id}`} deleteElement={deleteBlock} cancel={() => {}}></TrashButton>
+                </div>
+              }
+            </>
         )
         })
       }

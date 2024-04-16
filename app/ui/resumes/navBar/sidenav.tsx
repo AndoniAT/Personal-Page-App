@@ -6,9 +6,8 @@ import { Section, User } from '../../../lib/definitions';
 import AcmeLogo from '@/app/ui/components/acme-logo';
 import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
-import { customRevalidateTag, goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
+import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import EditModeNavBar from './editModeNavBar';
-import { changeBackgroundSection } from '@/app/lib/data';
 
 export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit', currentSection:Section|null } ) {
 
@@ -17,7 +16,6 @@ export default async function SideNav( { sections, user, mode, currentSection } 
   if( sections.length == 0 || !user || !currentSection || !home ) {
     return await createSideNav({ home:null, sections:[], user:null, currentSection:null });
   }
-  
   
   // Other sections
   sections = sections.filter( s => s.section_id != home.section_id ).filter( s => s.public );
@@ -53,7 +51,7 @@ async function createSideNav( paramsSend : {
 
   let visualModeNavBar = () => {
     return (
-      <Link href={`/resumes/${user?.username}/edit/section`}>
+      <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`}>
         <div className='flex content-center gap-2 cursor-pointer'>
           <PencilSquareIcon className='stroke-slate-700 w-5'/> 
           <span className='inline-block text-black align-middle h-fit content-center place-self-center'>
@@ -148,7 +146,7 @@ async function createSideNav( paramsSend : {
  */
 function constructSection( section:Section ) {
   return {
-    id: section.section_id,
+    section_id: section.section_id,
     name: section.name,
     created: section.created,
     type: section.type,

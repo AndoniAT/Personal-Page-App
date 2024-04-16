@@ -41,7 +41,6 @@ const SECTION = [
         type:'Projects',
         style:1,
         backgroundColor:'#82a3c0',
-        backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
     },
@@ -53,7 +52,6 @@ const SECTION = [
         type:'Gallery',
         style:1,
         backgroundColor:'#46aee2',
-        backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
     },
@@ -65,7 +63,6 @@ const SECTION = [
         type:'Custom',
         style:1,
         backgroundColor:'#55524e',
-        backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
     },*/
@@ -77,7 +74,6 @@ const SECTION = [
         type:'Home',
         style:1,
         backgroundColor:'#18191a',
-        backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111112',
     },
@@ -89,7 +85,6 @@ const SECTION = [
         type:'Home',
         style:1,
         backgroundColor:'#18191a',
-        backgroundImage:null,
 
         resume_id:'11111111-1111-1111-1111-111111111113',
     },

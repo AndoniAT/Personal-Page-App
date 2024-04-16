@@ -88,7 +88,6 @@ async function createSection( client ) {
             type VARCHAR(20) CHECK (type IN ('Projects', 'Gallery', 'Custom', 'Home')),
             style INT DEFAULT 1,
             backgroundcolor VARCHAR(7) DEFAULT '#FFFFFF',
-            backgroundimage VARCHAR(255),
             
             resume_id UUID
           );
@@ -407,8 +406,8 @@ async function seedSection( client ) {
           SECTION.map( async ( section ) => {
 
           return client.sql`
-          INSERT INTO SECTION ( section_id, name, public, type, style, backgroundColor, backgroundImage, resume_id )
-          VALUES ( ${section.section_id}, ${section.name}, ${section.public}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.backgroundImage}, ${section.resume_id})
+          INSERT INTO SECTION ( section_id, name, public, type, style, backgroundColor, resume_id )
+          VALUES ( ${section.section_id}, ${section.name}, ${section.public}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.resume_id})
           ON CONFLICT ( section_id ) DO NOTHING;
         `;
         } ),

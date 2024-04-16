@@ -22,7 +22,7 @@ export default function EditModeNavBar(  {
     let updateBg = async ( newColor:string ) => {
       'use server'
       if( currentSection ) {
-        await changeBackgroundSection( currentSection.id, newColor, user.username )
+        await changeBackgroundSection( currentSection.section_id, newColor, user.username )
         revalidateTag( 'edit' );
       }
     }
@@ -34,9 +34,10 @@ export default function EditModeNavBar(  {
       revalidateTag( 'edit' );
     }
 
+    let link = ( currentSection?.type == 'Home' ) ? `/resumes/${user.username}` : `/resumes/${user.username}/${currentSection?.section_id}`
     return ( 
       <div>
-        <Link href={`/resumes/${user.username}`}>
+        <Link href={link}>
           <div className='flex content-center gap-2 cursor-pointer'>
             <EyeIcon className='stroke-slate-700 w-5'/> 
             <span className='inline-block text-black align-middle h-fit content-center place-self-center m-l-10'>

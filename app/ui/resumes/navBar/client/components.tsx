@@ -12,6 +12,7 @@ interface LinkParam {
     name: string,
     href: string,
     icon: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & { title?: string, titleId?: string } & React.RefAttributes<SVGSVGElement>>;
+    current: boolean
 }
 
 /**
@@ -20,9 +21,10 @@ interface LinkParam {
  * @returns 
  */
 export function MainLinks() {
+  let path = usePathname();
     const mainLinksObj = [
-        { name: 'Home', href: '/', icon: HomeIcon },
-        { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon }
+        { name: 'Home', href: '/', icon: HomeIcon, current:(path == '/') },
+        { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon, current:(path == '/resumes') }
       ];
     return mainLinksObj.map( link => makeLink( link ) );
 }
@@ -31,9 +33,15 @@ export function MainLinks() {
  * @param home : Section home
  * @returns {Link}
  */
-export function CreateHomeLink( {home}:{home:SectionsNavBar} ) {
+export function CreateHomeLink( {
+  home,
+  current
+}:{
+  home:SectionsNavBar,
+  current:boolean
+} ) {
     let { username } = useParams();
-    const homeObj = { name: home.name, href: `/resumes/${username}/`, icon: HomeIcon }
+    const homeObj = { name: home.name, href: `/resumes/${username}/`, icon: HomeIcon, current:current }
     let homeLink = makeLink( homeObj );
     return homeLink;
 }
@@ -43,12 +51,20 @@ export function CreateHomeLink( {home}:{home:SectionsNavBar} ) {
  * @param sections : Collection of other sections for user
  * @returns {Link[]}
  */
-export function CreateSectionsLink( {sections}:{sections:SectionsNavBar[]}) {
+export function CreateSectionsLink( {
+  sections,
+  currentSection
+}:{
+  sections:SectionsNavBar[],
+  currentSection:SectionsNavBar
+}) {
     //const pathname = usePathname();
     let { username } = useParams();
     const sectionsObj = sections.map( s => {
-      return { name: s.name, href: `/resumes/${username}/${s.id}`, icon: Squares2X2Icon }
+      let current = s.section_id == currentSection.section_id ? true : false;
+      return { name: s.name, href: `/resumes/${username}/${s.section_id}`, icon: Squares2X2Icon, current:current }
     } );
+
     const sectionsLinks = sectionsObj.map( section => makeLink( section ) );
     return sectionsLinks;
 }
@@ -215,14 +231,14 @@ export function EditUserPencilLink() {
  */
 function makeLink( link:LinkParam ) {
     const LinkIcon = link.icon;
-  
+    const current = link.current ? 'bg-sky-300' : 'bg-sky-100'
     return (
       <Link
         key={link.name}
         href={link.href}
         className={clsx(
           'flex h-[48px] grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium',
-          'bg-gray-50 bg-sky-100 text-blue-600',
+          `${current} text-blue-600`,
           'hover:bg-sky-100 hover:text-blue-600',
           'md:flex-none md:justify-start md:p-2 md:px-3',
           'border-solid border-2 border-slate-400',
