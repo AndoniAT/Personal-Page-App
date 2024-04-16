@@ -89,7 +89,7 @@ export function Block({
   return ( 
     <>
       <div key={`blk1`} className={clsx({
-      ['w-full min-h-80 h-fit grid']: true,
+      ['w-full min-h-80 h-fit grid overflow-hidden']: true,
       /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
       [`grid-rows-${totLines}`]: true,
       [`grid-cols-${totCols}`]: true
@@ -207,6 +207,11 @@ export function ElementImage({
     }
   } as React.CSSProperties;
 
+  if( myCss.height ) {
+    gridCss.height = myCss.height;
+    delete myCss.height;
+  }
+
   myCss = {
     ...{
       'width': '100%',
@@ -221,7 +226,8 @@ export function ElementImage({
     <div style={gridCss}
      className={clsx({
       [element.defclassname]:true,
-      ['min-h-10']:true
+      ['min-h-10']:true,
+      ['hover:scale-110']:true
     })}
     >
       {

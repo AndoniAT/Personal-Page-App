@@ -10,7 +10,7 @@ import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import clsx from 'clsx';
-import { BorderButtons, PaddingButtons } from './customButtons';
+import { BorderButtons, InputValueButton, DirectionButtons } from './customButtons';
 import TrashButton from '@/app/ui/components/trash-button';
 
 
@@ -148,10 +148,10 @@ export function TextElementType({
     
     // Pading
     const DefaultsPadding = {
-        paddingLeft : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
-        paddingTop : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
-        paddingRight : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
-        paddingBottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
+        left : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
+        top : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
+        right : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
+        bottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
     }
     
     
@@ -426,7 +426,7 @@ export function TextElementType({
 
                                                 { /* Padding */}
                                                 <div className='mt-5'>
-                                                    <PaddingButtons handlerPadding={handlerPadding} defaults={DefaultsPadding}></PaddingButtons>
+                                                    <DirectionButtons handlerValue={handlerPadding} defaults={DefaultsPadding} title={'Padding'}></DirectionButtons>
                                                 </div>
                                                 { /* Border */}
                                                 <div className='mt-5'>
@@ -485,10 +485,18 @@ export function MediaElementType({
     let myCss = ( isEdit && element.css && typeof element.css == 'string' ) ? JSON.parse( element.css ) : {};
     // Pading
     let DefaultsPadding = {
-        paddingLeft : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
-        paddingTop : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
-        paddingRight : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
-        paddingBottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
+        left : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
+        top : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
+        right : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
+        bottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
+    }
+
+    // Margin
+    let DefaultsMargin = {
+        left : ( isEdit && myCss.marginLeft ) ? parseFloat( myCss.marginLeft.split('rem')[0] ) : 0.0,
+        top : ( isEdit && myCss.marginTop ) ? parseFloat( myCss.marginTop.split('rem')[0] ) : 0.0,
+        right : ( isEdit && myCss.marginLeft ) ? parseFloat( myCss.marginLeft.split('rem')[0] )*-1 : 0.0,
+        bottom : ( isEdit && myCss.marginTop ) ? parseFloat( myCss.marginTop.split('rem')[0] )*-1 : 0.0
     }
 
     // Border
@@ -500,11 +508,30 @@ export function MediaElementType({
         borderWidth : ( isEdit && myCss.borderWidth ) ? parseFloat( myCss.borderWidth.split('rem')[0] ) : 0.0,
         borderColor : ( isEdit && myCss.borderColor && typeof myCss.borderColor == 'string' ) ? myCss.borderColor : '0'
     }
+
+    const defaultHeight = ( isEdit && myCss.height ) ? parseFloat( myCss.height.split('%')[0] ) : 100;
+
     const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', 200 );
     const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), 200 );
 
     /* HANDLERS */
-    const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element), 200 );
+    const handlerPadding = useDebouncedCallback( (direction, value) => {
+        sendFormDataForElement( 'padding'+direction, value, element), 200 
+    } );
+
+    const handlerMargin = useDebouncedCallback( (direction, value) => {
+        if( direction == 'Bottom' ) {
+            direction = 'Top';
+            value *=-1; 
+        } else if( direction == 'Right') {
+            direction = 'Left';
+            value *=-1; 
+        }
+
+        sendFormDataForElement( 'margin'+direction, value, element), 200 
+    } );
+
+    const handlerHeight = useDebouncedCallback( (value) => sendFormDataForElement( 'height', value, element), 200 );
 
     const handleImageChange = async () => {
         if ( imageInputRef?.current?.files && imageInputRef.current.files.length > 0 ) {
@@ -619,15 +646,28 @@ export function MediaElementType({
                                                 {
                                                     
                                                     <div className='mt-5'>
-                                                        <PaddingButtons handlerPadding={handlerPadding} defaults={DefaultsPadding}></PaddingButtons>
+                                                        <DirectionButtons handlerValue={handlerPadding} defaults={DefaultsPadding} title={'Padding'}></DirectionButtons>
                                                     </div>
+                                                }
+                                            </div>
 
+                                            <div className="w-full">
+                                                { /* Margin */}
+                                                {
+                                                    
+                                                    <div className='mt-5'>
+                                                        <DirectionButtons handlerValue={handlerMargin} defaults={DefaultsMargin} title={'Margin'}></DirectionButtons>
+                                                    </div>
                                                 }
                                             </div>
 
                                             { /* Border */}
                                             <div className='mt-5'>
                                                 <BorderButtons defaults={DefaultsBorder} handleColorBorderChange={handleColorBorderChange} handlerBorder={handlerBorder}/>
+                                            </div>
+
+                                            <div className='mt-5'>
+                                                <InputValueButton title='Height (%)' min={100} defaultVal={defaultHeight} handlerValueChange={handlerHeight} step={1}/>
                                             </div>
 
                                             { /* DELETE */}

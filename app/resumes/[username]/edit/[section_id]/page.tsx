@@ -35,7 +35,7 @@ export default async function Page(
 
     let heroInMedia = medias.find( m => m.ishero );
     
-    if( section.type == "Hero" as SectionType ) {
+    if( section.type == "Home" as SectionType ) {
       if( heroInMedia ) {
         heroInMedia.update = putHomeHeroForUser;
       } else {
@@ -45,8 +45,8 @@ export default async function Page(
     }
 
     let photo_profile = await getProfilePhotoForUser( user.username ) as MediaClient
-  
-    if( section.type == "Hero" as SectionType ) {
+
+    if( section.type == "Home" as SectionType ) {
       if( photo_profile ) {
         photo_profile.update = putProfilePhotoForUser;
       } else {

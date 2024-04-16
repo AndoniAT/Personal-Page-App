@@ -287,11 +287,17 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
       case 'alignItems':
         await getAndUpdateFormAttribute( target, block_id, element, form, '' );
         break;
-      case 'fontSize':
+      case 'height':
+        await getAndUpdateFormAttribute( target, block_id, element, form, '%' );
+        break;
       case 'paddingLeft':
       case 'paddingTop':
       case 'paddingRight':
       case 'paddingBottom':
+      case 'marginLeft':
+      case 'marginTop':
+      case 'marginRight':
+      case 'marginBottom':
       case 'borderTopLeftRadius':
       case 'borderBottomLeftRadius':
       case 'borderTopRightRadius':

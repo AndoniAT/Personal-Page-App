@@ -3,11 +3,11 @@ import { ArrowDownIcon, ArrowDownLeftIcon, ArrowDownRightIcon, ArrowLeftIcon, Ar
 import { inputValueNumberClass } from '@/app/ui/cssComponents/styles';
 import { useRef } from "react";
 
-interface DefaultsPadding  {
-    paddingLeft:number,
-    paddingTop:number,
-    paddingRight:number,
-    paddingBottom:number
+interface DefaultsValuesDirection  {
+    left:number,
+    top:number,
+    right:number,
+    bottom:number
 }
 
 interface DefaultsBorder {
@@ -19,24 +19,26 @@ interface DefaultsBorder {
     borderColor:string
 }
 
-export function PaddingButtons({
-    handlerPadding,
-    defaults
+export function DirectionButtons({
+    handlerValue,
+    defaults,
+    title
 }:
 Readonly<{
-    handlerPadding:Function
-    defaults:DefaultsPadding
+    handlerValue:Function
+    defaults:DefaultsValuesDirection,
+    title:string
 }>) {
     return (
         <>
-            <span>Padding</span>
+            <span>{title}</span>
             <div className='mt-5 ml-10'>
                 <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
                     <div className="flex flex-col">
                         <input type="number" name="paddingleft" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                        defaultValue={defaults.paddingLeft}
+                        defaultValue={defaults.left}
                         onChange={ ( e ) => {
-                            handlerPadding( 'Left', e.target.value );
+                            handlerValue( 'Left', e.target.value );
                         }}
                         />
                         <div className='w-12 text-center flex mt-3 justify-center'>
@@ -45,9 +47,9 @@ Readonly<{
                     </div>
                     <div className="flex flex-col">
                         <input type="number" name="paddingTop" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                        defaultValue={defaults.paddingTop}
+                        defaultValue={defaults.top}
                                                                 onChange={ ( e ) => {
-                            handlerPadding( 'Top', e.target.value );
+                            handlerValue( 'Top', e.target.value );
                         }}
                         />
                         <div className='w-12 text-center flex mt-3 justify-center'>
@@ -56,9 +58,9 @@ Readonly<{
                     </div>
                     <div className="flex flex-col">
                         <input type="number" name="paddingRight" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                        defaultValue={defaults.paddingRight}
+                        defaultValue={defaults.right}
                         onChange={ ( e ) => {
-                            handlerPadding( 'Right', e.target.value );
+                            handlerValue( 'Right', e.target.value );
                         }}
                         />
                         <div className='w-12 text-center flex mt-3 justify-center'>
@@ -67,14 +69,48 @@ Readonly<{
                     </div>
                     <div className="flex flex-col">
                         <input type="number" name="paddingBottom" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
-                        defaultValue={defaults.paddingBottom}
+                        defaultValue={defaults.bottom}
                         onChange={ ( e ) => {
-                            handlerPadding( 'Bottom', e.target.value );
+                            handlerValue( 'Bottom', e.target.value );
                         }}
                         />
                         <div className='w-12 text-center flex mt-3 justify-center'>
                             <ArrowDownIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"/>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export function InputValueButton({
+    handlerValueChange,
+    defaultVal,
+    min,
+    step,
+    title
+} :
+Readonly<{
+    handlerValueChange:Function,
+    defaultVal:number,
+    min:number,
+    step:number,
+    title:string,
+}>) {
+    return (
+        <>
+            <span>{title}</span>
+            <div className='mt-5 ml-10'>
+                <div className='grid grid-cols-4 grid-row-1 m-2 gap-1'>
+                    <div className="flex flex-col">
+                        <input type="number" name="value" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={min} step={step}
+                        defaultValue={defaultVal}
+                        onChange={ ( e ) => {
+                            handlerValueChange( e.target.value );
+                            }
+                        }
+                        />
                     </div>
                 </div>
             </div>

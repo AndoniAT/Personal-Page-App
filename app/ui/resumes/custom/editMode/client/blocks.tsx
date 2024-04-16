@@ -225,7 +225,7 @@ export function Block({
   return ( 
     <>
       <div key={`blk1`} className={clsx({
-      ['w-full min-h-80 h-fit grid']: true,
+      ['w-full min-h-80 h-fit grid overflow-hidden']: true,
       /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
       [`grid-rows-${totLines}`]: true,
       [`grid-cols-${totCols}`]: true
@@ -416,6 +416,7 @@ export function ElementImage({
   let spanRow = element.lineto - element.linefrom + 1;
   let spanCol = element.colto - element.colfrom + 1;
   let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
+
   let gridCss = {
     ...{
       gridRow: `span ${spanRow} / span ${spanRow}`,
@@ -423,6 +424,11 @@ export function ElementImage({
       position: 'relative'
     }
   } as React.CSSProperties;
+
+  if( myCss.height ) {
+    gridCss.height = myCss.height;
+    delete myCss.height;
+  }
 
   myCss = {
     ...{
