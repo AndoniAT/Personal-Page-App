@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-interface CustomProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface CustomProps extends React.AllHTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
   }
 

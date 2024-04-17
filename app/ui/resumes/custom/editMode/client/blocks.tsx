@@ -34,7 +34,7 @@ export const TYPES_TO_CHOOSE = {
  */
 export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
   const [allBlocks, setAllBlocks] = useState<BlockClient[]>([])
- const [ loadingBlock, setLoadingBlock ] = useState<string>( null );
+ const [ loadingBlock, setLoadingBlock ] = useState<string>( '' );
 
   useEffect(() => {
     setAllBlocks( blocks );

@@ -41,7 +41,7 @@ export default async function Page(
         photo: user.photo,
         email: user.email,
         showheader: user.showheader,
-        photo_profile: photo_profile
+        photo_profile: photo_profile ?? undefined
       },
       section: {
         name: home.name,
