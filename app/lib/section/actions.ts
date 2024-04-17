@@ -288,12 +288,12 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
         await getAndUpdateFormAttribute( target, block_id, element, form, '' );
         break;
       case 'height':
-        await getAndUpdateFormAttribute( target, block_id, element, form, '%' );
-        break;
       case 'paddingLeft':
       case 'paddingTop':
       case 'paddingRight':
       case 'paddingBottom':
+        await getAndUpdateFormAttribute( target, block_id, element, form, '%' );
+        break;
       case 'marginLeft':
       case 'marginTop':
       case 'marginRight':

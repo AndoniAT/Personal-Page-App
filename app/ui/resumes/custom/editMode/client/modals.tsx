@@ -13,14 +13,15 @@ import clsx from 'clsx';
 import { BorderButtons, InputValueButton, DirectionButtons } from './customButtons';
 import TrashButton from '@/app/ui/components/trash-button';
 
+const waitTime = 50;
 
 export function AcceptFussion({
         acceptFusion,
         cancelFusion
-    }:{
+    }:Readonly<{
         acceptFusion:Function,
         cancelFusion:Function
-    }) {
+    }>) {
 
     return (
         <div id="default-modal" tabIndex={-1} aria-hidden="true" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex">
@@ -173,12 +174,12 @@ export function TextElementType({
     let transparentElement = ( isEdit && !myCss.backgroundColor || typeof myCss.backgroundColor == 'string' && myCss.backgroundColor == '');
     
     /* HANDLERS */ 
-    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), 200 );
-    const handlerSize = useDebouncedCallback( (value) => sendFormDataForElement( 'fontSize', value, element), 200 );
-    const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element), 200 );
-    const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), 200 );
-    const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), 200 );
-    const handleAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), 200 );
+    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), waitTime );
+    const handlerSize = useDebouncedCallback( (value) => sendFormDataForElement( 'fontSize', value, element), waitTime );
+    const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element), waitTime );
+    const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
+    const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), waitTime );
+    const handleAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), waitTime );
 
     const handleTransparency = useDebouncedCallback(
         ( transp ) => {
@@ -202,9 +203,9 @@ export function TextElementType({
     const handleColorTextClick = () => (colorTextInputRef.current) ? colorTextInputRef.current.click() : '';
     
     
-    const handleColorBgChange = useDebouncedCallback( () => ( isEdit && colorBgInputRef?.current ) ? sendFormDataForElement( 'backgroundColor', colorBgInputRef.current.value, element) : '', 200);
-    const handleColorTextChange = useDebouncedCallback( () => ( isEdit && colorTextInputRef?.current ) ? sendFormDataForElement( 'color', colorTextInputRef.current.value, element) : '', 200 );
-    const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', 200 );
+    const handleColorBgChange = useDebouncedCallback( () => ( isEdit && colorBgInputRef?.current ) ? sendFormDataForElement( 'backgroundColor', colorBgInputRef.current.value, element) : '', waitTime );
+    const handleColorTextChange = useDebouncedCallback( () => ( isEdit && colorTextInputRef?.current ) ? sendFormDataForElement( 'color', colorTextInputRef.current.value, element) : '', waitTime );
+    const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', waitTime );
     /* ===============  */
 
     useEffect(() => {
@@ -511,8 +512,8 @@ export function MediaElementType({
 
     const defaultHeight = ( isEdit && myCss.height ) ? parseFloat( myCss.height.split('%')[0] ) : 100;
 
-    const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', 200 );
-    const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), 200 );
+    const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', waitTime );
+    const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
 
     /* HANDLERS */
     const handlerPadding = useDebouncedCallback( (direction, value) => {
@@ -531,7 +532,7 @@ export function MediaElementType({
         sendFormDataForElement( 'margin'+direction, value, element), 200 
     } );
 
-    const handlerHeight = useDebouncedCallback( (value) => sendFormDataForElement( 'height', value, element), 200 );
+    const handlerHeight = useDebouncedCallback( (value) => sendFormDataForElement( 'height', value, element), waitTime );
 
     const handleImageChange = async () => {
         if ( imageInputRef?.current?.files && imageInputRef.current.files.length > 0 ) {
@@ -724,7 +725,7 @@ export function HtmlElementType({
     let content = ( isEdit && element.content ) ? element.content : contentExample;
     
     /* HANDLERS */ 
-    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), 200 );
+    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), waitTime );
 
     return (
         <motion.div
@@ -811,7 +812,7 @@ export function VideoElementType({
     let content = ( isEdit && element.content ) ? element.content : '';
     
     /* HANDLERS */ 
-    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), 200 );
+    const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), waitTime );
 
     return (
         <motion.div
