@@ -48,7 +48,7 @@ export default function CustomEditView(
             <ShowHeader hero={hero} user_photo_profile={user?.photo_profile ?? undefined}/>
             : <></>
           }
-              <div className='p-5'>
+              <div>
                 {
                     <BuildBlocksEditMode blocks={blocks}/>
                 }

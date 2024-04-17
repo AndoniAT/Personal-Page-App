@@ -35,7 +35,7 @@ export default function CustomView(
             <ShowHeader heroUrl={hero?.url ?? undefined} photoProfile={user?.photo_profile?.url ?? undefined}/>
             : <></>
           }
-          <div className='p-5'>
+          <div>
             { <BuildBlocks blocks={blocks}></BuildBlocks> }
           </div>
         </div>
