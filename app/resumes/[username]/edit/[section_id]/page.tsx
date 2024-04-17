@@ -141,6 +141,7 @@ export default async function Page(
         photo_profile: photo_profile
       },
       section: {
+        section_id:section.section_id,
         name: section.name,
         created: section.created,
         type: section.type,

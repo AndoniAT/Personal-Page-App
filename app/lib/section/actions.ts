@@ -1,7 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
-import { Block, ElementBlock, FusionElementsBlock, Section } from '../definitions';
+import { Block, ElementBlock, FusionElementsBlock, Media, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
 import { insertMedia } from '@/app/lib/media/actions';
 import { utapi } from '@/server/uploadthing';
@@ -236,6 +236,30 @@ export async function getBlocksSection( section_id:string ) {
       }
 }
 
+export async function deleteSection( section_id:string ) {
+  'use server'
+  noStore();
+
+  try {
+    let { username } = ( await sql`SELECT username FROM USERS WHERE
+                        user_id IN(SELECT user_id FROM RESUME 
+                            WHERE resume_id IN(SELECT resume_id FROM SECTION
+                                WHERE section_id = ${section_id}
+                            )
+                        )`).rows[ 0 ];
+    console.log('username', username);
+    await requiresSessionUserProperty( username );
+
+    let allMediaSection = (await getAllMediaSection( section_id )) as Media[];
+    const keys = allMediaSection.map(m => m.key);
+    await utapi.deleteFiles( keys ); // Delete from uploadthing
+    await sql`DELETE FROM SECTION WHERE section_id = ${section_id}`;
+
+  } catch( error:any ) {
+    throw new Error( 'Failed to delete section: ' + error?.message );
+  }
+}
+
 /**
  * 
  */
@@ -352,4 +376,8 @@ function updateBlockCss( block_id:string, element_id:string, newcss:string ) {
   return sql`UPDATE ELEMENT
         SET css = ${newcss}
         WHERE block_id = ${block_id} AND element_id = ${element_id}`; 
+}
+
+async function getAllMediaSection( section_id:string ):Promise<Media[]> {
+  return (await sql`SELECT * FROM MEDIA WHERE section_id = ${section_id}`).rows as Media[]
 }

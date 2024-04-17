@@ -23,6 +23,7 @@ export interface UserClient {
 }
 
 export interface SectionsClient {
+    section_id:string,
     name: string,
     created: Date,
     type: string,

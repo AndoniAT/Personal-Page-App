@@ -1,12 +1,13 @@
 import { UserClient, SectionsClient, BlockClient } from '../interfaces'
 import clsx from 'clsx';
-import { PlusCircleIcon } from '@heroicons/react/24/outline';
 import { BuildBlocksEditMode } from './client/blocks';
 import TrashButton from '../../../components/trash-button';
 import { ButtonPlus, ShowHeader } from './client/components';
 import CustomSection from '@/app/ui/components/custom-section';
 import { SectionType } from '@/app/lib/definitions';
 import { revalidateTag } from 'next/cache';
+import { deleteSection } from '@/app/lib/section/actions';
+import { redirect } from 'next/navigation';
 
 export default function CustomEditView(
   {
@@ -25,13 +26,14 @@ export default function CustomEditView(
   let handlerCreateBlock = async () => {
     'use server'
     await section?.actions?.addBlock();
-    await revalidateTag('edit');
+    revalidateTag('edit');
   }
 
-  /*let deleteSection = async () => {
+  let deleteThisSection = async () => {
     'use server'
-    console.log('delete section');
-  }*/
+    await deleteSection( section.section_id );
+    redirect(`/resumes/${user.username}/`);
+  }
 
   return (
     <div>
@@ -59,25 +61,23 @@ export default function CustomEditView(
         </div>
       </CustomSection>
       {
-        /*
+        ( section.type != 'Home' as SectionType) ?
         <div className='flex bg-slate-600	'>
           <TrashButton  
           cancel={async () => {
             'use server'
           }} 
-          deleteElement={ async () => {
-            'use server'
-            
-          }}
+          deleteElement={ deleteThisSection }
           confirmation={{
             title:'Delete Section',
             question:'Are you sure you want to delete this section?'
           }}/> 
-          <label className='mt-3 flex items-center text-white'>
+          <p className='mt-3 flex items-center text-white'>
             Delete Section
-          </label>
+          </p>
         </div> 
-        */
+        : <></>
+        
       }
     </div>
   );
