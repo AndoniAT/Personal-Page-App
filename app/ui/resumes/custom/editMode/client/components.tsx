@@ -5,8 +5,9 @@ import { showHeaderStyles } from "@/app/ui/cssComponents/styles";
 import Image from "next/image";
 import { MediaClient } from "../../interfaces";
 import clsx from "clsx";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
+import { UpdateSectionModal } from "./modals";
 
 export function ShowHeader({
     hero,
@@ -183,4 +184,35 @@ export function ButtonPlus({
     </>
     
             )
+}
+
+export function NameEditSectionIcon({
+  section,
+  customRevalidateTag
+}: Readonly<{
+  section:{section_id:string, name:string},
+  customRevalidateTag:Function
+}>) {
+  const [ editNameShow, setEditNameShow ] = useState<boolean>( false );
+
+  return (
+    <>
+      {
+        (editNameShow ) ?
+        <UpdateSectionModal customRevalidateTag={customRevalidateTag} 
+        section={section}
+        cancel={() => { setEditNameShow( false )}}></UpdateSectionModal>
+        :
+        <>
+          <PencilSquareIcon className="w-6 ml-3 cursor-pointer"
+            onClick={() => setEditNameShow(true)} 
+          /> 
+          <p className='m-3 flex items-center text-white'>
+            { section.name}
+          </p>
+        </>
+        
+      }
+    </>
+  )
 }

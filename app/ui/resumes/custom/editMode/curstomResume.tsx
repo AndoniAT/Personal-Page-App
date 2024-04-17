@@ -2,12 +2,14 @@ import { UserClient, SectionsClient, BlockClient } from '../interfaces'
 import clsx from 'clsx';
 import { BuildBlocksEditMode } from './client/blocks';
 import TrashButton from '../../../components/trash-button';
-import { ButtonPlus, ShowHeader } from './client/components';
+import { ButtonPlus, NameEditSectionIcon, ShowHeader } from './client/components';
 import CustomSection from '@/app/ui/components/custom-section';
 import { SectionType } from '@/app/lib/definitions';
 import { revalidateTag } from 'next/cache';
 import { deleteSection } from '@/app/lib/section/actions';
 import { redirect } from 'next/navigation';
+import { PencilIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import { customRevalidateTag } from '@/app/lib/actions';
 
 export default function CustomEditView(
   {
@@ -37,6 +39,12 @@ export default function CustomEditView(
 
   return (
     <div>
+      <div className='flex bg-slate-600	flex justify-center'>
+      <NameEditSectionIcon
+        section={ { section_id: section.section_id, name:section.name } }
+        customRevalidateTag={customRevalidateTag}
+      ></NameEditSectionIcon>
+      </div> 
       <CustomSection style={{ backgroundColor: section.backgroundcolor, minHeight:'90vh' }}
         className={clsx({
           ['w-full']: true,

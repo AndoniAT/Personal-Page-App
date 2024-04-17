@@ -4,7 +4,7 @@ import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3B
  } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../interfaces';
-import { useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { useDebouncedCallback }from 'use-debounce';
 import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
@@ -12,6 +12,8 @@ import { useParams } from 'next/navigation'
 import clsx from 'clsx';
 import { BorderButtons, InputValueButton, DirectionButtons } from './customButtons';
 import TrashButton from '@/app/ui/components/trash-button';
+import { CustomModal } from '@/app/ui/components/modalForm';
+import { LoadScreen } from '@/app/ui/components/loading-modal';
 
 const waitTime = 50;
 
@@ -917,6 +919,75 @@ export function ErrorModal({
         </div>
 
     )
+}
+
+export function UpdateSectionModal({
+        cancel,
+        customRevalidateTag,
+        section
+    }:Readonly<{
+        cancel:Function,
+        customRevalidateTag:Function,
+        section:{section_id:string, name:string}
+    }>) {
+        const [ loading, setLoading ] = useState<boolean>(false);
+
+        let { username } = useParams();
+
+        const handler = async (event: FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            setLoading(true);
+            const formData = new FormData( event.currentTarget )
+            formData.set('username', username.toString());
+
+            try {
+                let section_updated = await fetch(`/api/sections/${section.section_id}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+                console.log('updated', section_updated);
+                cancel();
+                customRevalidateTag('edit');
+                setLoading(false);
+            } catch( err ) {
+                console.log('Error', err);
+            }
+        }
+
+        return (
+            <>
+                {
+                    (loading) ?
+                    <LoadScreen/>:
+
+                    <CustomModal
+                cancel={cancel}
+                handler={() => {}}
+                title='Update Section'
+                >
+                    <form className="p-4 md:p-5" onSubmit={( event ) => {
+                                    handler( event );
+                                }}>
+                        <div className="grid gap-4 mb-4 grid-cols-2">
+                            <div className="col-span-2">
+                                <label htmlFor="txt-content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Name
+                                    </label>
+                                <input  type='text' name="name" 
+                                defaultValue={section.name}
+                                className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="My Section">
+                                </input>
+                            </div>
+                        </div>
+                        <button type="submit" className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            Accept
+                        </button>
+                    </form>
+                    </CustomModal>
+                }
+            </>
+        )
 }
 
 /**

@@ -14,18 +14,6 @@ export function CreateSectionModal({
     }>) {
         let { username } = useParams();
 
-        const contentExample = `<div
-        style="background-color: crimson;
-        height:100%;
-        text-align:center;
-        display:flex;
-        justify-content:center;
-        align-items: center;
-        opacity: 0.7;
-        ">
-        Hello Word
-        </div>`;
-
         const handler = async (event: FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData( event.currentTarget )

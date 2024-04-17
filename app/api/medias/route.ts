@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from 'next/cache';
-import { requiresLogin, requiresSessionUserProperty } from "@/app/lib/actions";
-import { utapi } from "@/server/uploadthing";
+import { requiresSessionUserProperty } from "@/app/lib/actions";
 import { sql } from "@vercel/postgres";
-import { Block, Media, Section } from "@/app/lib/definitions";
-import { NextApiRequest } from "next";
+import { Section } from "@/app/lib/definitions";
 import { insertMedia } from "@/app/lib/media/actions";
 
 export async function POST( req: Request, context:any ) {
