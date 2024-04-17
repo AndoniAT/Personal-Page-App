@@ -10,7 +10,8 @@ import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import clsx from 'clsx';
-import { BorderButtons, InputValueButton, DirectionButtons } from './customButtons';
+import { BorderButtons, DirectionButtons } from './customButtons';
+import { InputValueButton } from '@/app/ui/components/value-input';
 import TrashButton from '@/app/ui/components/trash-button';
 import { CustomModal } from '@/app/ui/components/modalForm';
 import { LoadScreen } from '@/app/ui/components/loading-modal';
@@ -205,7 +206,7 @@ export function TextElementType({
     const handleColorTextClick = () => (colorTextInputRef.current) ? colorTextInputRef.current.click() : '';
     
     
-    const handleColorBgChange = useDebouncedCallback( () => ( isEdit && colorBgInputRef?.current ) ? sendFormDataForElement( 'backgroundColor', colorBgInputRef.current.value, element) : '', waitTime );
+    const handleColorBgChange = useDebouncedCallback( () => ( isEdit && colorBgInputRef?.current ) ? sendFormDataForElement( 'backgroundColor', colorBgInputRef.current.value, element) : '', 0 );
     const handleColorTextChange = useDebouncedCallback( () => ( isEdit && colorTextInputRef?.current ) ? sendFormDataForElement( 'color', colorTextInputRef.current.value, element) : '', waitTime );
     const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', waitTime );
     /* ===============  */
@@ -303,16 +304,20 @@ export function TextElementType({
                                                 <span>Background</span>
                                                 <div
                                                     style={{ backgroundColor: backgroundColor }} 
-                                                    className='h-5 w-5 border border-gray-600 self-center rounded-full ml-2' onClick={handleColorBgClick}></div>
+                                                    className='h-5 w-5 border border-gray-600 self-center rounded-full ml-2' onClick={handleColorBgClick}>
+                                                </div>
                                                 <input 
-                                                ref={colorBgInputRef}
-                                                type="color"
-                                                id='colorBg'
-                                                name="colorBg"
-                                                onChange={handleColorBgChange}
-                                                defaultValue={backgroundColor}
-                                                className='w-5 -ml-5 invisible'
+                                                    ref={colorBgInputRef}
+                                                    type="color"
+                                                    
+                                                    id='colorBg'
+                                                    name="colorBg"
+                                                    onChange={handleColorBgChange}
+                                                    defaultValue={backgroundColor}
+                                                    className='w-5 -ml-5 invisible'
                                                 />
+                                                <div>
+                                            </div>
                                             </div>
                                             <div className="flex items-center mb-4">
                                                     <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Transparent</label>

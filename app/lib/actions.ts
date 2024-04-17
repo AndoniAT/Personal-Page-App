@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { notFound, redirect, RedirectType } from 'next/navigation'
 import { getUserByEmail, getUserByUsername } from './data';
 import { revalidateTag } from 'next/cache';
+import { sql } from '@vercel/postgres';
 
 export async function goToLogin() {
     'use server'
@@ -45,6 +46,21 @@ export async function requiresSessionUserProperty( username:string ) {
         throw new Error('You don\'t have acces to this action');
     }
 }
+
+/**
+ * Verify if the connected user is proprietary of the section
+ * @param section_id : Of the requested user information
+ */
+export async function requiresSessionUserPropertySection( section_id:string ) {
+    'use server'
+    let { username } = (await sql`SELECT username FROM USERS as u
+                                    INNER JOIN RESUME as r ON(u.user_id = r.user_id)
+                                    INNER JOIN SECTION as s ON(s.resume_id = r.resume_id)
+                                    WHERE section_id = ${section_id}`).rows[ 0 ];
+
+    await requiresSessionUserProperty( username );
+}
+
 
 
 export async function requiresLogin() {

@@ -4,9 +4,11 @@ import Link from "next/link";
 import { User } from "@/app/lib/definitions";
 import { CreateButtonNewSection, CreateCustomColorButton, RadioButton } from "./client/components";
 import { revalidateTag } from "next/cache";
-import { changeBackgroundSection } from "@/app/lib/data";
+import { changeBackgroundSection } from "@/app/lib/section/actions";
 import { customRevalidateTag } from "@/app/lib/actions";
 import { changeShowHeader } from "@/app/lib/user/actions";
+import { InputValueButton } from "../../components/value-input";
+import { rgbaStringToObject } from "@/app/lib/section/actions";
 
 export default function EditModeNavBar(  {
     data 
@@ -18,20 +20,31 @@ export default function EditModeNavBar(  {
     }>) 
     {
     let { currentSection, user } = data;
+    let rgb = currentSection ? rgbaStringToObject( currentSection.background.color ) : {r:0,g:0,b:0,a:0};
 
+    let defaultBgInput = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
     let updateBg = async ( newColor:string ) => {
       'use server'
       if( currentSection ) {
-        await changeBackgroundSection( currentSection.section_id, newColor, user.username )
+        await changeBackgroundSection( currentSection.section_id, newColor )
         revalidateTag( 'edit' );
       }
     }
+
     let showHeader = user.showheader;
 
     let updateShowHeader = async ( show:boolean ) => {
       'use server'
       await changeShowHeader( user.username, show );
       revalidateTag( 'edit' );
+    }
+
+    let updateAlpha = async( newAlpha:number ) => {
+      'use server'
+      if( currentSection ) {
+        await changeBackgroundSection( currentSection.section_id, undefined, newAlpha );
+        revalidateTag( 'edit' );
+      }
     }
 
     let link = ( currentSection?.type == 'Home' ) ? `/resumes/${user.username}` : `/resumes/${user.username}/${currentSection?.section_id}`
@@ -46,10 +59,21 @@ export default function EditModeNavBar(  {
           </div>
         </Link>
         <div className=' w-full text-black mt-5 pt-1 border-t border-t-gray-300 '>
-          <div className="grid grid-cols-2 grid-rows-3 grid-flow-col content-start">
+          <div className="grid grid-cols-2 grid-rows-4 grid-flow-col content-start">
             {
               <div className='w-full grid grid-cols-2 col-span-2 h-fit mb-2'>
-                <CreateCustomColorButton label="Background" update={updateBg} defaul_value={currentSection ? currentSection.background.color : '#000000'}/>
+                <CreateCustomColorButton label="Background" update={updateBg} defaul_value={defaultBgInput}/>
+              </div>
+            }
+            {
+              <div className='w-full grid grid-cols-2 col-span-2 h-fit mb-2'>
+                 <InputValueButton 
+                    defaultVal={rgb.a}
+                    handlerValueChange={updateAlpha}
+                    min={0}
+                    step={0.1}
+                    title='Opacity'
+                  />
               </div>
             }
 
@@ -61,7 +85,9 @@ export default function EditModeNavBar(  {
 
             {
               ( currentSection?.type == 'Home') ? 
+                <div className='w-full grid grid-cols-2 col-span-2 h-fit content-center'>
                 <RadioButton label={'Show Home Header'} default_value={showHeader} update={updateShowHeader}/>
+                </div>
               :<></>
             }
 

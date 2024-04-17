@@ -1,5 +1,5 @@
-import { unstable_noStore as noStore } from 'next/cache';
-import { requiresSessionUserProperty } from '../actions';
+import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
+import { requiresSessionUserProperty, requiresSessionUserPropertySection } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
 import { Block, ElementBlock, FusionElementsBlock, Media, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
@@ -260,6 +260,37 @@ export async function deleteSection( section_id:string ) {
   }
 }
 
+export async function changeBackgroundSection( id:string, color?:string, alpha?:number ) {
+  'use server';
+  noStore();
+  await requiresSessionUserPropertySection( id );
+
+  try {
+    let { backgroundcolor } = (await sql`SELECT backgroundcolor FROM SECTION WHERE section_id = ${id}`).rows[ 0 ];
+
+    let rgba_current = rgbaStringToObject( backgroundcolor );
+
+    if( color ) {
+      let { r, g, b } = hexToRgb( color );
+      rgba_current.r = r;
+      rgba_current.g = g;
+      rgba_current.b = b;
+    }
+    
+    if( alpha ) {
+      rgba_current.a = alpha;
+    }
+    
+    let new_rgba = rgbaToString( rgba_current );
+    await sql`UPDATE SECTION
+              SET backgroundcolor = ${new_rgba} WHERE section_id =${id};`;
+    return color;
+  } catch( e ) {
+    console.log(e);
+    throw new Error( 'Failed to change the backgorund' );
+  }
+}
+
 /**
  * 
  */
@@ -332,8 +363,6 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
         break;
       case 'customclassname': {
         let newCustomClass = form.get('customclassname') as string;
-        console.log('new custom', newCustomClass + 'j');
-
         const regex =  /^[a-zA-Z0-9- ]+$/;
         
         if (regex.test(newCustomClass)) {
@@ -380,4 +409,27 @@ function updateBlockCss( block_id:string, element_id:string, newcss:string ) {
 
 async function getAllMediaSection( section_id:string ):Promise<Media[]> {
   return (await sql`SELECT * FROM MEDIA WHERE section_id = ${section_id}`).rows as Media[]
+}
+
+export function hexToRgb( hex:string ) {
+  hex = hex.replace(/^#/, '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  return { r, g, b };
+}
+
+export function rgbaToString( rgb:{r:number, g:number, b:number, a:number} ) {
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`;
+}
+
+export function rgbaStringToObject( rgbaString:string ) {
+  let string = rgbaString.split('(')[ 1 ].split(')')[ 0 ];
+  const rgbaValues = string.split(',');
+  let rgba = { r:0, g:0, b:0, a:0};
+  const r = rgbaValues[0] ? parseInt(rgbaValues[0].trim()) : rgba.r;
+  const g = rgbaValues[1] ? parseInt(rgbaValues[1].trim()) :rgba.g;
+  const b = rgbaValues[2] ? parseInt(rgbaValues[2].trim()) : rgba.b;
+  const a = rgbaValues[3] ? parseFloat(rgbaValues[3].trim()) : rgba.a;
+  return { r, g, b, a };
 }

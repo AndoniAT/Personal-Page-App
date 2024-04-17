@@ -87,7 +87,7 @@ async function createSection( client ) {
             public BOOLEAN DEFAULT TRUE,
             type VARCHAR(20) CHECK (type IN ('Projects', 'Gallery', 'Custom', 'Home')),
             style INT DEFAULT 1,
-            backgroundcolor VARCHAR(7) DEFAULT '#FFFFFF',
+            backgroundcolor VARCHAR(30) DEFAULT 'rgba(0,0,0,1)',
             
             resume_id UUID
           );

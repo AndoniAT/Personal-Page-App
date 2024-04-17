@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 import { CreateSectionModal } from "./modals";
+import { useDebouncedCallback } from "use-debounce";
+import { LoadScreen } from "@/app/ui/components/loading-modal";
 
 interface LinkParam {
     name: string,
@@ -88,42 +90,58 @@ export function CreateCustomColorButton({
   defaul_value:string
 }>) {
   const colorInputRef = useRef<HTMLInputElement>(null);
-  
+  const [ loading, setLoading ] = useState<boolean>(false);
+
   const handleColorClick = () => {
     if (colorInputRef.current) {
       colorInputRef.current.click();
     }
   };
 
+  let handler = useDebouncedCallback( async (value) => {
+      setLoading(true);
+      await update( value )
+      setLoading(false);
+    }
+    , 200
+  );
+
   const handleColorChange = async () => {
     if ( colorInputRef?.current ) {
       let newColor = colorInputRef.current.value;
-      update( newColor );
+      handler( newColor );
     }
   };
 
   return (
     <>
-      <div>
-                <span>{label}</span>
-      </div>
-      <div className='text-center justify-left content-center pl-3'>
-        <div
-          style={{ backgroundColor: defaul_value, marginLeft:'2px' }} 
-          className='h-5 w-5 border border-gray-600 justify-left rounded-full self-center pl-3'
-          onClick={handleColorClick}>
-          
-          <input 
-            ref={colorInputRef}
-            type="color"
-            id='colorBg'
-            name="colorBg"
-            onChange={handleColorChange}
-            value={defaul_value}
-            className='w-5 -ml-5 invisible'
-          />
-        </div>
-      </div>
+      {
+        loading ? 
+        <LoadScreen/>
+        :
+        <>
+          <div>
+              <span>{label}</span>
+          </div>
+          <div className='text-center justify-left content-center pl-3'>
+            <div
+              style={{ backgroundColor: defaul_value, marginLeft:'2px' }} 
+              className='h-5 w-5 border border-gray-600 justify-left rounded-full self-center pl-3'
+              onClick={handleColorClick}>
+              
+              <input 
+                ref={colorInputRef}
+                type="color"
+                id='colorBg'
+                name="colorBg"
+                onChange={handleColorChange}
+                value={defaul_value}
+                className='w-5 -ml-5 invisible'
+              />
+            </div>
+          </div>
+        </>
+      }
     </>
             
   )

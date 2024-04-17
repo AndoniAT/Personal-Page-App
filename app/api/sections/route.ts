@@ -30,8 +30,7 @@ export async function POST( req: Request, context:any ) {
         name, 
         public, 
         type, 
-        style, 
-        backgroundColor,
+        style,
         resume_id 
       )
       VALUES (
@@ -39,7 +38,6 @@ export async function POST( req: Request, context:any ) {
         ${true}, 
         ${'Custom'}, 
         ${1}, 
-        ${'#FFFFFF'}, 
         ${resume.resume_id}
       ) RETURNING section_id
       `).rows[ 0 ] as Section;
