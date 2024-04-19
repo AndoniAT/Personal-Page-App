@@ -44,6 +44,7 @@ export default async function Page(
         photo_profile: photo_profile ?? undefined
       },
       section: {
+        section_id: home.section_id,
         name: home.name,
         created: home.created,
         type: home.type,
