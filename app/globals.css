@@ -94,3 +94,59 @@ body {
 .loading:hover {
   @apply cursor-progress
 }
+
+/* MAIN PAGE*/
+
+.box {
+  background-color: rgb(108, 108, 108);
+  border-radius: 50%; /* Forme initiale : cercle */
+  min-width: 80px;
+  min-height: 80px;
+  animation: rotate 5.7s infinite; /* 0.7s pour la rotation et 5s de délai avant de redémarrer */
+}
+
+.box-header {
+  background-color: rgb(158, 158, 158);
+  border-radius: 10px;
+  height: 100%;
+  width: 100%;
+  animation: rotateQuick 0.2s ease-in; /* 0.7s pour la rotation et 5s de délai avant de redémarrer */
+  background: rgb(2,0,36);
+background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,84,122,1) 55%);
+}
+
+.box-section {
+  background-color: rgb(158, 158, 158);
+  border-radius: 10px;
+  height: 100%;
+  width: 100%;
+  animation: rotateQuick 0.2s normal; /* 0.7s pour la rotation et 5s de délai avant de redémarrer */
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0) scaleX(1); /* Forme initiale : cercle */
+  }
+  95% {
+    transform: rotate(360deg) scaleX(1); /* Rotation en cercle */
+  }
+  100% {
+    border-radius: 0%; /* Transformation en carré */
+    transform: rotate(0) scaleX(1);
+  }
+}
+
+@keyframes rotateQuick {
+  0% {
+    transform: rotate(0) scaleX(1); /* Forme initiale : cercle */
+  }
+  95% {
+    transform: rotate(360deg) scaleX(1); /* Rotation en cercle */
+  }
+  100% {
+    border-radius: 0%; /* Transformation en carré */
+    transform: rotate(0) scaleX(1);
+    
+  }
+}
+

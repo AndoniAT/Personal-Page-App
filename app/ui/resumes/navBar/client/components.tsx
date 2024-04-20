@@ -26,7 +26,7 @@ export function MainLinks() {
   let path = usePathname();
     const mainLinksObj = [
         { name: 'Home', href: '/', icon: HomeIcon, current:(path == '/') },
-        { name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon, current:(path == '/resumes') }
+        /*{ name: 'Resumes', href: '/resumes', icon: ClipboardDocumentCheckIcon, current:(path == '/resumes') }*/
       ];
     return mainLinksObj.map( link => makeLink( link ) );
 }

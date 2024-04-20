@@ -223,14 +223,10 @@ function Block({
 
   return ( 
     <>
-      <div key={`blk1`} className={clsx({
-      ['w-full min-h-80 h-fit grid overflow-hidden']: true,
-      /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
-      [`grid-rows-${totLines}`]: true,
-      [`grid-cols-${totCols}`]: true
-      /*['pb-2']:true*/
-    })
-    }
+      <div key={`blk1`} className={`
+      w-full min-h-80 h-fit grid overflow-hidden
+      grid-rows-${totLines}
+      grid-cols-${totCols}`}
     >
       {
         blockElements
@@ -287,11 +283,11 @@ function EmptyElement({
   handler,
   position,
   fusionBlocks
-}: {
+}: Readonly<{
   position:Positions,
   handler:Function,
   fusionBlocks:FusionElementsBlock
-}) {
+}>) {
 
   const [color, setColor] = useState<string>('bg-slate-200');
 
@@ -305,12 +301,8 @@ function EmptyElement({
 
   return  ( 
     <div className="h-fit col-span-1">
-      <div className={clsx({
-        ['min-h-8']:true,
-        [color]:true,
-        ['border-solid border-2 rounded border-slate-700 hover:scale-105']:true
-      })
-      }
+      <div className={`min-h-8 ${color} border-solid border-2 rounded border-slate-700 hover:scale-105`}
+        /*style={{ width: '80px', height: '80px' }}*/
           onClick={() => {
             handler(position);
           }}
