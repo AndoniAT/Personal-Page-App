@@ -7,6 +7,8 @@ import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import Image from "next/image";
 import TrashButton from "@/app/ui/components/trash-button";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
+import { getImageCss } from "../../sharedFunctions";
+import { ImageElement } from "@/app/ui/components/image-element";
 
 const STEPS = {
   NONE: 0,
@@ -40,9 +42,7 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
     setAllBlocks( blocks );
   }, [ blocks ]);
 
-    return (<>
-      {
-        allBlocks.map( ( block:BlockClient ) => {
+    return allBlocks.map( ( block:BlockClient ) => {
 
           let deleteBlock = () => {
             setLoadingBlock( block.block_id );
@@ -75,8 +75,6 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
             </>
         )
         })
-      }
-    </>)
 }
   
   /**
@@ -412,31 +410,8 @@ export function ElementImage({
 }>) {
   let [editElement, setEditElement] = useState<boolean>(false);
   let [image, setImage] = useState<string>('');
-
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      position: 'relative'
-    }
-  } as React.CSSProperties;
-
-  if( myCss.height ) {
-    gridCss.height = myCss.height;
-    delete myCss.height;
-  }
-
-  myCss = {
-    ...{
-      'width': '100%',
-      'height': '100%'
-    },
-    ...myCss,
-  } as React.CSSProperties;
+  
+  const css = getImageCss( element );
 
   useEffect(() => {
     fetch(`/api/medias/${element.media_id}`)
@@ -469,7 +444,7 @@ export function ElementImage({
 
   return (
     <>
-        <div style={gridCss}
+        <div style={css.gridCss}
             className={clsx({
               [element.defclassname]:true,
               ['min-h-10']:true,
@@ -478,22 +453,7 @@ export function ElementImage({
           }
             onClick={() => { setEditElement(true)}}
             >
-            {
-              image ? 
-                    <Image
-                style={myCss}
-                className={clsx({
-                  /*[customClass]: (!!element.customclassname)*/
-                })}
-                src={image}
-                layout='fill'
-                objectFit='cover'
-                alt="ImageBlock"
-              />
-              :
-              <></>
-            }
-        
+            <ImageElement css={css} image={image}/>
       </div>
       {
         editElement ? 

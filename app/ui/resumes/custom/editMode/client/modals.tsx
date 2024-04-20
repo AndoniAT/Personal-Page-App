@@ -1,7 +1,5 @@
 'use client'
-import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, Bars3Icon, Bars3BottomLeftIcon, Bars3BottomRightIcon,
-    BarsArrowDownIcon, BarsArrowUpIcon, Bars2Icon
- } from '@heroicons/react/24/outline';
+import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../interfaces';
 import { FormEvent, useEffect, useRef, useState } from 'react';
@@ -10,11 +8,11 @@ import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import clsx from 'clsx';
-import { BorderButtons, DirectionButtons } from './customButtons';
+import { BackgroundColorButton, BorderButtons, DirectionButtons, DirectionMarginButtons, PositionTextButtons } from './customButtons';
 import { InputValueButton } from '@/app/ui/components/value-input';
 import TrashButton from '@/app/ui/components/trash-button';
-import { CustomModal } from '@/app/ui/components/modalForm';
 import { LoadScreen } from '@/app/ui/components/loading-modal';
+import { CustomModal } from '@/app/ui/components/modalForm';
 
 const waitTime = 50;
 
@@ -71,9 +69,9 @@ export function AcceptFussion({
 
 export function ChooseTypeFusion({
     chooseElementType
-}: {
+}: Readonly<{
     chooseElementType:Function
-}) {
+}>) {
     return (
         <div id="crypto-modal" tabIndex={-1} aria-hidden="true" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex">
             <div className="relative p-4 w-full max-w-md max-h-full">
@@ -138,12 +136,10 @@ export function TextElementType({
     element:ElementBlockClient|null
 }>) {
     let [tailwindClass, setTailwindClass] = useState<string|null>(null);
-    let [transparent, setTransparent] = useState<boolean>(true);
 
     const isEdit = !!element;
 
-    /* Colors refs */ 
-    const colorBgInputRef = useRef<HTMLInputElement>(null);
+    // Colors refs
     const colorTextInputRef = useRef<HTMLInputElement>(null);
     
     let myCss = ( isEdit && element.css && typeof element.css == 'string' ) ? JSON.parse( element.css ) : {};
@@ -151,46 +147,29 @@ export function TextElementType({
     let size = ( isEdit && myCss.fontSize ) ? parseFloat( myCss.fontSize.split('rem')[0] ) : 1.0;
     
     // Pading
-    const DefaultsPadding = {
-        left : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
-        top : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
-        right : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
-        bottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
-    }
+    const DefaultsPadding = getPaddingsFromCss( myCss, isEdit );
     
     
     // Border
-    const DefaultsBorder = {
-        borderTopLeftRadius : ( isEdit && myCss.borderTopLeftRadius ) ? parseFloat( myCss.borderTopLeftRadius.split('rem')[0] ) : 0.0,
-        borderBottomLeftRadius : ( isEdit && myCss.borderBottomLeftRadius ) ? parseFloat( myCss.borderBottomLeftRadius.split('rem')[0] ) : 0.0,
-        borderTopRightRadius : ( isEdit && myCss.borderTopRightRadius ) ? parseFloat( myCss.borderTopRightRadius.split('rem')[0] ) : 0.0,
-        borderBottomRightRadius : ( isEdit && myCss.borderBottomRightRadius ) ? parseFloat( myCss.borderBottomRightRadius.split('rem')[0] ) : 0.0,
-        borderWidth : ( isEdit && myCss.borderWidth ) ? parseFloat( myCss.borderWidth.split('rem')[0] ) : 0.0,
-        borderColor : ( isEdit && myCss.borderColor && typeof myCss.borderColor == 'string' ) ? myCss.borderColor : '0'
-    }
+    const DefaultsBorder = getBordersFromCss( myCss, isEdit );
 
 
-    let backgroundColor = ( isEdit && myCss.backgroundColor && typeof myCss.backgroundColor == 'string' ) ? myCss.backgroundColor : '0';
+    let backgroundColor = ( isEdit && myCss.backgroundColor && typeof myCss.backgroundColor == 'string' ) ? myCss.backgroundColor : '';
+
     let textColor = ( isEdit && myCss.color && typeof myCss.color == 'string' ) ? myCss.color : '0';
 
     let content = ( isEdit && element.content ) ? element.content : '';
     let transparentElement = ( isEdit && !myCss.backgroundColor || typeof myCss.backgroundColor == 'string' && myCss.backgroundColor == '');
     
-    /* HANDLERS */ 
+    // HANDLERS
     const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), waitTime );
     const handlerSize = useDebouncedCallback( (value) => sendFormDataForElement( 'fontSize', value, element), waitTime );
     const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element), waitTime );
     const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
     const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), waitTime );
     const handleAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), waitTime );
+    const handleTransparency = useDebouncedCallback( ( newcolor ) => sendFormDataForElement( 'backgroundColor', newcolor, element ), 200 );
 
-    const handleTransparency = useDebouncedCallback(
-        ( transp ) => {
-            let newColor = ( !transp && colorBgInputRef?.current) ? colorBgInputRef.current.value : '';
-            sendFormDataForElement( 'backgroundColor', newColor, element )
-        },
-        200
-    );
 
     /*let tailwindClassElement = ( isEdit && element.customclassname ) ? element.customclassname : '';
 
@@ -201,19 +180,13 @@ export function TextElementType({
     }, [tailwindClass, tailwindClassElement])*/
 
     
-    /* Colors Handlers */ 
-    const handleColorBgClick = () => (colorBgInputRef.current) ? colorBgInputRef.current.click() : '';
+    // Colors Handlers 
     const handleColorTextClick = () => (colorTextInputRef.current) ? colorTextInputRef.current.click() : '';
-    
-    
-    const handleColorBgChange = useDebouncedCallback( () => ( isEdit && colorBgInputRef?.current ) ? sendFormDataForElement( 'backgroundColor', colorBgInputRef.current.value, element) : '', 0 );
+
+    const handleColorBgChange = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'backgroundColor', value, element) : '', 0 );
     const handleColorTextChange = useDebouncedCallback( () => ( isEdit && colorTextInputRef?.current ) ? sendFormDataForElement( 'color', colorTextInputRef.current.value, element) : '', waitTime );
     const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', waitTime );
-    /* ===============  */
-
-    useEffect(() => {
-        setTransparent( transparentElement );
-    }, [ transparentElement ] )
+    // =============== 
 
     return (
         <motion.div
@@ -228,7 +201,7 @@ export function TextElementType({
         }}
         tabIndex={-1} aria-hidden="true" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
         >
-            <div className="relative p-4 w-full max-w-md max-h-full">
+            <div className="relative p-4 w-full max-w-lg max-h-full">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -251,6 +224,7 @@ export function TextElementType({
                                 {
                                     ( isEdit ) ? 
                                         <div className="col-span-1 sm:col-span-1">
+
                                             <label htmlFor="size" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Size</label>
                                             <input type="number" name="size" id="size" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={0.1} step={0.1}
                                             defaultValue={size ? size :0}
@@ -300,38 +274,7 @@ export function TextElementType({
                                     ( isEdit ) ? 
                                         <div className='col-span-3'>
                                             { /* Background */ }
-                                            <div className='w-full flex'>
-                                                <span>Background</span>
-                                                <div
-                                                    style={{ backgroundColor: backgroundColor }} 
-                                                    className='h-5 w-5 border border-gray-600 self-center rounded-full ml-2' onClick={handleColorBgClick}>
-                                                </div>
-                                                <input 
-                                                    ref={colorBgInputRef}
-                                                    type="color"
-                                                    
-                                                    id='colorBg'
-                                                    name="colorBg"
-                                                    onChange={handleColorBgChange}
-                                                    defaultValue={backgroundColor}
-                                                    className='w-5 -ml-5 invisible'
-                                                />
-                                                <div>
-                                            </div>
-                                            </div>
-                                            <div className="flex items-center mb-4">
-                                                    <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Transparent</label>
-                                                    <input 
-                                                    type="checkbox" 
-                                                    value="" 
-                                                    checked={transparent}
-                                                    onChange={() => {
-                                                        let newTransp = !transparent;
-                                                        setTransparent(newTransp);
-                                                        handleTransparency(newTransp);
-                                                    }}
-                                                    className="ml-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                                            </div>
+                                            <BackgroundColorButton backgroundColor={backgroundColor} handleTransparency={handleTransparency} handleColorBgChange={handleColorBgChange} transparentElement={transparentElement}/>
                                         </div>
                                     :<></>
                                 }
@@ -372,64 +315,7 @@ export function TextElementType({
                                                 
                                                 { /* ALIGN TEXT*/}
                                                 <div className='mt-5'>
-                                                    <span>Align text</span>
-                                                    
-                                                    <div className='mt-5 ml-10'>
-                                                        { /* JUSTIFY CONTENT */}
-                                                        <div className='grid grid-rows-1 grid-cols-5 mt-5'>
-                                                            <div className='flex justify-center flex-col text-center'>
-                                                                <Bars3BottomLeftIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                                onClick={() => {
-                                                                    handleJustify('left');
-                                                                }}
-                                                                ></Bars3BottomLeftIcon>
-                                                                <span>Left</span>
-                                                            </div>
-                                                            <div className='flex justify-center flex-col text-center'>
-                                                                <Bars3Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                                onClick={() => {
-                                                                    handleJustify('center');
-                                                                }}
-                                                                ></Bars3Icon>
-                                                                <span>Center</span>
-                                                            </div>
-                                                            <div className='flex justify-center flex-col text-center'>
-                                                                <Bars3BottomRightIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                                onClick={() => {
-                                                                    handleJustify('right');
-                                                                }}
-                                                                ></Bars3BottomRightIcon>
-                                                                <span>Right</span>
-                                                            </div>
-                                                        </div>
-                                                        { /* ALIGN ITEMS*/}
-                                                        <div className='grid grid-rows-1 grid-cols-5 mt-5'>
-                                                        <div className='flex justify-center flex-col text-center'>
-                                                                <BarsArrowDownIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                                onClick={() => {
-                                                                    handleAlign('flex-end');
-                                                                }}
-                                                                ></BarsArrowDownIcon>
-                                                                <span>End</span>
-                                                            </div>
-                                                            <div className='flex justify-center flex-col text-center'>
-                                                                    <Bars2Icon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                                    onClick={() => {
-                                                                        handleAlign('center');
-                                                                    }}
-                                                                    ></Bars2Icon>
-                                                                    <span>Center</span>
-                                                            </div>
-                                                            <div className='flex justify-center flex-col text-center'>
-                                                                    <BarsArrowUpIcon  className="self-center w-5 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer"
-                                                                    onClick={() => {
-                                                                        handleAlign('flex-start');
-                                                                    }}
-                                                                    ></BarsArrowUpIcon>
-                                                                    <span>Top</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <PositionTextButtons handlerAlign={handleAlign} handlerJustify={handleJustify}/>
                                                 </div>
 
                                                 { /* Padding */}
@@ -491,41 +377,35 @@ export function MediaElementType({
     const username = params.username as string;
 
     let myCss = ( isEdit && element.css && typeof element.css == 'string' ) ? JSON.parse( element.css ) : {};
+
+    // Bg
+    let backgroundColor = ( isEdit && myCss.backgroundColor && typeof myCss.backgroundColor == 'string' ) ? myCss.backgroundColor : '';
+    let transparentElement = ( isEdit && !myCss.backgroundColor || typeof myCss.backgroundColor == 'string' && myCss.backgroundColor == '');
+
     // Pading
-    let DefaultsPadding = {
-        left : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
-        top : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
-        right : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
-        bottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
-    }
+    let DefaultsPadding = getPaddingsFromCss( myCss, isEdit );
+
 
     // Margin
-    let DefaultsMargin = {
-        left : ( isEdit && myCss.marginLeft ) ? parseFloat( myCss.marginLeft.split('rem')[0] ) : 0.0,
-        top : ( isEdit && myCss.marginTop ) ? parseFloat( myCss.marginTop.split('rem')[0] ) : 0.0,
-        right : ( isEdit && myCss.marginLeft ) ? parseFloat( myCss.marginLeft.split('rem')[0] )*-1 : 0.0,
-        bottom : ( isEdit && myCss.marginTop ) ? parseFloat( myCss.marginTop.split('rem')[0] )*-1 : 0.0
-    }
+    let { left, top } = getMarginsFromCss( myCss, isEdit );
+    let DefaultsMargin = { left: left, top: top }
 
     // Border
-    const DefaultsBorder = {
-        borderTopLeftRadius : ( isEdit && myCss.borderTopLeftRadius ) ? parseFloat( myCss.borderTopLeftRadius.split('rem')[0] ) : 0.0,
-        borderBottomLeftRadius : ( isEdit && myCss.borderBottomLeftRadius ) ? parseFloat( myCss.borderBottomLeftRadius.split('rem')[0] ) : 0.0,
-        borderTopRightRadius : ( isEdit && myCss.borderTopRightRadius ) ? parseFloat( myCss.borderTopRightRadius.split('rem')[0] ) : 0.0,
-        borderBottomRightRadius : ( isEdit && myCss.borderBottomRightRadius ) ? parseFloat( myCss.borderBottomRightRadius.split('rem')[0] ) : 0.0,
-        borderWidth : ( isEdit && myCss.borderWidth ) ? parseFloat( myCss.borderWidth.split('rem')[0] ) : 0.0,
-        borderColor : ( isEdit && myCss.borderColor && typeof myCss.borderColor == 'string' ) ? myCss.borderColor : '0'
-    }
+    const DefaultsBorder = getBordersFromCss( myCss, isEdit );
 
-    const defaultHeight = ( isEdit && myCss.height ) ? parseFloat( myCss.height.split('%')[0] ) : 100;
+    const defaultHeight = ( isEdit && myCss.height ) ? parseFloat( myCss.height.split('rem')[0] ) : 8;
+    const defaultHeightImage = ( isEdit && myCss.heightContent ) ? parseFloat( myCss.heightContent.split('%')[0] ) : 100;
+    const defaultWidthImage = ( isEdit && myCss.widthContent ) ? parseFloat( myCss.widthContent.split('%')[0] ) : 100;
 
     const handleColorBorderChange = useDebouncedCallback( ( colorBorderInputRef ) => ( isEdit && colorBorderInputRef?.current ) ? sendFormDataForElement( 'borderColor', colorBorderInputRef.current.value, element) : '', waitTime );
     const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
 
     /* HANDLERS */
-    const handlerPadding = useDebouncedCallback( (direction, value) => {
-        sendFormDataForElement( 'padding'+direction, value, element), 200 
-    } );
+    const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element) , 200 );
+    const handlerJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), waitTime );
+    const handlerAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), waitTime );
+    const handleTransparency = useDebouncedCallback( ( newcolor ) => sendFormDataForElement( 'backgroundColor', newcolor, element ), 200 );
+    const handleColorBgChange = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'backgroundColor', value, element) : '', 0 );
 
     const handlerMargin = useDebouncedCallback( (direction, value) => {
         if( direction == 'Bottom' ) {
@@ -540,10 +420,11 @@ export function MediaElementType({
     } );
 
     const handlerHeight = useDebouncedCallback( (value) => sendFormDataForElement( 'height', value, element), waitTime );
+    const handlerHeightImage = useDebouncedCallback( (value) => sendFormDataForElement( 'heightContent', value, element), waitTime );
+    const handlerWidthImage = useDebouncedCallback( (value) => sendFormDataForElement( 'widthContent', value, element), waitTime );
 
     const handleImageChange = async () => {
         if ( imageInputRef?.current?.files && imageInputRef.current.files.length > 0 ) {
-          const formData = new FormData();
           let file = imageInputRef.current.files[0];
           let reader = new FileReader();
           reader.onloadend = () => {
@@ -553,8 +434,6 @@ export function MediaElementType({
 
           setLoading(true);
           reader.readAsDataURL(file);
-          /*setImage(url);
-          setLoading(false);*/
         }
     };
     
@@ -583,7 +462,7 @@ export function MediaElementType({
         }}
         tabIndex={-1} aria-hidden="true" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
         >
-            <div className="relative p-4 w-full max-w-md max-h-full" id='customImageModal'>
+            <div className="relative p-4 w-full max-w-lg max-h-full" id='customImageModal'>
                 <div className={clsx({
                     ["relative bg-white rounded-lg shadow dark:bg-gray-700"]:true,
                     ['loading']: loading,
@@ -664,10 +543,21 @@ export function MediaElementType({
                                                 {
                                                     
                                                     <div className='mt-5'>
-                                                        <DirectionButtons handlerValue={handlerMargin} defaults={DefaultsMargin} title={'Margin'}></DirectionButtons>
+                                                        <DirectionMarginButtons handlerValue={handlerMargin} defaults={DefaultsMargin} title={'Margin'}/>
                                                     </div>
                                                 }
                                             </div>
+
+                                            { /* BACKGROUND */}
+                                            <div className='mt-5'>
+                                                <BackgroundColorButton backgroundColor={backgroundColor} handleTransparency={handleTransparency} handleColorBgChange={handleColorBgChange} transparentElement={transparentElement}/>
+                                            </div>
+
+                                            { /* ALIGN TEXT*/}
+                                            <div className='mt-5'>
+                                                <PositionTextButtons handlerAlign={handlerAlign} handlerJustify={handlerJustify}/>
+                                            </div>
+
 
                                             { /* Border */}
                                             <div className='mt-5'>
@@ -675,8 +565,17 @@ export function MediaElementType({
                                             </div>
 
                                             <div className='mt-5'>
-                                                <InputValueButton title='Height (%)' min={100} defaultVal={defaultHeight} handlerValueChange={handlerHeight} step={1}/>
+                                                <InputValueButton title='Height Image (%)' min={10} defaultVal={defaultHeightImage} handlerValueChange={handlerHeightImage} step={1}/>
                                             </div>
+
+                                            <div className='mt-5'>
+                                                <InputValueButton title='Width Image (%)' min={100} defaultVal={defaultWidthImage} handlerValueChange={handlerWidthImage} step={1}/>
+                                            </div>
+
+                                            <div className='mt-5'>
+                                                <InputValueButton title='Height Container' min={8} defaultVal={defaultHeight} handlerValueChange={handlerHeight} step={1}/>
+                                            </div>
+
 
                                             { /* DELETE */}
                                                 {
@@ -958,7 +857,7 @@ export function UpdateSectionModal({
                 console.log('Error', err);
             }
         }
-
+        
         return (
             <>
                 {
@@ -1007,5 +906,34 @@ function sendFormDataForElement( attr:string, value:any, element:ElementBlockCli
         f.set( target, value );
         f.set( 'target', target );
         element.actions?.updateElement( f );
+    }
+}
+
+function getPaddingsFromCss( myCss:any, isEdit:boolean ) {
+    return {
+        left : ( isEdit && myCss.paddingLeft ) ? parseFloat( myCss.paddingLeft.split('rem')[0] ) : 0.0,
+        top : ( isEdit && myCss.paddingTop ) ? parseFloat( myCss.paddingTop.split('rem')[0] ) : 0.0,
+        right : ( isEdit && myCss.paddingRight ) ? parseFloat( myCss.paddingRight.split('rem')[0] ) : 0.0,
+        bottom : ( isEdit && myCss.paddingBottom ) ? parseFloat( myCss.paddingBottom.split('rem')[0] ) : 0.0
+    }
+}
+
+function getMarginsFromCss( myCss:any, isEdit:boolean ) {
+    return {
+        left : ( isEdit && myCss.marginLeft ) ? parseFloat( myCss.marginLeft.split('rem')[0] ) : 0.0,
+        top : ( isEdit && myCss.marginTop ) ? parseFloat( myCss.marginTop.split('rem')[0] ) : 0.0,
+        right : ( isEdit && myCss.marginRight ) ? parseFloat( myCss.marginRight.split('rem')[0] ) : 0.0,
+        bottom : ( isEdit && myCss.marginBottom ) ? parseFloat( myCss.marginBottom.split('rem')[0] ) : 0.0
+    }
+}
+
+function getBordersFromCss( myCss:any, isEdit:boolean ) {
+    return {
+        borderTopLeftRadius : ( isEdit && myCss.borderTopLeftRadius ) ? parseFloat( myCss.borderTopLeftRadius.split('rem')[0] ) : 0.0,
+        borderBottomLeftRadius : ( isEdit && myCss.borderBottomLeftRadius ) ? parseFloat( myCss.borderBottomLeftRadius.split('rem')[0] ) : 0.0,
+        borderTopRightRadius : ( isEdit && myCss.borderTopRightRadius ) ? parseFloat( myCss.borderTopRightRadius.split('rem')[0] ) : 0.0,
+        borderBottomRightRadius : ( isEdit && myCss.borderBottomRightRadius ) ? parseFloat( myCss.borderBottomRightRadius.split('rem')[0] ) : 0.0,
+        borderWidth : ( isEdit && myCss.borderWidth ) ? parseFloat( myCss.borderWidth.split('rem')[0] ) : 0.0,
+        borderColor : ( isEdit && myCss.borderColor && typeof myCss.borderColor == 'string' ) ? myCss.borderColor : '0'
     }
 }

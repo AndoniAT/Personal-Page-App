@@ -28,7 +28,6 @@ export default async function Page(
     const user = await getUserByUsername( username );
 
     let section = await getUserSection( username, section_id );
-    //const home = await getHomeUserSection( username );
 
     const medias = await getMediasForSection( section.section_id ) as MediaClient[];
     let blocks = await getBlocksSection( section.section_id ) as BlockClient[]|[];
@@ -157,7 +156,9 @@ export default async function Page(
     return (
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>
+          {
             <CustomEditView data={sendData}/>
+          }
         </Suspense>
       </main>
     );

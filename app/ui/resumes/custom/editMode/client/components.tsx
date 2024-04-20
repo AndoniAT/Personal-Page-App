@@ -201,7 +201,7 @@ export function NameEditSectionIcon({
         (editNameShow ) ?
         <UpdateSectionModal customRevalidateTag={customRevalidateTag} 
         section={section}
-        cancel={() => { setEditNameShow( false )}}></UpdateSectionModal>
+        cancel={() => { setEditNameShow( false )}}/>
         :
         <>
           <PencilSquareIcon className="w-6 ml-3 cursor-pointer"

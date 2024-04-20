@@ -8,7 +8,7 @@ import { changeBackgroundSection } from "@/app/lib/section/actions";
 import { customRevalidateTag } from "@/app/lib/actions";
 import { changeShowHeader } from "@/app/lib/user/actions";
 import { InputValueButton } from "../../components/value-input";
-import { rgbaStringToObject } from "@/app/lib/section/actions";
+import { colorStringToObjectRGBA } from "@/app/lib/section/actions";
 
 export default function EditModeNavBar(  {
     data 
@@ -20,7 +20,7 @@ export default function EditModeNavBar(  {
     }>) 
     {
     let { currentSection, user } = data;
-    let rgb = currentSection ? rgbaStringToObject( currentSection.background.color ) : {r:0,g:0,b:0,a:0};
+    let rgb = currentSection ? colorStringToObjectRGBA( currentSection.background.color ) : {r:0,g:0,b:0,a:0};
 
     let defaultBgInput = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
     let updateBg = async ( newColor:string ) => {

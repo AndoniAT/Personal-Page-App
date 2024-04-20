@@ -20,10 +20,10 @@ export default function CustomEditView(
       section: SectionsClient
     }
   }>) {
-  const user = data.user;
-  const section = data.section;
-  const hero = section.medias.find(m => m.ishero);
-  let blocks = section.blocks as BlockClient[];
+    const user = data.user;
+    const section = data.section;
+    const hero = section.medias.find(m => m.ishero);
+    let blocks = section.blocks as BlockClient[];
 
   let handlerCreateBlock = async () => {
     'use server'
@@ -40,34 +40,36 @@ export default function CustomEditView(
   return (
     <div>
       <div className='flex bg-slate-600	flex justify-center'>
-      <NameEditSectionIcon
-        section={ { section_id: section.section_id, name:section.name } }
-        customRevalidateTag={customRevalidateTag}
-      ></NameEditSectionIcon>
+        <NameEditSectionIcon
+          section={ { section_id: section.section_id, name:section.name } }
+          customRevalidateTag={customRevalidateTag}
+        />
       </div> 
-      <CustomSection style={{ backgroundColor: section.backgroundcolor, minHeight:'90vh' }}
-        className={clsx({
-          ['w-full']: true,
-          ['h-fit pb-10']: true
-        })} >
-        <div>
-          { 
-            ( user.showheader && ( section.type == 'Home' as SectionType ) ) ?
-            <ShowHeader hero={hero} user_photo_profile={user?.photo_profile ?? undefined}/>
-            : <></>
-          }
-              <div>
-                {
-                    <BuildBlocksEditMode blocks={blocks}/>
-                }
-              </div>
-        </div>
-        <div className='grid grid-cols-12 grid-rows-1 h-20'>
-          <div className='col-start-6 col-span-2 text-center flex justify-center'>
-              <ButtonPlus handler={handlerCreateBlock}/>
+      {
+        <CustomSection style={{ backgroundColor: section.backgroundcolor, minHeight:'90vh' }}
+          className={clsx({
+            ['w-full']: true,
+            ['h-fit pb-10']: true
+          })} >
+          <div>
+            { 
+              ( user.showheader && ( section.type == 'Home' as SectionType ) ) ?
+              <ShowHeader hero={hero} user_photo_profile={user?.photo_profile ?? undefined}/>
+              : <></>
+            }
+                <div>
+                  {
+                      <BuildBlocksEditMode blocks={blocks}/>
+                  }
+                </div>
           </div>
-        </div>
-      </CustomSection>
+          <div className='grid grid-cols-12 grid-rows-1 h-20'>
+            <div className='col-start-6 col-span-2 text-center flex justify-center'>
+                <ButtonPlus handler={handlerCreateBlock}/>
+            </div>
+          </div>
+        </CustomSection>
+      }
       {
         ( section.type != 'Home' as SectionType) ?
         <div className='flex bg-slate-600	'>

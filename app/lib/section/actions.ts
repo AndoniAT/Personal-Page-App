@@ -1,4 +1,4 @@
-import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
+import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty, requiresSessionUserPropertySection } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
 import { Block, ElementBlock, FusionElementsBlock, Media, Section } from '../definitions';
@@ -268,20 +268,9 @@ export async function changeBackgroundSection( id:string, color?:string, alpha?:
   try {
     let { backgroundcolor } = (await sql`SELECT backgroundcolor FROM SECTION WHERE section_id = ${id}`).rows[ 0 ];
 
-    let rgba_current = rgbaStringToObject( backgroundcolor );
-
-    if( color ) {
-      let { r, g, b } = hexToRgb( color );
-      rgba_current.r = r;
-      rgba_current.g = g;
-      rgba_current.b = b;
-    }
+    let rgba_current = colorStringToObjectRGBA( backgroundcolor );
+    let new_rgba = transformHexaColor( color, alpha, rgba_current );
     
-    if( alpha ) {
-      rgba_current.a = alpha;
-    }
-    
-    let new_rgba = rgbaToString( rgba_current );
     await sql`UPDATE SECTION
               SET backgroundcolor = ${new_rgba} WHERE section_id =${id};`;
     return color;
@@ -342,7 +331,8 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
       case 'alignItems':
         await getAndUpdateFormAttribute( target, block_id, element, form, '' );
         break;
-      case 'height':
+      case 'heightContent':
+      case 'widthContent':
       case 'paddingLeft':
       case 'paddingTop':
       case 'paddingRight':
@@ -358,6 +348,7 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
       case 'borderTopRightRadius':
       case 'borderBottomRightRadius':
       case 'borderWidth':
+      case 'height':
         console.log('check', element);
         await getAndUpdateFormAttribute( target, block_id, element, form, 'rem' );
         break;
@@ -411,20 +402,51 @@ async function getAllMediaSection( section_id:string ):Promise<Media[]> {
   return (await sql`SELECT * FROM MEDIA WHERE section_id = ${section_id}`).rows as Media[]
 }
 
-export function hexToRgb( hex:string ) {
+export function transformHexaColor( color?:string, alpha?:number, rgba?:{r:number, g:number, b:number, a:number} ) {
+  const rgba_current = rgba ?? { r:0, g:0, b:0, a:1};
+
+  if( color ) {
+    let { r, g, b } = hexToRgba( color );
+    rgba_current.r = r;
+    rgba_current.g = g;
+    rgba_current.b = b;
+  }
+  
+  if( alpha ) {
+    rgba_current.a = alpha;
+  }
+
+  let new_rgba = rgbaToString( rgba_current );
+  return new_rgba;
+}
+
+export function hexToRgba( hex:string ) {
   hex = hex.replace(/^#/, '');
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
-  return { r, g, b };
+  const a = 1;
+  return { r, g, b, a};
 }
+
 
 export function rgbaToString( rgb:{r:number, g:number, b:number, a:number} ) {
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`;
 }
 
-export function rgbaStringToObject( rgbaString:string ) {
-  let string = rgbaString.split('(')[ 1 ].split(')')[ 0 ];
+/**
+ * Transforms a color string in a rgba object
+ * @param colorString a rgba or hexa color
+ * @returns 
+ */
+export function colorStringToObjectRGBA( colorString:string ) {
+  if( !colorString ) colorString = `rgba(0, 0, 0, 0)`;
+  if( colorString.includes('#')) {
+      let rgba = hexToRgba( colorString );
+      colorString = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+  }
+
+  let string = colorString.split('(')[ 1 ].split(')')[ 0 ];
   const rgbaValues = string.split(',');
   let rgba = { r:0, g:0, b:0, a:0};
   const r = rgbaValues[0] ? parseInt(rgbaValues[0].trim()) : rgba.r;
@@ -432,4 +454,9 @@ export function rgbaStringToObject( rgbaString:string ) {
   const b = rgbaValues[2] ? parseInt(rgbaValues[2].trim()) : rgba.b;
   const a = rgbaValues[3] ? parseFloat(rgbaValues[3].trim()) : rgba.a;
   return { r, g, b, a };
+}
+
+export function colorStringToRGBAString( color:string ) {
+  let objectRGBA = colorStringToObjectRGBA( color );
+  return rgbaToString( objectRGBA );
 }

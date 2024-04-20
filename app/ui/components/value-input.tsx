@@ -33,9 +33,9 @@ Readonly<{
             <LoadScreen/>
             :
             <>
-                <span>{title}</span>
+                <span className="mr-3">{title}</span>
                 <div>
-                    <div className='grid grid-cols-4 grid-row-1 gap-1'>
+                    <div className='grid grid-cols-1 grid-row-1 gap-1'>
                         <div className="flex flex-col">
                             <input type="number" name="value" className="w-12 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-1 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required min={min} step={step}
                             defaultValue={value}

@@ -1,10 +1,11 @@
 'use client'
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BlockClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
-import Image from "next/image";
 import { TYPES_TO_CHOOSE } from "../../editMode/client/blocks";
 import { Media } from "@/app/lib/definitions";
+import { getImageCss } from "../../sharedFunctions";
+import { ImageElement } from "@/app/ui/components/image-element";
 
 /**
  * Construct customed blocks to show in page
@@ -181,6 +182,8 @@ export function ElementImage({
 }>) {
 
   let [image, setImage] = useState<string>('');
+  
+  const css = getImageCss( element );
 
   useEffect(() => {
     fetch(`/api/medias/${element.media_id}`)
@@ -192,59 +195,20 @@ export function ElementImage({
       setImage(media.url);
     })
     .catch( err => {
-
+      console.log( 'Error', err );
     });
   }, [ image, element.media_id ] );
-
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      position: 'relative'
-    }
-  } as React.CSSProperties;
-
-  if( myCss.height ) {
-    gridCss.height = myCss.height;
-    delete myCss.height;
-  }
-
-  myCss = {
-    ...{
-      'width': '100%',
-      'height': '100%'
-    },
-    ...myCss,
-  } as React.CSSProperties;
 
   let customClass = element.customclassname ?? '';
 
   return (
-    <div style={gridCss}
+    <div style={css.gridCss}
      className={clsx({
       [element.defclassname]:true,
-      ['min-h-10']:true,
-      ['hover:scale-110']:true
+      ['min-h-10']:true
     })}
     >
-      {
-        image ? 
-        <Image
-            style={myCss}
-            className={clsx({
-              //[customClass]: (!!element.customclassname)
-            })}
-            src={image}
-            layout='fill'
-            objectFit='cover'
-            alt="ImageBlock"
-        />
-        : 
-        <></>
-      }
+      <ImageElement css={css} image={image} className="hover:scale-105"/>
     </div>
   )
 }
