@@ -4,8 +4,9 @@ import { BlockClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
 import { TYPES_TO_CHOOSE } from "../../editMode/client/blocks";
 import { Media } from "@/app/lib/definitions";
-import { getImageCss } from "../../sharedFunctions";
+import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
 import { ImageElement } from "@/app/ui/components/image-element";
+import { TextElement } from "@/app/ui/components/text-element";
 
 /**
  * Construct customed blocks to show in page
@@ -74,7 +75,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
     return elementsList;
 }
 
-export function Block({
+function Block({
   block
 }: Readonly<{
   block:BlockClient
@@ -88,94 +89,61 @@ export function Block({
   let blockElements = buildElementsForBlock( elements, totLines, totCols );
 
   return ( 
-    <>
-      <div key={`blk1`} className={clsx({
-      ['w-full min-h-80 h-fit grid overflow-hidden']: true,
-      /*[`grid-rows-[repeat(${totLines}, auto)]`]: true,*/
-      [`grid-rows-${totLines}`]: true,
-      [`grid-cols-${totCols}`]: true
-      /*['pb-2']:true*/
-    })
-    }
-    >
+    <div key={`blk1`} className={`
+      w-full min-h-80 h-fit grid overflow-hidden
+      grid-rows-${totLines}
+      grid-cols-${totCols}`
+      }
+      >
       {
         blockElements
       }
-  
     </div>
-    </>
   )
 } 
 
-export function EmptyElement() {
+function EmptyElement() {
 
   return  ( 
     <div className="h-fit col-span-1">
-      <div className={clsx({
-        ['min-h-8']:true,
-        /*['bg-slate-200']:true,
-        ['border-solid border-2 rounded border-slate-700 hover:scale-105']:true*/
-      })}/>
+      <div className="min-h-8"/>
     </div>
    );
 }
 
-export function CustomElement({
+function CustomElement({
   element
 }:Readonly<{
   element:ElementBlockClient
 }>) {
   switch(element.type) {
     case TYPES_TO_CHOOSE.text:
-      return <ElementText element={element}></ElementText>
+      return <ElementTextGrid element={element}></ElementTextGrid>
     case TYPES_TO_CHOOSE.image:
-      return <ElementImage element={element}></ElementImage>
+      return <ElementImageGrid element={element}></ElementImageGrid>
     case TYPES_TO_CHOOSE.html:
-      return <ElementHtml element={element}></ElementHtml>
+      return <ElementHtmlGrid element={element}></ElementHtmlGrid>
     case TYPES_TO_CHOOSE.video:
-      return <ElementVideo element={element}></ElementVideo>
+      return <ElementVideoGrid element={element}></ElementVideoGrid>
   }
 }
 
-export function ElementText({
+function ElementTextGrid({
   element
 }:Readonly<{
   element:ElementBlockClient
 }>) {
 
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      width: '100%',
-      height: '100%'
-    }
-  }  
-
-  myCss = {
-    ...myCss
-  }
+  let css = getTextCss( element );
 
   return (
-    <div style={gridCss} className={clsx({
-      ['min-h-8 h-fit']:true
-    })}>
-      <div
-        className={clsx({ [element.defclassname]:true
-          //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
-        })}
-        style={myCss}
-      >
-        {element.content}
-      </div>
+    <div style={css.gridCss} className={'min-h-8 h-fit'}>
+      <TextElement className={element.defclassname} content={element.content} css={css}/><TextElement className={element.defclassname} content={element.content} css={css}/>
     </div>
   )
 }
 
-export function ElementImage({
+function ElementImageGrid({
   element
 }:Readonly<{
   element:ElementBlockClient
@@ -199,7 +167,7 @@ export function ElementImage({
     });
   }, [ image, element.media_id ] );
 
-  let customClass = element.customclassname ?? '';
+  //let customClass = element.customclassname ?? '';
 
   return (
     <div style={css.gridCss}
@@ -213,66 +181,35 @@ export function ElementImage({
   )
 }
 
-export function ElementHtml({
+function ElementHtmlGrid({
   element
 }:Readonly<{
   element:ElementBlockClient,
 }>) {
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      width: '100%',
-      height: '100%'
-    }
-  }  
+  let css = getHTMLCss( element );
 
-  myCss = {
-    ...myCss,
-    width: '100%',
-    height: '100%'
-  }
-
-  let customClass = element.customclassname ?? '';
+  // let customClass = element.customclassname ?? '';
   return (
-    <div style={gridCss}>
-      <div style={myCss} 
+    <div style={css.gridCss}>
+      <div style={css.htmlCss} 
         className={clsx({ [element.defclassname]:true})}
         dangerouslySetInnerHTML={createHTML( element.content )} />
     </div>
   )
 }
 
-export function ElementVideo({
+function ElementVideoGrid({
   element
 }:Readonly<{
   element:ElementBlockClient,
 }>) {
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      width: '100%',
-      height: '100%'
-    }
-  }  
+  let css = getVideoCss( element );
 
-  myCss = {
-    ...myCss,
-    width: '100%',
-    height: '100%'
-  }
+  //let customClass = element.customclassname ?? '';
 
-  let customClass = element.customclassname ?? '';
   return (
-    <div style={gridCss}>
-      <div style={myCss} 
+    <div style={css.gridCss}>
+      <div style={css.videoCss} 
         className={clsx({ [element.defclassname]:true})}
         dangerouslySetInnerHTML={createHTML( element.content )} />
     </div>

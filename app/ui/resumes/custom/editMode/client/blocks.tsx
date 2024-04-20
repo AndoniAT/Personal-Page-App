@@ -7,8 +7,9 @@ import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import Image from "next/image";
 import TrashButton from "@/app/ui/components/trash-button";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
-import { getImageCss } from "../../sharedFunctions";
+import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
 import { ImageElement } from "@/app/ui/components/image-element";
+import { TextElement } from "@/app/ui/components/text-element";
 
 const STEPS = {
   NONE: 0,
@@ -132,7 +133,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
     return elementsList;
 }
 
-export function Block({
+function Block({
   block
 }: Readonly<{
   block:BlockClient
@@ -282,7 +283,7 @@ export function Block({
   )
 } 
 
-export function EmptyElement({
+function EmptyElement({
   handler,
   position,
   fusionBlocks
@@ -319,7 +320,7 @@ export function EmptyElement({
    );
 }
 
-export function CustomElement({
+function CustomElement({
   element,
 }:{
   element:ElementBlockClient,
@@ -328,71 +329,42 @@ export function CustomElement({
   if( element.customclassname == null || element.customclassname == '') alert('nooo');
   switch(element.type) {
     case TYPES_TO_CHOOSE.text:
-      return <ElementText element={element}></ElementText>
+      return <ElementTextGrid element={element}></ElementTextGrid>
     case TYPES_TO_CHOOSE.image:
-      return <ElementImage element={element}></ElementImage>
+      return <ElementImageGrid element={element}></ElementImageGrid>
     case TYPES_TO_CHOOSE.html:
-      return <ElementHtml element={element}></ElementHtml>
+      return <ElementHtmlGrid element={element}></ElementHtmlGrid>
     case TYPES_TO_CHOOSE.video:
-      return <ElementVideo element={element}></ElementVideo>
+      return <ElementVideoGrid element={element}></ElementVideoGrid>
   }
 }
 
-export function ElementText({
+function ElementTextGrid({
   element
 }:Readonly<{
   element:ElementBlockClient,
 }>) {
   let [editElement, setEditElement] = useState<boolean>(false);
 
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      width: '100%',
-      height: '100%'
-    }
-  }  
-
-  myCss = {
-    ...myCss,
-  }
+  let css = getTextCss( element );
 
   let submitEditTextElementBlock = async function (event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-     
-    const formData = new FormData( event.currentTarget )
-    if( element.actions?.updateElement ) {
-      try {
-        await element.actions.updateElement( formData );
-      } catch ( err ) {
-        console.log('Error', err);
-      }
-    }
+    submitEditElementBlock( event, element );
   }
 
-  let customClass = element.customclassname ?? '';
+  //let customClass = element.customclassname ?? '';
   return (
     <>
-      <div style={gridCss} className={clsx({
-          ['min-h-8 h-fit']:true,
-          ['rounded hover:border-slate-700']: true,
-          ['hover:scale-105 cursor-pointer hover:border-solid']:true 
-        })
-      }
-      onClick={() => { setEditElement(true)}}
+      <div 
+        style={css.gridCss} 
+        className={`
+          min-h-8 h-fit
+          rounded hover:border-slate-700
+          hover:scale-105 cursor-pointer hover:border-solid`
+        }
+        onClick={() => { setEditElement(true)}}
       >
-        <div 
-          className={clsx({ [element.defclassname]:true
-              //['hover:scale-105 cursor-pointer border-solid border-2 rounded border-slate-700']:true ,
-          })}
-          style={myCss} 
-        >
-          {element.content}
-        </div>
+        <TextElement className={element.defclassname} content={element.content} css={css}/>
       </div>
           {
             editElement ? 
@@ -403,7 +375,7 @@ export function ElementText({
   )
 }
 
-export function ElementImage({
+function ElementImageGrid({
   element
 }:Readonly<{
   element:ElementBlockClient,
@@ -428,33 +400,23 @@ export function ElementImage({
   }, [ image, element.media_id ] );
 
   let submitEditImageElementBlock = async function (event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-     
-    const formData = new FormData( event.currentTarget )
-    if( element.actions?.updateElement ) {
-      try {
-        await element.actions.updateElement( formData );
-      } catch ( err ) {
-        console.log('Error', err);
-      }
-    }
+    submitEditElementBlock( event, element );
   }
 
-  let customClass = element.customclassname ?? '';
+  //let customClass = element.customclassname ?? '';
 
   return (
     <>
         <div style={css.gridCss}
-            className={clsx({
-              [element.defclassname]:true,
-              ['min-h-10']:true,
-              ['hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700']:true ,
-            })
-          }
+            className={`
+              element.defclassname,
+              min-h-10
+              hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700
+              `}
             onClick={() => { setEditElement(true)}}
             >
-            <ImageElement css={css} image={image}/>
-      </div>
+              <ImageElement css={css} image={image}/>
+        </div>
       {
         editElement ? 
         <MediaElementType handler={submitEditImageElementBlock} cancel={() => { setEditElement(false) }} element={element} imageUrl={image}></MediaElementType>
@@ -464,58 +426,34 @@ export function ElementImage({
   )
 }
 
-export function ElementHtml({
+function ElementHtmlGrid({
   element
 }:Readonly<{
   element:ElementBlockClient,
 }>) {
   let [editElement, setEditElement] = useState<boolean>(false);
 
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      width: '100%',
-      height: '100%'
-    }
-  }  
-
-  myCss = {
-    ...myCss,
-    width: '100%',
-    height: '100%'
-  }
+  let css = getHTMLCss( element );
 
   let submitEditHTMLElementBlock = async function (event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-     
-    const formData = new FormData( event.currentTarget )
-    if( element.actions?.updateElement ) {
-      try {
-        await element.actions.updateElement( formData );
-      } catch ( err ) {
-        console.log('Error', err);
-      }
-    }
+    submitEditElementBlock( event, element );
   }
 
-  let customClass = element.customclassname ?? '';
+  //let customClass = element.customclassname ?? '';
+
   return (
     <>
-      <div style={gridCss} className={clsx({
-          ['min-h-full border-2 rounded hover:border-slate-700 h-fit']: true,
-          ['hover:scale-105 cursor-pointer hover:border-solid']:true 
-        })
-      }
-      onClick={() => { setEditElement(true)}}
+      <div style={css.gridCss} 
+        className={`
+          min-h-full border-2 rounded hover:border-slate-700 h-fit
+          hover:scale-105 cursor-pointer hover:border-solid 
+        `}
+        onClick={() => { setEditElement(true)}}
       >
         {
-          <div style={myCss}
-              className={clsx({ [element.defclassname]:true})}
-              dangerouslySetInnerHTML={createHTML( element.content )} 
+          <div style={css.htmlCss}
+              className={element.defclassname}
+              dangerouslySetInnerHTML={createHTMLGrid( element.content )} 
           />
           
         }
@@ -530,58 +468,34 @@ export function ElementHtml({
   )
 }
 
-export function ElementVideo({
+function ElementVideoGrid({
   element
 }:Readonly<{
   element:ElementBlockClient,
 }>) {
   let [editElement, setEditElement] = useState<boolean>(false);
 
-  let spanRow = element.lineto - element.linefrom + 1;
-  let spanCol = element.colto - element.colfrom + 1;
-  let myCss = element.css && typeof element.css == 'string' ? JSON.parse( element.css ) : {};
-  let gridCss = {
-    ...{
-      gridRow: `span ${spanRow} / span ${spanRow}`,
-      gridColumn: `span ${spanCol} / span ${spanCol}`,
-      width: '100%',
-      height: '100%'
-    }
-  }  
-
-  myCss = {
-    ...myCss,
-    width: '100%',
-    height: '100%'
-  }
+  let css = getVideoCss( element );
 
   let submitEditHTMLElementBlock = async function (event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-     
-    const formData = new FormData( event.currentTarget )
-    if( element.actions?.updateElement ) {
-      try {
-        await element.actions.updateElement( formData );
-      } catch ( err ) {
-        console.log('Error', err);
-      }
-    }
+    submitEditElementBlock( event, element );
   }
 
-  let customClass = element.customclassname ?? '';
+  //let customClass = element.customclassname ?? '';
+
   return (
     <>
-      <div style={gridCss} className={clsx({
-          ['min-h-full border-2 rounded hover:border-slate-700 h-fit']: true,
-          ['hover:scale-105 cursor-pointer hover:border-solid']:true 
-        })
-      }
+      <div style={css.gridCss} 
+        className={`
+          min-h-full border-2 rounded hover:border-slate-700 h-fit
+          hover:scale-105 cursor-pointer hover:border-solid
+          `}
       onClick={() => { setEditElement(true)}}
       >
         {
-          <div style={myCss}
+          <div style={css.videoCss}
               className={clsx({ [element.defclassname]:true})}
-              dangerouslySetInnerHTML={createHTML( element.content )} 
+              dangerouslySetInnerHTML={createHTMLGrid( element.content )} 
           />
           
         }
@@ -596,6 +510,19 @@ export function ElementVideo({
   )
 }
 
-function createHTML( str:string ) {
+function createHTMLGrid( str:string ) {
   return {__html: str };
+}
+
+async function submitEditElementBlock( event: FormEvent<HTMLFormElement>, element:ElementBlockClient ) {
+  event.preventDefault()
+   
+  const formData = new FormData( event.currentTarget )
+  if( element.actions?.updateElement ) {
+    try {
+      await element.actions.updateElement( formData );
+    } catch ( err ) {
+      console.log('Error', err);
+    }
+  }
 }
