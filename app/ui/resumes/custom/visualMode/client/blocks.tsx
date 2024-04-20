@@ -138,7 +138,7 @@ function ElementTextGrid({
 
   return (
     <div style={css.gridCss} className={'min-h-8 h-fit'}>
-      <TextElement className={element.defclassname} content={element.content} css={css}/><TextElement className={element.defclassname} content={element.content} css={css}/>
+      <TextElement className={element.defclassname} content={element.content} css={css}/>
     </div>
   )
 }

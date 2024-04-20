@@ -339,6 +339,7 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
       case 'paddingBottom':
         await getAndUpdateFormAttribute( target, block_id, element, form, '%' );
         break;
+      case 'fontSize':
       case 'marginLeft':
       case 'marginTop':
       case 'marginRight':
