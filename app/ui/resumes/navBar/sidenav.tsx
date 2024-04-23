@@ -52,7 +52,7 @@ async function createSideNav( paramsSend : {
 
   let visualModeNavBar = () => {
     return (
-      <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`}>
+      <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='hidden md:block'>
         <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
           <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
           <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
@@ -72,39 +72,20 @@ async function createSideNav( paramsSend : {
   };
 
   return (
-    <>
       <MySideNav>
-        <div className="flex h-full flex-col px-3 py-4 md:px-2">
-          {
-            // Top link logo 
-            <Link  href="/" className={`
-              mb-2 flex h-20 items-end justify-start rounded-md  p-4 md:h-30
-              bg-slate-800
-              dark:bg-slate-200
-              `} >
-              <div className={`w-32 md:w-60
-                text-white 
-                dark:text-zinc-800	
-                `}>
-                <AcmeLogo />
-              </div>
-            </Link>
-          }
-          <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-            <NavLinks params={paramsSend}/>
+        <NavLinks params={paramsSend}/>
+        { // Edit or visual section mode 
+          (isUsersSessionProfile) ? 
+          ( 
+            (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
+          )
+          :
+          <></>
+        }
 
-            { // Edit or visual section mode 
-              (isUsersSessionProfile) ? 
-                ( 
-                  (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
-                )
-              :
-              <></>
-            }
-
-            <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
-            { // Nav bar footer 
-              session?.user ? (
+        <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
+          { // Nav bar footer 
+            session?.user ? (
                     <div className='grid grid-cols-2'>
                         <form
                           action={async () => {
@@ -124,9 +105,9 @@ async function createSideNav( paramsSend : {
                         </button>
                       </form>
                     </div>
-              ) : 
-              (
-                <div className='grid grid-cols-2'>
+            ) : 
+            (
+              <div className='grid grid-cols-2'>
                   <form action={goToLogin}>
                     <button className="sessionIconsNavBar">
                       <PowerIcon className="w-6 text-blue-600 mr-5" />
@@ -139,14 +120,10 @@ async function createSideNav( paramsSend : {
                       <div className="text-session-btn">Create an account</div>
                     </button>
                   </form>
-                </div>
-              )
-            }
-            
-          </div>
-        </div>
+              </div>
+            )
+          }
       </MySideNav>
-    </>
   );
 }
 

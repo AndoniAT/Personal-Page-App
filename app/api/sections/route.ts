@@ -31,6 +31,7 @@ export async function POST( req: Request, context:any ) {
         public, 
         type, 
         style,
+        backgroundcolor,
         resume_id 
       )
       VALUES (
@@ -38,6 +39,7 @@ export async function POST( req: Request, context:any ) {
         ${true}, 
         ${'Custom'}, 
         ${1}, 
+        ${'rgba(0,0,0,0)'},
         ${resume.resume_id}
       ) RETURNING section_id
       `).rows[ 0 ] as Section;

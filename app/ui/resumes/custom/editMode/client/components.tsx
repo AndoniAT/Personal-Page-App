@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { PencilSquareIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
 import { UpdateSectionModal } from "./modals";
+import { MyTooltip } from "@/app/ui/components/tooltip";
 
 export function ShowHeader({
     hero,
@@ -208,9 +209,11 @@ export function NameEditSectionIcon({
         cancel={() => { setEditNameShow( false )}}/>
         :
         <>
-          <PencilSquareIcon className="w-6 ml-3 cursor-pointer text-white"
-            onClick={() => setEditNameShow(true)} 
-          /> 
+          <MyTooltip content='Edit name section' className='flex'>
+            <PencilSquareIcon className="w-6 ml-3 cursor-pointer text-white"
+              onClick={() => setEditNameShow(true)} 
+            /> 
+          </MyTooltip>
           <p className='m-3 flex items-center text-white'>
             { section.name}
           </p>

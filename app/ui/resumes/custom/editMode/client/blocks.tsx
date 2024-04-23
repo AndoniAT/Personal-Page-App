@@ -10,6 +10,7 @@ import { LoadScreen } from "@/app/ui/components/loading-modal";
 import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
 import { ImageElement } from "@/app/ui/components/image-element";
 import { TextElement } from "@/app/ui/components/text-element";
+import { MyTooltip } from "@/app/ui/components/tooltip";
 
 const STEPS = {
   NONE: 0,
@@ -70,7 +71,9 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
                 :
                 <div key={`blockContainer${block.block_id}`}>
                   <Block key={block.block_id} block={block} /> 
-                  <TrashButton key={`trash_${block.block_id}`} deleteElement={deleteBlock} cancel={() => {}}></TrashButton>
+                  <MyTooltip content={'Delete this block'}>
+                      <TrashButton key={`trash_${block.block_id}`} deleteElement={deleteBlock} cancel={() => {}}></TrashButton>
+                  </MyTooltip>
                 </div>
               }
             </>
@@ -300,14 +303,21 @@ function EmptyElement({
     setColor(col)
   }, [ fusionBlocks, position ])
 
+  let textTooltip = 'Fusion blocks : \n';
+  textTooltip += ( !fusionBlocks.from && !fusionBlocks.to ) ? 'Click to set the starting corner' : '';
+  textTooltip += ( fusionBlocks.from && !fusionBlocks.to ) ? 'Click to set the final corner' : '';
+  textTooltip = ( fusionBlocks.from && position.indexArr == fusionBlocks.from.indexArr && !fusionBlocks.to ) ? 'Remove starting corner' : textTooltip;
+
   return  ( 
     <div className="h-fit col-span-1">
-      <div className={`min-h-8 ${color} border-solid border-2 rounded border-slate-700 hover:scale-105`}
-        /*style={{ width: '80px', height: '80px' }}*/
-          onClick={() => {
-            handler(position);
-          }}
-          />
+      <MyTooltip content={textTooltip} className='flex' offset={5} crossOffset={50}>
+        <div className={`min-h-8 ${color} border-solid border-2 rounded border-slate-700 hover:scale-105 w-full cursor-pointer`}
+          /*style={{ width: '80px', height: '80px' }}*/
+            onClick={() => {
+              handler(position);
+            }}
+            />
+      </MyTooltip>
     </div>
   
    );

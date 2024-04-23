@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import { CreateSectionModal } from "./modals";
 import { useDebouncedCallback } from "use-debounce";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
+import AcmeLogo from "@/app/ui/components/acme-logo";
 
 interface LinkParam {
     name: string,
@@ -29,11 +30,11 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
       className={clsx({
           [ " flex-none bg-slate-300 dark:bg-gray-700" ]: true,
           [ 'transition-all duration-500 ease-out'] : true,
-          [' w-full md:w-60 lg:w-60 2xl:w-80']: show,
+          [' w-full md:w-60 lg:w-72 2xl:w-80']: show,
           [ 'w-5']: !show,
         })
         }>
-        <div className="relative w-full flex items-center justify-center font-bold	">
+        <div className="relative w-full flex items-center justify-center font-bold	hidden md:block">
             {
               show ?
               <ArrowLeftCircleIcon className={`
@@ -63,12 +64,36 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
               />
 
             }
-          </div>
+        </div>
+        <div className="flex h-full flex-col px-3 py-4 md:px-2">
             {
               ( show ) ?
-                children:
-              <></>
+                <>
+                <Link  href="/" className={`
+                      mb-2 flex h-20 items-end justify-start rounded-md  p-4 md:h-30
+                      bg-slate-800
+                      dark:bg-slate-200
+                      `} >
+                      <div className={`w-32 md:w-60
+                        text-white 
+                        dark:text-zinc-800	
+                        `}>
+                        <AcmeLogo />
+                      </div>
+                  </Link>
+                  <div className={`
+                  grow justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 flex
+                  flex-col overflow-hidden
+                  md:overflow-auto
+                  `
+                  }
+                  style={{ maxHeight: '90vh', overflowY:'auto'}}>
+                    {children}
+                  </div>
+                </>
+                :<></>
             }
+        </div>
           
       </div>
   )

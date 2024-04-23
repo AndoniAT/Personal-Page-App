@@ -19,7 +19,7 @@ Readonly<{
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden myBackgroundPage">
       { /* <div className="w-full flex-none md:w-80"> */ }
       <SideNav sections={sections} user={user} mode={'edit'} currentSection={section || null} />
-      <div className="flex-grow p-6 md:overflow-y-auto md:p-3">{children}</div>
+      <div className="flex-grow p-6 md:overflow-y-auto md:p-3 mb-10">{children}</div>
     </div>
   );
 }

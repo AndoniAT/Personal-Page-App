@@ -10,6 +10,8 @@ import { deleteSection } from '@/app/lib/section/actions';
 import { redirect } from 'next/navigation';
 import { PencilIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { customRevalidateTag } from '@/app/lib/actions';
+import {Tooltip} from "@nextui-org/tooltip";
+import { MyTooltip } from '@/app/ui/components/tooltip';
 
 export default function CustomEditView(
   {
@@ -65,14 +67,16 @@ export default function CustomEditView(
           </div>
           <div className='grid grid-cols-12 grid-rows-1 h-20'>
             <div className='col-start-6 col-span-2 text-center flex justify-center'>
-                <ButtonPlus handler={handlerCreateBlock}/>
+                <MyTooltip content='Create a new block'>
+                    <ButtonPlus handler={handlerCreateBlock}/>
+                </MyTooltip>
             </div>
           </div>
         </CustomSection>
       }
       {
         ( section.type != 'Home' as SectionType) ?
-        <div className='flex bg-slate-600	'>
+        <div className='flex bg-slate-600	fixed bottom-0 w-full'>
           <TrashButton  
           cancel={async () => {
             'use server'
