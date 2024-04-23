@@ -8,6 +8,8 @@ import { string, z } from 'zod';
 import { getUserByEmail, getUserByUsername } from '../data';
 import bcrypt from 'bcrypt';
 
+const specialCharactersRegex = /^[a-zA-Z0-9]*$/;
+
 const FormSchema = z.object({
   firstname: z.string({
     invalid_type_error: 'Please enter your firstname.',
@@ -17,7 +19,11 @@ const FormSchema = z.object({
   }).min(1, { message: "Lastname is required" }),
   username: z.string({
     invalid_type_error: 'Please enter your username.',
-  }).min(1, { message: "Username is required" }),
+  }).min(1, { message: "Username is required" })
+  .regex(specialCharactersRegex, {
+    message: 'Le nom d\'utilisateur ne peux pas contenir des caractères spéciaux.'
+  })
+  ,
   email: z.string({
     invalid_type_error: 'Please enter your email.',
   }).email(),
