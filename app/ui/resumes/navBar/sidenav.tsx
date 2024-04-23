@@ -4,10 +4,11 @@ import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
 import { Section, User } from '../../../lib/definitions'; 
 import AcmeLogo from '@/app/ui/components/acme-logo';
-import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import { PowerIcon, UserCircleIcon, PencilSquareIcon, ArrowLeftCircleIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import EditModeNavBar from './editModeNavBar';
+import { MySideNav } from './client/components';
 
 export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit', currentSection:Section|null } ) {
 
@@ -71,79 +72,81 @@ async function createSideNav( paramsSend : {
   };
 
   return (
-    <div className="w-full flex-none md:w-60 lg:w-60 2xl:w-80 bg-slate-300 dark:bg-gray-700">
-      <div className="flex h-full flex-col px-3 py-4 md:px-2">
-        {
-          /* Top link logo */
-          <Link  href="/" className={`
-            mb-2 flex h-20 items-end justify-start rounded-md  p-4 md:h-30
-            bg-slate-800
-            dark:bg-slate-200
-            `} >
-            <div className={`w-32 md:w-60
-              text-white 
-              dark:text-zinc-800	
-              `}>
-              <AcmeLogo />
-            </div>
-          </Link>
-        }
-        <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-          <NavLinks params={paramsSend}/>
-
-          { /* Edit or visual section mode */
-            (isUsersSessionProfile) ? 
-              ( 
-                (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
-              )
-            :
-            <></>
-          }
-
-          <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
-          { /* Nav bar footer */
-            session?.user ? (
-                  <div className='grid grid-cols-2'>
-                      <form
-                        action={async () => {
-                          'use server';
-                          await signOut({ redirect: true, redirectTo:'/'} );
-                        }}
-                      >
-                        <button className="sessionIconsNavBar">
-                          <PowerIcon className="w-6 text-blue-600 mr-5" />
-                          <div className="text-session-btn">Sign Out</div>
-                        </button>
-                    </form>
-                    <form action={goToMyresume}>
-                      <button className="sessionIconsNavBar">
-                        <UserCircleIcon className="w-6 text-blue-600 mr-5" />
-                        <div className="text-session-btn">My page</div>
-                      </button>
-                    </form>
-                  </div>
-            ) : 
-            (
-              <div className='grid grid-cols-2'>
-                <form action={goToLogin}>
-                  <button className="sessionIconsNavBar">
-                    <PowerIcon className="w-6 text-blue-600 mr-5" />
-                    <div className="text-session-btn">Login</div>
-                  </button>
-                </form>
-                <form action={goToCreateAccount}>
-                  <button className="sessionIconsNavBar">
-                    <UserCircleIcon className="w-10 text-blue-600 mr-5" />
-                    <div className="text-session-btn">Create an account</div>
-                  </button>
-                </form>
+    <>
+      <MySideNav>
+        <div className="flex h-full flex-col px-3 py-4 md:px-2">
+          {
+            // Top link logo 
+            <Link  href="/" className={`
+              mb-2 flex h-20 items-end justify-start rounded-md  p-4 md:h-30
+              bg-slate-800
+              dark:bg-slate-200
+              `} >
+              <div className={`w-32 md:w-60
+                text-white 
+                dark:text-zinc-800	
+                `}>
+                <AcmeLogo />
               </div>
-            )
+            </Link>
           }
-          
+          <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+            <NavLinks params={paramsSend}/>
+
+            { // Edit or visual section mode 
+              (isUsersSessionProfile) ? 
+                ( 
+                  (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
+                )
+              :
+              <></>
+            }
+
+            <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible"></div>
+            { // Nav bar footer 
+              session?.user ? (
+                    <div className='grid grid-cols-2'>
+                        <form
+                          action={async () => {
+                            'use server';
+                            await signOut({ redirect: true, redirectTo:'/'} );
+                          }}
+                        >
+                          <button className="sessionIconsNavBar">
+                            <PowerIcon className="w-6 text-blue-600 mr-5" />
+                            <div className="text-session-btn">Sign Out</div>
+                          </button>
+                      </form>
+                      <form action={goToMyresume}>
+                        <button className="sessionIconsNavBar">
+                          <UserCircleIcon className="w-6 text-blue-600 mr-5" />
+                          <div className="text-session-btn">My page</div>
+                        </button>
+                      </form>
+                    </div>
+              ) : 
+              (
+                <div className='grid grid-cols-2'>
+                  <form action={goToLogin}>
+                    <button className="sessionIconsNavBar">
+                      <PowerIcon className="w-6 text-blue-600 mr-5" />
+                      <div className="text-session-btn">Login</div>
+                    </button>
+                  </form>
+                  <form action={goToCreateAccount}>
+                    <button className="sessionIconsNavBar">
+                      <UserCircleIcon className="w-10 text-blue-600 mr-5" />
+                      <div className="text-session-btn">Create an account</div>
+                    </button>
+                  </form>
+                </div>
+              )
+            }
+            
+          </div>
         </div>
-      </div>
-    </div>
+      </MySideNav>
+    </>
   );
 }
 

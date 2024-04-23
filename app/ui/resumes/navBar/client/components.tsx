@@ -1,7 +1,7 @@
 "use client"
 
 import { SectionsNavBar } from "@/app/resumes/[username]/interfaces";
-import { ClipboardDocumentCheckIcon, HomeIcon, PencilSquareIcon, PlusCircleIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ClipboardDocumentCheckIcon, HomeIcon, PencilSquareIcon, PlusCircleIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -15,6 +15,63 @@ interface LinkParam {
     href: string,
     icon: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & { title?: string, titleId?: string } & React.RefAttributes<SVGSVGElement>>;
     current: boolean
+}
+
+interface MySideNavProps extends React.AllHTMLAttributes<HTMLAllCollection> {
+  children: React.ReactNode;
+}
+
+export function MySideNav({ children, className, ...rest }: Readonly<MySideNavProps>) {
+  const [ show, setShow ] = useState<boolean>(true);
+
+  return (
+      <div
+      className={clsx({
+          [ " flex-none bg-slate-300 dark:bg-gray-700" ]: true,
+          [ 'transition-all duration-500 ease-out'] : true,
+          [' w-full md:w-60 lg:w-60 2xl:w-80']: show,
+          [ 'w-5']: !show,
+        })
+        }>
+        <div className="relative w-full flex items-center justify-center font-bold	">
+            {
+              show ?
+              <ArrowLeftCircleIcon className={`
+                  w-7 h-7 absolute right-0 cursor-pointer hover:scale-125
+                  stroke-slate-200 bg-slate-500
+                  rounded-full
+                  `
+                  
+                }
+              style={{top: '50vh', right:'-13'}}
+              onClick={() => {
+                setShow(!show);
+              }}
+              />
+              :
+              <ArrowRightCircleIcon className={`
+                  w-7 h-7 absolute right-0 cursor-pointer hover:scale-125
+                  stroke-slate-200 bg-slate-500
+                  rounded-full
+                  `
+                  
+                }
+              style={{top: '50vh', right:'-13'}}
+              onClick={() => {
+                setShow(!show);
+              }}
+              />
+
+            }
+          </div>
+            {
+              ( show ) ?
+                children:
+              <></>
+            }
+          
+      </div>
+  )
 }
 
 /**
