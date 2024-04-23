@@ -86,7 +86,6 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
    * @param handlerFusion
    */
 function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:number, totCols:number, handlerFusion:Function, fusionBlocks:FusionElementsBlock ) {
-
     let elementsList:any = [];
     elementsList.length = totLines * totCols;
 
@@ -221,12 +220,14 @@ function Block({
     }
   }
 
+  /*grid-rows-50*/
   return ( 
     <>
       <div key={`blk1`} className={`
       w-full min-h-80 h-fit grid overflow-hidden
-      grid-rows-${totLines}
-      grid-cols-${totCols}`}
+      grid-cols-${totCols/3}
+      xl:grid-cols-${totCols}
+      `}
     >
       {
         blockElements

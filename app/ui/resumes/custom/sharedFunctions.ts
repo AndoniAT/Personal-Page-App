@@ -12,10 +12,10 @@ export function getImageCss( element:ElementBlockClient ) {
       position: 'relative'
     } as React.CSSProperties;
   
-    if( myCss.height ) {
-      gridCss.height = myCss.height;
-      delete myCss.height;
-    }
+    if( myCss.height ) gridCss.height = myCss.height;
+    
+    delete myCss.height;
+
   
     // == Container CSS ==
     let containerCss = {
@@ -26,6 +26,7 @@ export function getImageCss( element:ElementBlockClient ) {
     if( myCss.justifyContent ) containerCss.justifyContent = myCss.justifyContent
     if( myCss.alignItems ) containerCss.alignItems = myCss.alignItems
     if( myCss.backgroundColor ) containerCss.backgroundColor = myCss.backgroundColor
+
     delete myCss.justifyContent;
     delete myCss.alignItems;
     delete myCss.backgroundColor;

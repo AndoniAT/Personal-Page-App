@@ -31,7 +31,7 @@ body {
   @apply bg-red-100;
 }*/
 .myBackgroundPage {
-  @apply bg-slate-100
+  @apply bg-slate-100 dark:bg-slate-900
 }
 
 
@@ -72,7 +72,7 @@ body {
 }
 
 #customImageModal .no-image, #customImageModal .image-found {
-  @apply h-32 col-span-12 bg-slate-400 border rounded-xl mb-5
+  @apply bg-slate-400 border rounded-xl min-h-40
 }
 
 #customImageModal .no-image .Imageelement,
@@ -95,6 +95,28 @@ body {
   @apply cursor-progress
 }
 
+.arrowsIcons {
+  @apply self-center w-5 rounded border  cursor-pointer hover:scale-110 
+  border-gray-600
+  text-slate-900
+  hover:bg-slate-900 hover:text-slate-200	
+  dark:text-zinc-50
+  dark:hover:bg-slate-200 dark:hover:text-slate-900
+}
+
+.inputNumberValue {
+  @apply border border-gray-600 
+  w-12 bg-gray-50 
+  text-gray-900 text-sm rounded-lg 
+  p-1 dark:bg-gray-600 dark:border-gray-500 
+  dark:placeholder-gray-400 dark:text-white 
+  
+}
+
+.colorCercleButton {
+  @apply h-5 w-5 border border-gray-600 self-center rounded-full ml-2 cursor-pointer hover:scale-105
+}
+
 /* MAIN PAGE*/
 
 .box {
@@ -111,12 +133,13 @@ body {
   height: 100%;
   width: 100%;
   animation: rotateQuick 0.2s ease-in; /* 0.7s pour la rotation et 5s de délai avant de redémarrer */
-  background: rgb(2,0,36);
-background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(1,84,122,1) 55%);
+  /*background: rgb(185,185,185);
+  background: linear-gradient(90deg, rgba(185,185,185,1) 0%, rgba(255,255,255,1) 85%, rgba(255,255,255,1) 100%);*/
+  
+  @apply bg-gradient-to-r from-slate-400 to-slate-100	
+  dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-200	
 }
-
 .box-section {
-  background-color: rgb(158, 158, 158);
   border-radius: 10px;
   height: 100%;
   width: 100%;

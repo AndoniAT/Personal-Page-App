@@ -298,7 +298,7 @@ export function Content3() {
 
             <div className="box-section col-span-7 row-span-4 p-10"
             style={{ backgroundColor: 'rgba(158, 158, 158, 0.3)' }}>
-                <div className={`${lusitana.className} text-black text-2xl`}>
+                <div className={`${lusitana.className} text-black text-2xl dark:text-white`}>
                     Welcome to Resumes page ! <br/><br/> Create your own personal website
                     with this grid system 
                     <p>
@@ -374,7 +374,7 @@ export function Content3() {
                         <UserCircleIcon className='text-blue-300'/>
                     </div>
 
-                    <div className={`flex justify-center col-span-3 text-black ${lusitana.className} text-2xl text-center`}>
+                    <div className={`flex justify-center col-span-3 text-black dark:text-white ${lusitana.className} text-2xl text-center`}>
                         <p>Rest connected with other people</p>
                     </div>
                 </div>
@@ -391,7 +391,7 @@ export function Content3() {
                                 alt="ImageBlock"
                             />
                 </div>
-                <div className='w-full flex justify-center mt-3'>
+                <div className='w-full flex justify-center mt-5'>
                     <div className='w-fit flex items-center rounded-xl p-3 cursor-pointer bg-sky-600 hover:bg-sky-400' style={{height:'50px'}}>
                         <Link href={'/createAccount'}>
                             Create your account to start your page !
@@ -407,10 +407,10 @@ export function Content3() {
 
 function Head() {
     return (
-        <div className="box-header col-span-12 row-span-3 h-full">
+        <div className="box-header col-span-12 row-span-3 h-full dark:box-header-dark">
             <div className="h-full w-2/3 flex align-center justify-center items-center">
-                <div className='flex flex-col'>
-                    <p className={`text-white text-8xl ${lusitana.className}`}>Resumes</p>
+                <div className='flex flex-col text-black  dark:text-white'>
+                    <p className={`text-8xl ${lusitana.className}`}>Resumes</p>
                     <p className='w-fit self-end'>Created by : Andoni ALONSO TORT</p>
                     <p className='w-fit self-end'>2024</p>
                 </div>

@@ -19,8 +19,18 @@ const config: Config = {
     },
   },
   /*safelist: [{ pattern: /./ }],*/
-  safelist: ['w-full', 'min-h-80', 'h-fit', 'grid', 'grid-rows-12', 'grid-cols-12', 'h-full'],
+  safelist: ['w-full', 'min-h-80', 'h-fit', 'grid', 'grid-rows-12', 'grid-cols-12', 'h-full', 
+  {
+    pattern: /grid-cols-(1|2|3|4|5|6|7|8|9|10|11|12)/,
+    variants: ['sm', 'lg', 'xl', '2xl'],
+  },
+],
   /*mode: 'jit',*/
   plugins: [],
+  variants: {
+    extend: {
+      gridTemplateColumns: ['responsive'], // Enable responsive variants for grid columns
+    },
+  },
 };
 export default config;

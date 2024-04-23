@@ -52,9 +52,9 @@ async function createSideNav( paramsSend : {
   let visualModeNavBar = () => {
     return (
       <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`}>
-        <div className='flex content-center gap-2 cursor-pointer'>
-          <PencilSquareIcon className='stroke-slate-700 w-5'/> 
-          <span className='inline-block text-black align-middle h-fit content-center place-self-center'>
+        <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
+          <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
+          <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
             Edit mode
           </span>
         </div>
@@ -71,12 +71,19 @@ async function createSideNav( paramsSend : {
   };
 
   return (
-    <div className="w-full flex-none md:w-60 lg:w-60 2xl:w-80">
+    <div className="w-full flex-none md:w-60 lg:w-60 2xl:w-80 bg-slate-300 dark:bg-gray-700">
       <div className="flex h-full flex-col px-3 py-4 md:px-2">
         {
           /* Top link logo */
-          <Link className="mb-2 flex h-20 items-end justify-start rounded-md bg-slate-800 p-4 md:h-30" href="/" >
-            <div className="w-32 text-white md:w-60">
+          <Link  href="/" className={`
+            mb-2 flex h-20 items-end justify-start rounded-md  p-4 md:h-30
+            bg-slate-800
+            dark:bg-slate-200
+            `} >
+            <div className={`w-32 md:w-60
+              text-white 
+              dark:text-zinc-800	
+              `}>
               <AcmeLogo />
             </div>
           </Link>

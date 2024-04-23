@@ -31,7 +31,9 @@ export default async function NavLinks( { params } : Readonly<{ params: ParamsPr
         {<MainLinks/>}
       </div>
       <div className='grid grid-rows-* gap-1 mt-10'>
-        <div className='text-gray-600 font-bold text-lg flex'>
+        <div className={`font-bold text-lg flex
+        text-gray-600 
+        dark:text-white`}>
           {<GetUsernameSection/>}
           { ( isUsersSessionProfile && isEdit ) ? <EditUserPencilLink/> : <></>}
         </div>

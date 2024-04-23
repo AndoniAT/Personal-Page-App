@@ -2,7 +2,8 @@
 
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { Askonfirmation } from "./confirmation-modal";
+import { AskConfirmation } from "./confirmation-modal";
+import clsx from "clsx";
 
 export default function TrashButton({
     deleteElement,
@@ -16,6 +17,8 @@ export default function TrashButton({
         question:string
     }
 }>) {
+    const [loading, setLoading] = useState<boolean>(false);
+
     const [ showConfirmation, setShowConfirmation ] = useState<boolean>(false);
 
     let cancelTrash = () => {
@@ -24,24 +27,34 @@ export default function TrashButton({
     }
 
     let acceptTrash = async () => {
+        setLoading(true);
         await deleteElement();
         cancelTrash();
+        setLoading(false);
     }
 
     return (
         <>
-            <div className='w-12 text-center flex mt-3 justify-center p-2'>
-                <TrashIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer hover:bg-red-300"
-                    onClick={async () => {
-                        if( confirmation ) {
-                            setShowConfirmation(true);
-                        } else {
-                            acceptTrash();
-                        }
-                    }}/>
+            <div className={clsx({
+                ['w-12 text-center flex mt-3 justify-center p-2']:true,
+                ['loading']: loading,
+                })}>
+                    {
+                        (!loading) ?
+                        <TrashIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer hover:bg-red-300"
+                            onClick={async () => {
+                                if( confirmation ) {
+                                    setShowConfirmation(true);
+                                } else {
+                                    acceptTrash();
+                                }
+                            }}/>
+                            :
+                            <></>
+                    }
             </div>
             { showConfirmation && confirmation ? 
-                <Askonfirmation cancel={cancelTrash} accept={acceptTrash} question={confirmation.question} title={confirmation.title}/>
+                <AskConfirmation cancel={cancelTrash} accept={acceptTrash} question={confirmation.question} title={confirmation.title}/>
             : <></>}
         </>
     )

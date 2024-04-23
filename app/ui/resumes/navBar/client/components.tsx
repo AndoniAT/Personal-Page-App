@@ -80,73 +80,6 @@ export function GetUsernameSection() {
   return username;
 }
 
-export function CreateCustomColorButton({
-  label,
-  update,
-  defaul_value
-}:Readonly<{
-  label:string,
-  update:Function,
-  defaul_value:string
-}>) {
-  const colorInputRef = useRef<HTMLInputElement>(null);
-  const [ loading, setLoading ] = useState<boolean>(false);
-
-  const handleColorClick = () => {
-    if (colorInputRef.current) {
-      colorInputRef.current.click();
-    }
-  };
-
-  let handler = useDebouncedCallback( async (value) => {
-      setLoading(true);
-      await update( value )
-      setLoading(false);
-    }
-    , 200
-  );
-
-  const handleColorChange = async () => {
-    if ( colorInputRef?.current ) {
-      let newColor = colorInputRef.current.value;
-      handler( newColor );
-    }
-  };
-
-  return (
-    <>
-      {
-        loading ? 
-        <LoadScreen/>
-        :
-        <>
-          <div>
-              <span>{label}</span>
-          </div>
-          <div className='text-center justify-left content-center pl-3'>
-            <div
-              style={{ backgroundColor: defaul_value, marginLeft:'2px' }} 
-              className='h-5 w-5 border border-gray-600 justify-left rounded-full self-center pl-3'
-              onClick={handleColorClick}>
-              
-              <input 
-                ref={colorInputRef}
-                type="color"
-                id='colorBg'
-                name="colorBg"
-                onChange={handleColorChange}
-                value={defaul_value}
-                className='w-5 -ml-5 invisible'
-              />
-            </div>
-          </div>
-        </>
-      }
-    </>
-            
-  )
-}
-
 export function RadioButton({
   label,
   default_value,
@@ -168,8 +101,8 @@ export function RadioButton({
 
   return (
     <>
-      <div>
-        <span>Show Home Header</span>
+      <div className="dark:text-white">
+        <span>{label}</span>
       </div>
         <div className='text-center flex justify-left pl-3'>
           <label className="inline-flex items-center cursor-pointer">
@@ -178,18 +111,18 @@ export function RadioButton({
             onClick={handler}
             className={clsx({
                             ["rounded-full peer"]:true,
-                            ["relative w-11 h-5 bg-gray-200 peer-focus:outline-none"]:true,
+                            ["relative w-11 h-5 peer-focus:outline-none"]:true,
                             ["peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-400"]:true,
                             ["peer-checked:after:border-white after:content-['']"]:true,
                             ["dark:border-gray-600"]:true,
+                            ["bg-blue-300"]:true,
 
-                            ["dark:bg-gray-700"]:!showHeader,
+                            ["dark:bg-slate-200 bg-gray-700"]:!showHeader,
                             ["peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"]:!showHeader && click,
-                            ["after:absolute after:top-[2px] after:start-[5px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"]:!showHeader,
+                            ["after:absolute after:top-[2px] after:start-[5px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all after:bg-slate-300 after:dark:bg-gray-700"]:!showHeader,
                             
-                            ["dark:bg-blue-300"]:showHeader,                          
                             ["peer-checked:after:-translate-x-full rtl:peer-checked:after:translate-x-full"]:showHeader && click,
-                            ["after:absolute after:top-[2px] after:start after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"]:showHeader,
+                            ["after:absolute after:top-[2px] after:start after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all after:bg-slate-300 after:dark:bg-gray-700"]:showHeader,
 
                           })}
             ></div>
@@ -210,11 +143,22 @@ export function CreateButtonNewSection({
 
   return (
     <>
-      <div>
-        <span>{label}</span>
-      </div>
-      <div className='text-center justify-left content-center pl-3'>
-        <PlusCircleIcon onClick={() => { setShowCreateSection(true)}}  className='h-6 cursor-pointer stroke-white hover:scale-105 bg-blue-300 rounded-full border bg-slate-700'></PlusCircleIcon>
+      <div className="flex">
+        <div className="dark:text-white">
+          <span>{label}</span>
+        </div>
+        <div className='text-center justify-left content-center pl-3'>
+          <PlusCircleIcon onClick={() => { setShowCreateSection(true)}}  
+          className={`
+          h-6 cursor-pointer hover:scale-105 rounded-full
+          border border-2 border-zinc-800
+          
+          text-gray-400 bg-gray-700 
+          dark:text-zinc-800	dark:bg-slate-300
+          `}>
+
+          </PlusCircleIcon>
+        </div>
       </div>
       {
         showCreateSection ?

@@ -176,9 +176,13 @@ export function ButtonPlus({
                   setLoading( false );
                 }
                 } 
-                className={clsx({
-                  ['h-20 cursor-pointer hover:scale-105 bg-blue-300 rounded-full border bg-slate-700 mt-5']:true
-                })}
+                className={
+                  `h-20 cursor-pointer hover:scale-105 rounded-full mt-5 
+                  border border-2 border-zinc-800	
+                  bg-slate-300 text-zinc-800	
+                  dark:bg-gray-700 dark:text-gray-400
+                  `
+                }
                 />
       }
     </>
@@ -204,7 +208,7 @@ export function NameEditSectionIcon({
         cancel={() => { setEditNameShow( false )}}/>
         :
         <>
-          <PencilSquareIcon className="w-6 ml-3 cursor-pointer"
+          <PencilSquareIcon className="w-6 ml-3 cursor-pointer text-white"
             onClick={() => setEditNameShow(true)} 
           /> 
           <p className='m-3 flex items-center text-white'>

@@ -266,13 +266,11 @@ export async function changeBackgroundSection( id:string, color?:string, alpha?:
   await requiresSessionUserPropertySection( id );
 
   try {
-    let { backgroundcolor } = (await sql`SELECT backgroundcolor FROM SECTION WHERE section_id = ${id}`).rows[ 0 ];
-
-    let rgba_current = colorStringToObjectRGBA( backgroundcolor );
-    let new_rgba = transformHexaColor( color, alpha, rgba_current );
-    
+    //let { backgroundcolor } = (await sql`SELECT backgroundcolor FROM SECTION WHERE section_id = ${id}`).rows[ 0 ];
+    /*let rgba_current = colorStringToObjectRGBA( backgroundcolor );
+    let new_rgba = transformHexaColor( color, alpha, rgba_current );*/
     await sql`UPDATE SECTION
-              SET backgroundcolor = ${new_rgba} WHERE section_id =${id};`;
+              SET backgroundcolor = ${color} WHERE section_id =${id};`;
     return color;
   } catch( e ) {
     console.log(e);
@@ -442,9 +440,21 @@ export function rgbaToString( rgb:{r:number, g:number, b:number, a:number} ) {
  */
 export function colorStringToObjectRGBA( colorString:string ) {
   if( !colorString ) colorString = `rgba(0, 0, 0, 0)`;
+
   if( colorString.includes('#')) {
       let rgba = hexToRgba( colorString );
       colorString = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+  } else if( !colorString.startsWith( 'rgba(' ) && !colorString.endsWith(')') ) {
+      colorString = `rgba(0, 0, 0, 0)`;
+  } else {
+      let string = colorString.split('rgba(').slice(-1)[0];
+      string = string.split( ')' )[ 0 ];
+      let values =  string.split(',');
+      let r = !isNaN(parseFloat(values[ 0 ])) ? values[ 0 ] : 0;
+      let g = !isNaN(parseFloat(values[ 1 ])) ? values[ 1 ] : 0;
+      let b = !isNaN(parseFloat(values[ 2 ])) ? values[ 2 ] : 0;
+      let a = !isNaN(parseFloat(values[ 3 ])) ? values[ 3 ] : 0;
+      colorString = `rgba(${r}, ${g}, ${b}, ${a})`;
   }
 
   let string = colorString.split('(')[ 1 ].split(')')[ 0 ];
