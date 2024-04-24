@@ -391,10 +391,14 @@ export function ColorButtons(
     vertical,
     ...rest 
     }
-:ColorsProps) {
+:Readonly<ColorsProps>) {
     defaultColor = colorStringToRGBAString( defaultColor );
     let rgba_calc = colorStringToObjectRGBA( defaultColor );
-    let isVertical = !!vertical;
+
+    if( !showAlpha ) {
+        rgba_calc.a = 1;
+    }
+
     let [rgba, setRgba ] = useState<RGBA>(rgba_calc);
     
     const handleTransparencyCall = () => {
