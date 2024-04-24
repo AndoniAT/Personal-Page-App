@@ -1,7 +1,7 @@
 "use client"
 
 import { SectionsNavBar } from "@/app/resumes/[username]/interfaces";
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ClipboardDocumentCheckIcon, HomeIcon, PencilSquareIcon, PlusCircleIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import { ArrowDownCircleIcon, ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowUpCircleIcon, ClipboardDocumentCheckIcon, HomeIcon, PencilSquareIcon, PlusCircleIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -31,9 +31,42 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
           [ " flex-none bg-slate-300 dark:bg-gray-700" ]: true,
           [ 'transition-all duration-500 ease-out'] : true,
           [' w-full md:w-60 lg:w-72 2xl:w-80']: show,
-          [ 'w-5']: !show,
+          [ 'h-5 md:h-full md:w-5']: !show,
         })
         }>
+
+        <div className="md:hidden relative w-full flex items-center justify-center font-bold	block md:hidden">
+            {
+              show ?
+              <ArrowUpCircleIcon className={`
+                  w-7 h-7 absolute right-0 cursor-pointer hover:scale-125
+                  stroke-slate-200 bg-slate-500
+                  rounded-full
+                  `
+                  
+                }
+              style={{top: '40px', right:'25px'}}
+              onClick={() => {
+                setShow(!show);
+              }}
+              />
+              :
+              <ArrowDownCircleIcon className={`
+                  w-7 h-7 absolute right-0 cursor-pointer hover:scale-125
+                  stroke-slate-200 bg-slate-500
+                  rounded-full
+                  `
+                  
+                }
+              style={{top: '10px', right:'25px'}}
+              onClick={() => {
+                setShow(!show);
+              }}
+              />
+
+            }
+        </div>
+
         <div className="relative w-full flex items-center justify-center font-bold	hidden md:block">
             {
               show ?

@@ -16,10 +16,14 @@ export default function Home() {
     setTimeout(() => {
       setContent( 3 );
     }, 3500 ) 
-  } 
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-2">
+    <main className="flex min-h-screen flex-col items-center justify-between 
+    mt-5 md:mt-0
+    lg:p-2
+
+    ">
       {
         (content == 1)  ?
         <Content1/>

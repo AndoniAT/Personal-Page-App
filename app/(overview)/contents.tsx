@@ -3,7 +3,7 @@ import { UserCircleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 export function Content1() {
     return (
-        <div className="grid grid-rows-12 grid-cols-12 gap-5">
+        <div className="grid grid-rows-12 grid-cols-12 gap-9 w-full">
         <div className="box"></div>
         <div className="box"></div>
         <div className="box"></div>
@@ -166,7 +166,7 @@ export function Content1() {
 
 export function Content2() {
     return (
-        <div className="grid grid-rows-12 grid-cols-12 gap-5">
+        <div className="grid grid-rows-12 grid-cols-12 gap-9 w-full">
         <Head/>
 
         <div className="box"></div>
@@ -292,11 +292,14 @@ export function Content2() {
 
 export function Content3() {
     return (
-        <div className="grid grid-rows-12 grid-cols-12 gap-5 w-full min-h-80 h-fit grid overflow-hidden">
+        <div className="grid grid-rows-12 grid-cols-12 gap-9 w-full min-h-80 h-fit grid overflow-hidden">
             
             <Head/>
 
-            <div className="box-section col-span-7 row-span-4 p-10"
+            <div className="box-section 
+            col-span-12 row-span-4 p-10
+            lg:col-span-7
+            "
             style={{ backgroundColor: 'rgba(158, 158, 158, 0.3)' }}>
                 <div className={`${lusitana.className} text-black text-2xl dark:text-white`}>
                     Welcome to Resumes page ! <br/><br/> Create your own personal website
@@ -331,7 +334,9 @@ export function Content3() {
                     </div>
                 </div>
             </div>
-            <div className="box-section col-span-5 row-span-4 rounded-2xl overflow-hidden hover:scale-105 cursor-pointer">
+            <div className="box-section col-span-5 row-span-4 rounded-2xl overflow-hidden hover:scale-105 cursor-pointer
+            m-5 lg:m-0
+            ">
                      <img
                                     style={{
                                     objectFit: 'cover', height: '100%', width: '100%'
@@ -342,7 +347,10 @@ export function Content3() {
             
             </div>
 
-            <div className="box-section col-span-3 row-span-5 p-5"
+            <div className="box-section 
+            col-span-6 row-span-5 p-5
+            lg:col-span-3
+            "
             style={{backgroundColor:'transparent'}}>
                 <div className='grid grid-cols-3 w-full rounded-2xl p-5'
                 style={{ backgroundColor: 'rgba(158, 158, 158, 0.3)' }}>
@@ -380,7 +388,11 @@ export function Content3() {
                 </div>
 
             </div>
-            <div className="box-section col-span-9 row-span-5"
+
+            <div className="box-section 
+            col-span-12 row-span-5
+            lg:col-span-9 row-span-5
+            "
             style={{backgroundColor: 'transparent'}}>
                 <div className='rounded-2xl overflow-hidden hover:scale-105 cursor-pointer'>
                 <img
@@ -410,7 +422,7 @@ function Head() {
         <div className="box-header col-span-12 row-span-3 h-full dark:box-header-dark">
             <div className="h-full w-2/3 flex align-center justify-center items-center">
                 <div className='flex flex-col text-black  dark:text-white'>
-                    <p className={`text-8xl ${lusitana.className}`}>Resumes</p>
+                    <p className={`text-6xl lg:text-8xl ${lusitana.className}`}>Resumes</p>
                     <p className='w-fit self-end'>Created by : Andoni ALONSO TORT</p>
                     <p className='w-fit self-end'>2024</p>
                 </div>

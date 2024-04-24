@@ -122,9 +122,9 @@ body {
 .box {
   background-color: rgb(108, 108, 108);
   border-radius: 50%; /* Forme initiale : cercle */
-  min-width: 80px;
-  min-height: 80px;
   animation: rotate 5.7s infinite; /* 0.7s pour la rotation et 5s de délai avant de redémarrer */
+  @apply min-w-9 min-h-9 md:min-w-10 md:min-h-10 lg:min-w-14 lg:min-h-14 xl:min-w-20 xl:min-h-20 
+  before:absolute before:inset-0 before:rounded-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent
 }
 
 .box-header {
