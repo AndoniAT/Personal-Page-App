@@ -334,8 +334,12 @@ export function Content3() {
                     </div>
                 </div>
             </div>
-            <div className="box-section col-span-5 row-span-4 rounded-2xl overflow-hidden hover:scale-105 cursor-pointer
+            <div className="box-section 
+            rounded-2xl overflow-hidden hover:scale-105 cursor-pointer
+            col-span-6
+            md:col-span-5 row-span-4 
             m-5 lg:m-0
+            dark:border dark:border-px dark:border-white
             ">
                      <img
                                     style={{
