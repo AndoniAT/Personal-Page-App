@@ -85,7 +85,7 @@ async function createSideNav( paramsSend : {
 
         <div className="hidden h-auto w-full grow rounded-md myBackgroundPage md:block invisible
         "></div>
-          <div className='w-full dark:bg-slate-200 rounded-lg'>
+          <div className='w-full dark:bg-slate-200 rounded-lg' style={{margin: '10px 0px 0px 0px'}}>
 
           { // Nav bar footer 
             session?.user ? (
