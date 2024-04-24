@@ -87,8 +87,8 @@ async function createSideNav( paramsSend : {
           { // Nav bar footer 
             session?.user ? (
                     <div className='grid grid-cols-2'>
-                        <div
-                          onClick={async () => {
+                        <form
+                          action={async () => {
                             'use server';
                             await signOut({ redirect: true, redirectTo:'/'} );
                           }}
@@ -98,15 +98,15 @@ async function createSideNav( paramsSend : {
                             <PowerIcon className="w-6 text-blue-600 mr-5" />
                             <div className="text-session-btn">Sign Out</div>
                           </button>
-                      </div>
-                      <div onClick={goToMyresume}
+                      </form>
+                      <form action={goToMyresume}
                       className='flex justify-center'
                       >
                         <button className="sessionIconsNavBar">
                           <UserCircleIcon className="w-6 text-blue-600 mr-5" />
                           <div className="text-session-btn">My page</div>
                         </button>
-                      </div>
+                      </form>
                     </div>
             ) : 
             (
