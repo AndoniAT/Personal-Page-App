@@ -4,18 +4,22 @@ const USERS = [
         username: 'AndoniAT',
         firstname: 'Andoni',
         lastname: 'Alonso Tort',
-        password: 'User123?',
-        photo: null,
         email: 'example@example.com',
+        password: 'User123?',
+        showheader: true,
+        url_hero: null,
+        url_profile: null
     },
     {
         user_id:'11111111-1111-1111-1111-111111111555',
         username: 'User',
         firstname: 'user',
         lastname: 'example',
+        email: 'user@example.com',
         password: 'User123?',
-        photo: null,
-        email: 'user@example.com'
+        showheader: false,
+        url_hero: null,
+        url_profile: null
     },
 ];
 
@@ -71,9 +75,8 @@ const SECTION = [
         name: 'My Home',
         created: '2024-03-23T17:15:57.508Z',
         public: true,
-        type:'Home',
-        style:1,
-        backgroundColor:'#18191a',
+        isHome:true,
+        css:'{"backgoroundColor": "rbga(0,0,0,0)"}',
 
         resume_id:'11111111-1111-1111-1111-111111111112',
     },
@@ -82,9 +85,8 @@ const SECTION = [
         name: 'Home User',
         created: '2024-03-28T17:15:57.508Z',
         public: true,
-        type:'Home',
-        style:1,
-        backgroundColor:'#18191a',
+        isHome:true,
+        css:'{"backgoroundColor": "rbga(0,0,0,0)"}',
 
         resume_id:'11111111-1111-1111-1111-111111111113',
     },

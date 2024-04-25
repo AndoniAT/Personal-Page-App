@@ -11,6 +11,7 @@ const bcrypt = require( 'bcrypt' );
 async function dropTables( client ) {
     try {
         await client.sql`DROP TABLE IF EXISTS USERS CASCADE;`;
+        await client.sql`DROP TABLE IF EXISTS USER_FOLLOW_USER CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS RESUME CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS SECTION CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS MEDIA CASCADE;`;
@@ -27,30 +28,54 @@ async function dropTables( client ) {
 }
 
 async function createUsers( client ) {
-    try {
-        await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-        
-        // Create the "USERS" table if it doesn't exist
-        const createTable = await client.sql`
-          CREATE TABLE IF NOT EXISTS USERS (
-            user_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-            username VARCHAR(50) NOT NULL,
-            firstname VARCHAR(255) NOT NULL,
-            lastname VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            showheader BOOLEAN DEFAULT TRUE,
-            photo_profile_id UUID
-            );
-            `;
-    
-        console.log( `Created "USERS" table` );
+  try {
+      await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+      
+      // Create the "USERS" table if it doesn't exist
+      const createTable = await client.sql`
+        CREATE TABLE IF NOT EXISTS USERS (
+          user_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+          username VARCHAR(50) NOT NULL,
+          firstname VARCHAR(255) NOT NULL,
+          lastname VARCHAR(255) NOT NULL,
+          email VARCHAR(255) NOT NULL UNIQUE,
+          password TEXT NOT NULL,
+          showheader BOOLEAN DEFAULT TRUE,
+          url_hero VARCHAR(255),
+          url_profile VARCHAR(255)
+          );
+          `;
+  
+      console.log( `Created "USERS" table` );
 
-        return createTable;
-      } catch ( error ) {
-        console.error('Error create users:', error);
-        throw error;
-      }
+      return createTable;
+    } catch ( error ) {
+      console.error('Error create users:', error);
+      throw error;
+    }
+}
+
+async function createUser_Folow_User( client ) {
+  try {
+      await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+      
+      // Create the "USERS" table if it doesn't exist
+      const createTable = await client.sql`
+        CREATE TABLE IF NOT EXISTS USER_FOLLOW_USER (
+          user_id UUID,
+          user_id_followed UUID,
+
+          PRIMARY KEY (user_id, user_id_followed)
+          );
+          `;
+  
+      console.log( `Created "USER_FOLLOW_USER" table` );
+
+      return createTable;
+    } catch ( error ) {
+      console.error('Error create user follow user:', error);
+      throw error;
+    }
 }
 
 async function createResume( client ) {
@@ -83,9 +108,8 @@ async function createSection( client ) {
             name VARCHAR(255) NOT NULL,
             created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
             public BOOLEAN DEFAULT TRUE,
-            type VARCHAR(20) CHECK (type IN ('Projects', 'Gallery', 'Custom', 'Home')),
-            style INT DEFAULT 1,
-            backgroundcolor VARCHAR(30) DEFAULT 'rgba(0,0,0,1)',
+            isHome BOOLEAN DEFAULT FALSE,
+            css VARCHAR(255),
             
             resume_id UUID
           );
@@ -112,9 +136,8 @@ async function createMedia( client ) {
             url TEXT NOT NULL,
             contenttype VARCHAR(255) NOT NULL,
             size INT NOT NULL,
-            isHero BOOLEAN DEFAULT False,
 
-            section_id UUID
+            user_id UUID
           );
         `;
     
@@ -176,6 +199,9 @@ async function createBlock( client ) {
       await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
       
       // Create the "USERS" table if it doesn't exist
+      await client.sql`DROP TYPE type_screen;`;
+      await client.sql`CREATE TYPE type_screen AS ENUM ('def', 'md', 'lg', 'xl', '2xl');`
+
       const createTable = await client.sql`
         CREATE TABLE IF NOT EXISTS BLOCK (
           block_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -184,6 +210,9 @@ async function createBlock( client ) {
           defclassName TEXT NOT NULL,
           customclassname TEXT,
           css TEXT,
+
+          place INT,
+          screen type_screen,
 
           section_id UUID NOT NULL
         );
@@ -219,7 +248,7 @@ async function createElement( client ) {
           type type_element,
 
           block_id UUID NOT NULL,
-          media_id UUID
+          element_id_ref UUID NOT NULL
         );
       `;
       console.log( `Created "ELEMENT" table` );
@@ -231,19 +260,9 @@ async function createElement( client ) {
     }
 }
 
-async function seedTables( client ) {
-  await seedUsers( client );
-  await seedResume( client );
-  await seedSection( client );
-
-  await seedMedia( client );
-  await seedSocialMedia( client );
-  await seedSocialMediaUser( client );
-  return;
-}
-
 async function createTables( client ) {
   await createUsers( client );
+  await createUser_Folow_User( client );
   await createResume( client );
   await createSection( client );
 
@@ -253,42 +272,57 @@ async function createTables( client ) {
 
   await createBlock( client );
   await createElement( client );
-
-  return;
 }
 
 async function createForeignKeys( client ) {
   try {
 
-    await client.sql`ALTER TABLE USERS
-      ADD CONSTRAINT fk_users_media FOREIGN KEY (photo_profile_id) REFERENCES MEDIA(media_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
-    
+    // USER_FOLLOW_USER
+    await client.sql`ALTER TABLE USER_FOLLOW_USER
+      ADD CONSTRAINT fk_user_follow_user FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
+      ADD CONSTRAINT fk_user_followed_by_user FOREIGN KEY (user_id_followed) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+
+    // RESUME
     await client.sql`ALTER TABLE RESUME
       ADD CONSTRAINT fk_resume_users FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
-    
+
+    // SECTION
     await client.sql`ALTER TABLE SECTION
       ADD CONSTRAINT fk_section_resume FOREIGN KEY (resume_id) REFERENCES RESUME(resume_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
     
+    // MEDIA
     await client.sql`ALTER TABLE MEDIA
-      ADD CONSTRAINT fk_media_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+      ADD CONSTRAINT fk_media_user FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
   
+    // SOCIAL_MEDIA_USER
     await client.sql`ALTER TABLE SOCIAL_MEDIA_USER
-      ADD CONSTRAINT fk_user_socialmedia FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
-  
-    await client.sql`ALTER TABLE SOCIAL_MEDIA_USER
+      ADD CONSTRAINT fk_user_socialmedia FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE,
       ADD CONSTRAINT fk_socialmedia_user FOREIGN KEY (social_id) REFERENCES SOCIAL_MEDIA(social_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
     
+    // BLOCK
     await client.sql`ALTER TABLE BLOCK
       ADD CONSTRAINT fk_block_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
 
-      await client.sql`ALTER TABLE ELEMENT
+    // ELEMENT
+    await client.sql`ALTER TABLE ELEMENT
       ADD CONSTRAINT fk_element_block FOREIGN KEY (block_id) REFERENCES BLOCK(block_id) ON UPDATE CASCADE ON DELETE CASCADE,
-      ADD CONSTRAINT fk_element_media FOREIGN KEY (media_id) REFERENCES MEDIA(media_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+      ADD CONSTRAINT fk_element_ref FOREIGN KEY (element_id_ref) REFERENCES ELEMENT(element_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
   } catch( e ) {
     console.log('Error generating foreign keys', e);
     throw new Error( e );
   }
 
+  return;
+}
+
+async function seedTables( client ) {
+  await seedUsers( client );
+  await seedResume( client );
+  await seedSection( client );
+
+  await seedMedia( client );
+  await seedSocialMedia( client );
+  await seedSocialMediaUser( client );
   return;
 }
 
@@ -319,8 +353,22 @@ async function seedUsers( client ) {
 
           const hashedPassword = await bcrypt.hash( user.password, 10 );
           let users = await client.sql`
-          INSERT INTO USERS ( user_id, username, firstname, lastname, email, password )
-          VALUES ( ${user.user_id}, ${user.username}, ${user.firstname}, ${user.lastname}, ${user.email}, ${hashedPassword} )
+          INSERT INTO USERS ( 
+            user_id,
+            username,
+            firstname,
+            lastname,
+            email,
+            password
+          )
+          VALUES ( 
+            ${user.user_id}, 
+            ${user.username}, 
+            ${user.firstname}, 
+            ${user.lastname}, 
+            ${user.email}, 
+            ${hashedPassword} 
+          )
           ON CONFLICT ( user_id ) DO NOTHING
           RETURNING user_id;
         `;
@@ -372,8 +420,23 @@ async function seedSection( client ) {
           SECTION.map( async ( section ) => {
 
           return client.sql`
-          INSERT INTO SECTION ( section_id, name, public, type, style, backgroundColor, resume_id )
-          VALUES ( ${section.section_id}, ${section.name}, ${section.public}, ${section.type}, ${section.style}, ${section.backgroundColor}, ${section.resume_id})
+          INSERT INTO SECTION ( 
+            section_id, 
+            name, 
+            public, 
+            isHome,
+            css,
+            
+            resume_id )
+          VALUES ( 
+            ${section.section_id}, 
+            ${section.name},
+            ${section.public}, 
+            ${section.isHome},
+            ${section.css},
+
+            ${section.resume_id}
+          )
           ON CONFLICT ( section_id ) DO NOTHING;
         `;
         } ),
