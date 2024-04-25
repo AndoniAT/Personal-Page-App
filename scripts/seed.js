@@ -3,7 +3,6 @@ const {
     USERS,
     RESUME,
     SECTION,
-    PROJECT,
     MEDIA,
     SOCIAL_MEDIA
   } = require( '../app/lib/placeholder-data.js' );
@@ -14,7 +13,6 @@ async function dropTables( client ) {
         await client.sql`DROP TABLE IF EXISTS USERS CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS RESUME CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS SECTION CASCADE;`;
-        await client.sql`DROP TABLE IF EXISTS PROJECT CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS MEDIA CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS SOCIAL_MEDIA CASCADE;`;
         await client.sql`DROP TABLE IF EXISTS SOCIAL_MEDIA_USER CASCADE;`;
@@ -101,32 +99,6 @@ async function createSection( client ) {
       }
 }
 
-async function createProject( client ) {
-    try {
-        await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-
-        const createTable = await client.sql`
-          CREATE TABLE IF NOT EXISTS PROJECT (
-            project_id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            link VARCHAR(255),
-            technologies VARCHAR(255),
-            description TEXT,
-            moreInfo TEXT,
-            team VARCHAR(255)
-          );
-        `;
-    
-        console.log( `Created "PROJECT" table` );
-    
-        return createTable;
-
-      } catch ( error ) {
-        console.error( 'Error create projects:', error );
-        throw error;
-      }
-}
-
 async function createMedia( client ) {
     try {
         await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
@@ -142,8 +114,7 @@ async function createMedia( client ) {
             size INT NOT NULL,
             isHero BOOLEAN DEFAULT False,
 
-            section_id UUID,
-            project_id UUID
+            section_id UUID
           );
         `;
     
@@ -265,7 +236,6 @@ async function seedTables( client ) {
   await seedResume( client );
   await seedSection( client );
 
-  await seedProject( client );
   await seedMedia( client );
   await seedSocialMedia( client );
   await seedSocialMediaUser( client );
@@ -277,7 +247,6 @@ async function createTables( client ) {
   await createResume( client );
   await createSection( client );
 
-  await createProject( client );
   await createMedia( client );
   await createSocialMedia( client );
   await createSocialMediaUser( client );
@@ -302,9 +271,6 @@ async function createForeignKeys( client ) {
     
     await client.sql`ALTER TABLE MEDIA
       ADD CONSTRAINT fk_media_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
-  
-    await client.sql`ALTER TABLE MEDIA
-      ADD CONSTRAINT fk_media_project FOREIGN KEY (project_id) REFERENCES PROJECT(project_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
   
     await client.sql`ALTER TABLE SOCIAL_MEDIA_USER
       ADD CONSTRAINT fk_user_socialmedia FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
@@ -424,42 +390,15 @@ async function seedSection( client ) {
     }
 }
 
-async function seedProject( client ) {
-  try {
-
-        const insertedProjects = await Promise.all(
-        
-          PROJECT.map( async ( project ) => {
-
-          return client.sql`
-          INSERT INTO PROJECT ( project_id, name, link, technologies, description, moreInfo, team )
-          VALUES ( ${project.project_id}, ${project.name}, ${project.link}, ${project.technologies}, ${project.description}, ${project.moreInfo}, ${project.team} )
-          ON CONFLICT ( project_id ) DO NOTHING;
-        `;
-        } ),
-      );
-  
-      console.log( `Seeded : ${insertedProjects.length} projects` );
-  
-      return {
-        users: insertedProjects,
-      };
-    } catch ( error ) {
-      console.error( 'Error seeding projects:', error );
-      throw error;
-    }
-}
-
 async function seedMedia( client ) {
   try {
-      // Insert data into the "PROJECT" table
       /*const insertedMedias = await Promise.all(
         
           MEDIA.map( async ( media ) => {
 
           return client.sql`
-          INSERT INTO MEDIA ( media_id, filename, position, section_id, project_id )
-          VALUES ( ${media.media_id}, ${media.filename}, ${media.position}, ${media.section_id}, ${media.project_id} )
+          INSERT INTO MEDIA ( media_id, filename, position, section_id )
+          VALUES ( ${media.media_id}, ${media.filename}, ${media.position}, ${media.section_id} )
           ON CONFLICT ( media_id ) DO NOTHING;
         `;
         } ),
@@ -478,7 +417,6 @@ async function seedMedia( client ) {
 
 async function seedSocialMedia( client ) {
   try {
-      // Insert data into the "PROJECT" table
       const insertedSocialMedias = await Promise.all(
         
           SOCIAL_MEDIA.map( async ( social_media ) => {

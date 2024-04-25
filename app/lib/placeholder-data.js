@@ -90,21 +90,6 @@ const SECTION = [
     },
 ];
 
-const PROJECT = [
-    {
-        project_id:'11111111-1111-1111-1111-111111111117',
-
-        name:'My project',
-        link: null,
-        technologies:'nodejs,docker,javascript',
-        description:'My project description',
-        moreInfo:'More about it',
-        team:'Another integrants',
-
-        section_id:'11111111-1111-1111-1111-111111111113'
-    }
-];
-
 const MEDIA = [
     /*{
         media_id:'11111111-1111-1111-1111-111111111118',
@@ -153,7 +138,6 @@ module.exports = {
     USERS,
     RESUME,
     SECTION,
-    PROJECT,
     MEDIA,
     SOCIAL_MEDIA
   };
