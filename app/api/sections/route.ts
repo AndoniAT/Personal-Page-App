@@ -13,8 +13,7 @@ export async function POST( req: Request, context:any ) {
     if( !username || !name ) {
       throw new Error( 'Some params are missing' );
     }
-  
-    let media_url = '';
+
     try {
       await requiresSessionUserProperty( username );
 
@@ -26,20 +25,21 @@ export async function POST( req: Request, context:any ) {
         throw new Error(`No resume found for user ${username}`);
       }
 
+      let css = { backgroundColor: 'rgba(0,0,0,0)' };
       let sec = (await sql`INSERT INTO SECTION ( 
         name, 
         public, 
-        type, 
-        style,
-        backgroundcolor,
+        ishome,
+        css,
+
         resume_id 
       )
       VALUES (
         ${name}, 
         ${true}, 
-        ${'Custom'}, 
-        ${1}, 
-        ${'rgba(0,0,0,0)'},
+        ${false},
+        ${JSON.stringify( css )},
+
         ${resume.resume_id}
       ) RETURNING section_id
       `).rows[ 0 ] as Section;

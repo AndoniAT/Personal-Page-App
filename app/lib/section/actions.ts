@@ -260,21 +260,27 @@ export async function deleteSection( section_id:string ) {
   }
 }
 
-export async function changeBackgroundSection( id:string, color?:string, alpha?:number ) {
+export async function changeCssSection( id:string, css_to_change:string ) {
   'use server';
   noStore();
   await requiresSessionUserPropertySection( id );
 
   try {
-    //let { backgroundcolor } = (await sql`SELECT backgroundcolor FROM SECTION WHERE section_id = ${id}`).rows[ 0 ];
-    /*let rgba_current = colorStringToObjectRGBA( backgroundcolor );
-    let new_rgba = transformHexaColor( color, alpha, rgba_current );*/
+    let new_css = JSON.parse( css_to_change );
+    let { css } = (await sql`SELECT css FROM SECTION WHERE section_id = ${id}`).rows[ 0 ];
+    let old_css_obj = JSON.parse( css );
+
+    for ( const [ prop, value ] of Object.entries( new_css ) ) {
+      console.log(`${prop}: ${value}`);
+      old_css_obj[ prop ] =  value
+    }
+    
     await sql`UPDATE SECTION
-              SET backgroundcolor = ${color} WHERE section_id =${id};`;
-    return color;
+              SET css = ${JSON.stringify(old_css_obj)} WHERE section_id =${id};`;
+    return css;
   } catch( e ) {
     console.log(e);
-    throw new Error( 'Failed to change the backgorund' );
+    throw new Error( 'Failed to change the css' );
   }
 }
 

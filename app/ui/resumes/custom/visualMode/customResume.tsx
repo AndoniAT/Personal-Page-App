@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { BuildBlocks } from "./client/blocks";
 import { ShowHeader } from "./client/components";
 import CustomSection from "@/app/ui/components/custom-section";
-import { SectionType } from "@/app/lib/definitions";
 
 /**
  * Style 1 for home page
@@ -21,18 +20,20 @@ export default function CustomView(
   
     const user = data.user;
     const section = data.section;
-    const hero = section.medias.find(m => m.ishero);
     let blocks = section.blocks as BlockClient[];
-  
+    let css_string = section.css;
+    let css = JSON.parse( css_string );
+    let { backgroundColor } = css.backgroundColor ?? 'rgba( 0, 0, 0, 0)';
+
     return (
-      <CustomSection style={{ backgroundColor: section.backgroundcolor }} className={clsx({
+      <CustomSection style={{ backgroundColor: backgroundColor }} className={clsx({
         ['w-full min-h-screen']: true,
         ['h-fit pb-10']: true,
       })}>
         <div>
           {
-            ( user.showheader && section.type == 'Home' as SectionType ) ?
-            <ShowHeader heroUrl={hero?.url ?? undefined} photoProfile={user?.photo_profile?.url ?? undefined}/>
+            ( user.showheader && section.ishome ) ?
+            <ShowHeader heroUrl={user.url_hero} photoProfile={user.url_profile}/>
             : <></>
           }
           <div>

@@ -13,7 +13,7 @@ import { TextElement } from "@/app/ui/components/text-element";
  * @param blocks 
  * @returns 
  */
-export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {console.log('check blocks', blocks);
+export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
     return (<>
       {
         blocks.map( ( block:BlockClient ) => <Block key={block.block_id} block={block} /> )

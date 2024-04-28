@@ -3,11 +3,11 @@ export type User = {
     username: string;
     firstname: string;
     lastname: string;
-    password: string;
-    photo: string;
     email: string;
-    photo_profile_id: string;
+    password: string;
     showheader:boolean;
+    url_hero: string;
+    url_profile: string;
 };
 
 export type Resume = {
@@ -16,16 +16,15 @@ export type Resume = {
     user_id:string
 }
 
-export type SectionType = 'Projects' | 'Gallery' | 'Custom' | 'Home';
-
 export type Section = {
     section_id: string;
     name: string;
     created: Date;
     public: boolean;
-    type: SectionType;
-    style: number;
-    backgroundcolor: string;
+    ishome: boolean;
+    css: string;
+    
+    resume_id: string;
 };
 
 export type Media = {
@@ -35,38 +34,29 @@ export type Media = {
     url: string,
     contenttype: string,
     size:number,
-    ishero: boolean
 
-    section_id: string
-    project_id?: string
-    update: Function|never
+    user_id:string
+    /*update: Function|never*/
 }
 
-export type MediaEditMode = {
-    media_id: string
-    filename: string
-    url: string,
-    downloadurl: string,
-    contenttype: string
-    position: number
-    ishero: boolean
-    section_id: number
-    project_id: number
-    update: Function|never
-}
-
+export type ScreenType = 'def'|'md'|'lg'|'xl'|'2xl';
 export interface Block {
-    block_id:string,
-    numlines:number,
-    numcols:number,
-    defclassName:string,
-    customclassname: string|null,
-    css: string|null,
+    block_id: string,
+    numlines: number,
+    numcols: number,
+    defclassName: string,
+    customclassname: string,
+    css: string,
+    
+    place: number,
+    screen: ScreenType,
+    
     section_id: string,
-    place:number,
-    elements?:Element[]
+
+    elements?: Element[]
 }
 
+export type ElementType = 'text'|'media'|'linkvideo'|'html';
 export interface ElementBlock {
     element_id: string,
     linefrom: number,
@@ -74,11 +64,13 @@ export interface ElementBlock {
     colfrom: number,
     colto: number,
     defclassname: string,
-    customclassname: string|null,
-    css: string|null,
+    customclassname: string,
+    css: string,
     content:string
-    type:'text'|'media'|'linkvideo'|'html',
+    type: ElementType,
+
     block_id:string
+    element_id_ref:string|null
 }
 
 export interface Positions {

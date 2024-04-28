@@ -1,13 +1,12 @@
-import { getUserByUsername, getMediasForSection, putHomeHeroForUser, putProfilePhotoForUser, getProfilePhotoForUser, getUserSection } from '@/app/lib/data';
+import { getUserByUsername, getUserSection } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import CustomEditView from '@/app/ui/resumes/custom/editMode/curstomResume';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
-import { BlockClient, MediaClient } from '@/app/ui/resumes/custom/interfaces';
+import { BlockClient } from '@/app/ui/resumes/custom/interfaces';
 import { revalidatePath } from 'next/cache';
 import { createElementBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
-import { SectionType } from '@/app/lib/definitions';
 
 export const metadata: Metadata = {
   title: 'Edit User\'s Section',
@@ -29,29 +28,7 @@ export default async function Page(
 
     let section = await getUserSection( username, section_id );
 
-    const medias = await getMediasForSection( section.section_id ) as MediaClient[];
     let blocks = await getBlocksSection( section.section_id ) as BlockClient[]|[];
-
-    let heroInMedia = medias.find( m => m.ishero );
-    
-    if( section.type == "Home" as SectionType ) {
-      if( heroInMedia ) {
-        heroInMedia.update = putHomeHeroForUser;
-      } else {
-        let hero = { update: putHomeHeroForUser, ishero:true, section_id: section.section_id } as MediaClient;
-        medias.push( hero );
-      }
-    }
-
-    let photo_profile = await getProfilePhotoForUser( user.username ) as MediaClient
-
-    if( section.type == "Home" as SectionType ) {
-      if( photo_profile ) {
-        photo_profile.update = putProfilePhotoForUser;
-      } else {
-        photo_profile = { update: putProfilePhotoForUser  } as MediaClient;
-      }
-    }
 
     const createBlockBind = async () => {
       'use server'
@@ -134,18 +111,18 @@ export default async function Page(
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
-        photo: user.photo,
         email: user.email,
         showheader: user.showheader,
-        photo_profile: photo_profile
+        url_profile: user.url_profile,
+        url_hero: user.url_hero,
       },
       section: {
         section_id:section.section_id,
         name: section.name,
         created: section.created,
-        type: section.type,
-        backgroundcolor: section.backgroundcolor,
-        medias: medias,
+        public: section.public,
+        ishome: section.ishome,
+        css: section.css,
         blocks: blocks,
         actions: {
           addBlock: createBlockBind

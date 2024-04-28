@@ -1,12 +1,12 @@
-import { SectionType } from "@/app/lib/definitions"
-
 export interface SectionsNavBar {
     section_id: string,
     name: string,
     created: Date,
-    type: SectionType,
-    background: {
+    ishome: boolean;
+    css: string;
+
+    /*background: {
         update?: Function,
         color: string
-    }
+    }*/
 }

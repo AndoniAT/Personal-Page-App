@@ -1,4 +1,5 @@
-import { getUserByUsername, getHomeUserSection, getMediasForSection, getProfilePhotoForUser } from '@/app/lib/data';
+import { getUserByUsername, getHomeUserSection, getProfilePhotoForUser } from '@/app/lib/data';
+import { getMediasForUser } from '@/app/lib/user/actions';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -29,8 +30,6 @@ export default async function Page(
     }
 
     const home = await getHomeUserSection( username );
-    const medias = await getMediasForSection( home.section_id );
-    let photo_profile = await getProfilePhotoForUser( user.username );
     const blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
 
     const sendData = {
@@ -38,18 +37,18 @@ export default async function Page(
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
-        photo: user.photo,
         email: user.email,
         showheader: user.showheader,
-        photo_profile: photo_profile ?? undefined
+        url_profile: user.url_profile,
+        url_hero: user.url_hero,
       },
       section: {
-        section_id: home.section_id,
+         section_id: home.section_id,
         name: home.name,
         created: home.created,
-        type: home.type,
-        backgroundcolor: home.backgroundcolor,
-        medias: medias,
+        public: home.public,
+        ishome: home.ishome,
+        css: home.css,
         blocks: blocks,
       }
     }

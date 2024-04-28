@@ -75,7 +75,7 @@ const SECTION = [
         name: 'My Home',
         created: '2024-03-23T17:15:57.508Z',
         public: true,
-        isHome:true,
+        ishome:true,
         css:'{"backgoroundColor": "rbga(0,0,0,0)"}',
 
         resume_id:'11111111-1111-1111-1111-111111111112',
@@ -85,7 +85,7 @@ const SECTION = [
         name: 'Home User',
         created: '2024-03-28T17:15:57.508Z',
         public: true,
-        isHome:true,
+        ishome:true,
         css:'{"backgoroundColor": "rbga(0,0,0,0)"}',
 
         resume_id:'11111111-1111-1111-1111-111111111113',

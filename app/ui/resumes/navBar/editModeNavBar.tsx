@@ -4,7 +4,7 @@ import Link from "next/link";
 import { User } from "@/app/lib/definitions";
 import { CreateButtonNewSection, RadioButton } from "./client/components";
 import { revalidateTag } from "next/cache";
-import { changeBackgroundSection } from "@/app/lib/section/actions";
+import { changeCssSection } from "@/app/lib/section/actions";
 import { customRevalidateTag } from "@/app/lib/actions";
 import { changeShowHeader } from "@/app/lib/user/actions";
 import { ColorButtons } from "../custom/editMode/client/customButtons";
@@ -14,17 +14,24 @@ export default function EditModeNavBar(  {
   } : Readonly<{
     data : {
         user: User,
-        currentSection: SectionsNavBar|null,
+        currentSection?: SectionsNavBar,
       }
     }>) 
     {
     let { currentSection, user } = data;
+    let css = currentSection?.css ? JSON.parse( currentSection.css ) : {};
+    let background = css.backgoroundColor;
+
 
     let updateBg = async ( newColor:string ) => {
       'use server'
-      console.log('checking update bg', newColor);
       if( currentSection ) {
-        await changeBackgroundSection( currentSection.section_id, newColor )
+        let css_send = {
+          ...css,
+          backgoroundColor: newColor
+        }
+
+        await changeCssSection( currentSection.section_id, JSON.stringify( css_send ) )
         revalidateTag( 'edit' );
       }
     }
@@ -37,7 +44,8 @@ export default function EditModeNavBar(  {
       revalidateTag( 'edit' );
     }
 
-    let link = ( currentSection?.type == 'Home' ) ? `/resumes/${user.username}` : `/resumes/${user.username}/${currentSection?.section_id}`
+    let link = ( currentSection?.ishome ) ? `/resumes/${user.username}` : `/resumes/${user.username}/${currentSection?.section_id}`
+
     return ( 
       <div>
         <Link href={link}>
@@ -59,7 +67,7 @@ export default function EditModeNavBar(  {
                 
                 <ColorButtons
                 title='Background'
-                defaultColor={currentSection?.background.color ?? ''}
+                defaultColor={background}
                 handleColorBgChange={updateBg}
                 showAlpha={true}
                 showTransparency={true}
@@ -75,7 +83,8 @@ export default function EditModeNavBar(  {
             }
 
             {
-              ( currentSection?.type == 'Home') ? 
+              
+              ( currentSection?.ishome ) ? 
                 <div className='w-full grid grid-cols-2 col-span-2 h-fit content-center mt-3'>
                 <RadioButton label={'Show Home Header'} default_value={showHeader} update={updateShowHeader}/>
                 </div>

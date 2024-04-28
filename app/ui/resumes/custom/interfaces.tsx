@@ -16,19 +16,19 @@ export interface UserClient {
     username: string,
     firstname: string,
     lastname: string,
-    photo: string,
     email: string,
     showheader: boolean,
-    photo_profile?: MediaClient
+    url_hero?: string,
+    url_profile?: string
 }
 
 export interface SectionsClient {
     section_id:string,
     name: string,
     created: Date,
-    type: string,
-    backgroundcolor: string,
-    medias: MediaClient[]
+    public:boolean,
+    ishome:boolean,
+    css: string,
     blocks: BlockClient[]|[]
     actions?: {
         addBlock: Function

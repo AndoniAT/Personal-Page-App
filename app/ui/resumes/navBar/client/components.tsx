@@ -172,17 +172,21 @@ export function CreateSectionsLink( {
   sections,
   currentSection
 }:{
-  sections:SectionsNavBar[],
+  sections?:SectionsNavBar[],
   currentSection:SectionsNavBar
 }) {
     //const pathname = usePathname();
     let { username } = useParams();
-    const sectionsObj = sections.map( s => {
-      let current = s.section_id == currentSection.section_id ? true : false;
-      return { name: s.name, href: `/resumes/${username}/${s.section_id}`, icon: Squares2X2Icon, current:current }
-    } );
 
-    const sectionsLinks = sectionsObj.map( section => makeLink( section ) );
+    let sectionsObj:LinkParam[] = [];
+
+    if( sections ) {
+      sectionsObj = sections.map( s => {
+        let current = ( s.section_id == currentSection.section_id );
+        return { name: s.name, href: `/resumes/${username}/${s.section_id}`, icon: Squares2X2Icon, current:current }
+      } );
+    }
+    const sectionsLinks = ( sectionsObj.length > 0 ) ? sectionsObj.map( section => makeLink( section ) ) : [];
     return sectionsLinks;
 }
 

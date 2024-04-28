@@ -2,22 +2,24 @@ import Link from 'next/link';
 import NavLinks from '@/app/ui/resumes/navBar/nav-links';
 import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
 
-import { Section, User } from '../../../lib/definitions'; 
-import AcmeLogo from '@/app/ui/components/acme-logo';
-import { PowerIcon, UserCircleIcon, PencilSquareIcon, ArrowLeftCircleIcon } from '@heroicons/react/24/outline';
+import { Section, User } from '../../../lib/definitions';
+import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { auth, signOut } from '@/auth';
 import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import EditModeNavBar from './editModeNavBar';
 import { MySideNav } from './client/components';
 
-export default async function SideNav( { sections, user, mode, currentSection } : { sections: Section[]|[], user: User|null, mode?: 'edit', currentSection:Section|null } ) {
-
-  const home = sections.find( s => s.type == 'Home' );
+export default async function SideNav( { 
+  sections, user, mode, currentSection 
+} : { 
+  sections: Section[]|[], user?: User, mode?: 'edit', currentSection?:Section 
+} ) {
+  const home = sections.find( s => s.ishome );
   
   if( sections.length == 0 || !user || !currentSection || !home ) {
-    return await createSideNav({ home:null, sections:[], user:null, currentSection:null });
+    return await createSideNav({});
   }
-  
+
   // Other sections
   sections = sections.filter( s => s.section_id != home.section_id ).filter( s => s.public );
 
@@ -37,11 +39,11 @@ export default async function SideNav( { sections, user, mode, currentSection } 
 }
 
 async function createSideNav( paramsSend : {
-  home: SectionsNavBar|null,
-  sections: SectionsNavBar[]|[],
-  user: User|null,
+  home?: SectionsNavBar,
+  sections?: SectionsNavBar[],
+  user?: User,
   mode?: 'edit',
-  currentSection: SectionsNavBar|null
+  currentSection?: SectionsNavBar
 }) {
 
   let { user, mode, currentSection } = paramsSend;
@@ -143,9 +145,7 @@ function constructSection( section:Section ) {
     section_id: section.section_id,
     name: section.name,
     created: section.created,
-    type: section.type,
-    background: {
-      color: section.backgroundcolor
-    }
+    ishome: section.ishome,
+    css: section.css
   }
 }

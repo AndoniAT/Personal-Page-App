@@ -108,7 +108,7 @@ async function createSection( client ) {
             name VARCHAR(255) NOT NULL,
             created TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
             public BOOLEAN DEFAULT TRUE,
-            isHome BOOLEAN DEFAULT FALSE,
+            ishome BOOLEAN DEFAULT FALSE,
             css VARCHAR(255),
             
             resume_id UUID
@@ -424,7 +424,7 @@ async function seedSection( client ) {
             section_id, 
             name, 
             public, 
-            isHome,
+            ishome,
             css,
             
             resume_id )
@@ -432,7 +432,7 @@ async function seedSection( client ) {
             ${section.section_id}, 
             ${section.name},
             ${section.public}, 
-            ${section.isHome},
+            ${section.ishome},
             ${section.css},
 
             ${section.resume_id}

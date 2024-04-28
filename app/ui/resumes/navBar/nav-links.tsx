@@ -4,11 +4,11 @@ import { CreateHomeLink, CreateSectionsLink, EditUserPencilLink, GetUsernameSect
 import { auth } from '@/auth';
 
 interface ParamsProps {
-  home  :SectionsNavBar|null
-  sections:SectionsNavBar[]|[],
+  home?: SectionsNavBar
+  sections?: SectionsNavBar[],
   mode?: 'edit',
-  user: User|null,
-  currentSection:SectionsNavBar|null
+  user?: User,
+  currentSection?: SectionsNavBar
 }
 
 export default async function NavLinks( { params } : Readonly<{ params: ParamsProps }>) {
@@ -40,7 +40,11 @@ export default async function NavLinks( { params } : Readonly<{ params: ParamsPr
         {
           ( currentSection ) ?
             <>
-              { ( home ) ? <CreateHomeLink home={home} current={currentSection.section_id == home.section_id}></CreateHomeLink> : <></>}
+              { 
+                ( home ) ? 
+                  <CreateHomeLink home={home} current={currentSection.section_id == home.section_id}></CreateHomeLink> : <></>
+              }
+
               <CreateSectionsLink sections={sections} currentSection={currentSection}></CreateSectionsLink>
             </>
           

@@ -1,5 +1,5 @@
 import { sql } from '@vercel/postgres';
-import { Section } from '../definitions';
+import { Media, Section } from '../definitions';
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from '../actions';
 import { utapi } from '@/server/uploadthing';
@@ -23,6 +23,22 @@ export async function getSectionByIdForUser(username:string, section_id:string) 
         })
     })
 }
+
+export async function getMediasForUser( user_id: string ) {
+    noStore();
+  
+    try {
+      const medias = await sql`SELECT * FROM MEDIA
+                                WHERE 
+                                user_id = ${user_id}`;
+  
+      return medias.rows as Media[];
+  
+    } catch ( error ) {
+      console.error( 'Failed to fetch medias for user:', error );
+      throw new Error( 'Failed to fetch medias for user.' );
+    }
+  }
 
 export async function changeShowHeader( username:string, show:boolean ) {
     noStore();

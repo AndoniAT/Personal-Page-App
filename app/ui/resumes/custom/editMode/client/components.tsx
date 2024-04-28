@@ -3,7 +3,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showHeaderStyles } from "@/app/ui/cssComponents/styles";
 import Image from "next/image";
-import { MediaClient } from "../../interfaces";
 import clsx from "clsx";
 import { PencilSquareIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
@@ -14,11 +13,12 @@ export function ShowHeader({
     hero,
     user_photo_profile
 }:Readonly<{
-    hero?:MediaClient,
-    user_photo_profile?:MediaClient
+    hero:string,
+    user_photo_profile:string
 }>) {
-    const [heroPhoto, setHeroPhoto] = useState<string>('');
-    const [photoProfile, setPhotoProfile] = useState<string>('');
+    const { username } = useParams();
+    const [heroPhoto, setHeroPhoto] = useState<string>(hero);
+    const [photoProfile, setPhotoProfile] = useState<string>(user_photo_profile);
 
     const paramsUrl = useParams<{ username: string }>()
     const heroInputRef = useRef<HTMLInputElement>(null);
@@ -37,40 +37,42 @@ export function ShowHeader({
         }
     };
 
-    
-    useEffect(() => {
-        if (user_photo_profile?.url && !photoProfile) {
-        setPhotoProfile(user_photo_profile?.url);
-        }
-    }, [photoProfile, user_photo_profile]);
-    
-    useEffect(() => {
-        if (hero && !heroPhoto && hero.url) {
-          setHeroPhoto(hero.url);
-        }
-      }, [heroPhoto, hero]);
+    const changeImage = async ( attr:string ) => {
+      let inputRef = attr == 'url_hero' ? heroInputRef : profileInputRef;
 
-    const handleHeroChange = async () => {
-        if (hero?.update && heroInputRef?.current?.files && heroInputRef.current.files.length > 0) {
-          const formData = new FormData();
-          formData.append('image', heroInputRef.current.files[0]);
-          setLoading(true);
-          let url = await hero?.update(paramsUrl.username, formData)
-          setHeroPhoto(url);
-          setLoading(false);
-        }
-      };
-    
-      const handleProfileChange = async () => {
-        if (user_photo_profile?.update && profileInputRef?.current?.files && profileInputRef.current.files.length > 0) {
-          const formData = new FormData();
-          formData.append('image', profileInputRef.current.files[0]);
-          setLoading(true);
-          let url = await user_photo_profile.update( paramsUrl.username, formData );
-          setPhotoProfile(url);
-          setLoading(false);
-        }
-      };
+      if( inputRef?.current?.files ) {
+        const formData = new FormData();
+       formData.append('image', inputRef.current.files[0]);
+       formData.append('username', username as string );
+       formData.append('attr', attr );
+       setLoading(true);
+  
+       try {
+         let res = await fetch('/api/medias', {
+             method: 'POST',
+             body: formData
+         } );
+         let { url } = await res.json();
+         
+         // Save for user
+         formData.append('url', url);
+         await fetch(`/api/users/${username}/photo`, {
+            method: 'PUT',
+            body: formData
+          } );
+          
+        if( attr == 'url_hero') setHeroPhoto( url );
+        if( attr == 'url_profile') setPhotoProfile( url );
+         setLoading(false);
+       } catch( err ) {
+         console.log('Error', err);
+         setLoading(false);
+       }
+      }
+    }
+
+    const handleHeroChange = async () => changeImage( 'url_hero' );
+    const handleProfileChange = async () => changeImage( 'url_profile' );
 
     return (
         <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
@@ -80,7 +82,8 @@ export function ShowHeader({
                   <div className={clsx({
                     [showHeaderStyles.custom.edit.hover]: !loading,
                     [showHeaderStyles.custom.hero.gral]: true,
-                    [showHeaderStyles.custom.hero.withProfilePhoto]: true
+                    [showHeaderStyles.custom.hero.withProfilePhoto]: true,
+                    [showHeaderStyles.custom.status.loading]: loading
                   })}
                     onClick={handleHeroClick}>
                     {
@@ -153,7 +156,7 @@ export function ShowHeader({
                   }
                 </div>
               </div>
-            </div>
+        </div>
     )
 }
 

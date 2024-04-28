@@ -13,12 +13,14 @@ Readonly<{
   const username = params.username;
   let sections = await getAllUserSections( username );
   const user = await getUserByUsername( username );
-  const home = sections.find( s => s.type == 'Home' );
+  const home = sections.find( s => s.ishome );
 
   return (
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden myBackgroundPage">
-        <SideNav sections={sections} user={user} currentSection={home || null} />
-      <div className="flex-grow p-2 md:overflow-y-auto md:p-3">{children}</div>
+        <SideNav sections={sections} user={user} currentSection={home} />
+      <div className="flex-grow p-2 md:overflow-y-auto md:p-3">{
+        /*children*/
+      }</div>
     </div>
   );
 }

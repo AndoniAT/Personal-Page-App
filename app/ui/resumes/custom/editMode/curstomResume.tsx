@@ -4,13 +4,10 @@ import { BuildBlocksEditMode } from './client/blocks';
 import TrashButton from '../../../components/trash-button';
 import { ButtonPlus, NameEditSectionIcon, ShowHeader } from './client/components';
 import CustomSection from '@/app/ui/components/custom-section';
-import { SectionType } from '@/app/lib/definitions';
 import { revalidateTag } from 'next/cache';
 import { deleteSection } from '@/app/lib/section/actions';
 import { redirect } from 'next/navigation';
-import { PencilIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { customRevalidateTag } from '@/app/lib/actions';
-import {Tooltip} from "@nextui-org/tooltip";
 import { MyTooltip } from '@/app/ui/components/tooltip';
 
 export default function CustomEditView(
@@ -24,8 +21,10 @@ export default function CustomEditView(
   }>) {
     const user = data.user;
     const section = data.section;
-    const hero = section.medias.find(m => m.ishero);
     let blocks = section.blocks as BlockClient[];
+    let css_string = section.css;
+    let css = JSON.parse( css_string );
+    let backgroundColor = css.backgroundColor ?? 'rgba(0,0,0,0)';
 
   let handlerCreateBlock = async () => {
     'use server'
@@ -48,15 +47,15 @@ export default function CustomEditView(
         />
       </div> 
       {
-        <CustomSection style={{ backgroundColor: section.backgroundcolor, minHeight:'90vh' }}
+        <CustomSection style={{ backgroundColor: backgroundColor, minHeight:'90vh' }}
           className={clsx({
             ['w-full']: true,
             ['h-fit pb-10']: true
           })} >
           <div>
             { 
-              ( user.showheader && ( section.type == 'Home' as SectionType ) ) ?
-              <ShowHeader hero={hero} user_photo_profile={user?.photo_profile ?? undefined}/>
+              ( user.showheader && ( section.ishome ) ) ?
+              <ShowHeader hero={user.url_hero ?? ''} user_photo_profile={user.url_profile ?? ''}/>
               : <></>
             }
                 <div>
@@ -75,7 +74,7 @@ export default function CustomEditView(
         </CustomSection>
       }
       {
-        ( section.type != 'Home' as SectionType) ?
+        ( !section.ishome ) ?
         <div className='flex bg-slate-600	fixed bottom-0 w-full'>
           <TrashButton  
           cancel={async () => {

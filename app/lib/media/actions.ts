@@ -10,7 +10,7 @@ import { Media } from '../definitions';
  * @param formData 
  * @returns 
  */
-export async function insertMedia( section_id:string, formData: FormData ) {
+export async function insertMedia( username:string, formData: FormData ) {
     'use server'
     noStore();
   
@@ -19,22 +19,30 @@ export async function insertMedia( section_id:string, formData: FormData ) {
     const image = response[ 0 ].data;
 
     try {
+      let { user_id } = ( await sql`SELECT user_id FROM USERS WHERE username = ${username}`).rows[ 0 ];
+      if(!user_id) throw new Error( 'No found user' );
+
       let inserted = await sql`INSERT INTO MEDIA (
           filename,
           key,
           url,
           size,
           contentType,
-          isHero,
+          user_id
+          )
   
-          section_id,
-          project_id )
-  
-          VALUES ( ${image?.name}, ${image?.key}, ${image?.url}, ${image?.size}, ${image?.type}, FALSE, ${section_id}, null )
-          RETURNING media_id;`;
+          VALUES (
+            ${image?.name}, 
+            ${image?.key}, 
+            ${image?.url}, 
+            ${image?.size}, 
+            ${image?.type}, 
+            ${user_id}
+          )
+          RETURNING url;`;
         
         let media = inserted.rows[ 0 ] as Media;
-        return media.media_id;
+        return media.url;
     } catch ( error:any ) {
       console.error( 'Failed insert media:', error );
       throw new Error( 'Failed insert media:' + error?.message );
