@@ -512,8 +512,7 @@ export function ColorButton({
             handleColorChange( obj );
         }
     }
-    console.log('value', colorDefault)
-    console.log('value HEXA ', rgbaToHex(colorDefault))
+
     return (
         <>
             <span>{title}</span>

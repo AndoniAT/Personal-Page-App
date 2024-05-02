@@ -40,20 +40,22 @@ export type Media = {
 }
 
 export type ScreenType = 'def'|'md'|'lg'|'xl'|'2xl';
+
 export interface Block {
     block_id: string,
     numlines: number,
     numcols: number,
-    defclassName: string,
-    customclassname: string,
-    css: string,
+    defclassname: string,
+    customclassname: string|null,
+    css: string|null,
     
     place: number,
     screen: ScreenType,
     
     section_id: string,
+    block_id_ref: string|null,
 
-    elements?: Element[]
+    elements?: ElementBlock[]
 }
 
 export type ElementType = 'text'|'media'|'linkvideo'|'html';

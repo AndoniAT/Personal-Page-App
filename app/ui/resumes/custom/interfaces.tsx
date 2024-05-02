@@ -1,4 +1,4 @@
-import { Media } from "@/app/lib/definitions"
+import { Block, ElementType, Media, ScreenType } from "@/app/lib/definitions"
 
 export interface MediaClient {
     media_id?: string
@@ -29,10 +29,18 @@ export interface SectionsClient {
     public:boolean,
     ishome:boolean,
     css: string,
-    blocks: BlockClient[]|[]
+    blocks: BlocksScreenClient
     actions?: {
         addBlock: Function
     }
+}
+
+export interface BlocksScreenClient {
+    phone: Block[],
+    md: Block[],
+    lg: Block[],
+    xl: Block[],
+    _2xl: Block[]
 }
 
 export interface BlockClient {
@@ -42,7 +50,13 @@ export interface BlockClient {
     defclassname:string,
     customclassname: string|null,
     css: string|null,
+
+    place:number,
+    screen: ScreenType,
+
     section_id:string,
+    block_id_ref: string|null,
+
     elements:ElementBlockClient[]|[]
     actions?: {
         addElement: Function
@@ -59,9 +73,10 @@ export interface ElementBlockClient {
     customclassname: string|null,
     css: string|null,
     content:string,
-    type:'text'|'media'|'linkvideo'|'html',
+    type:ElementType,
+
     block_id:string,
-    media_id?:string,
+    element_id_ref:string|null,
     actions?: {
         updateElement: Function
         deleteElement: Function

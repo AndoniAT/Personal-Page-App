@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Content1, Content2, Content3 } from "./contents";
+import { MyTooltip } from "../ui/components/tooltip";
 
 export default function Home() {
   const [ content, setContent ] = useState<number>(1);
@@ -33,7 +34,6 @@ export default function Home() {
         : 
         <Content3/>
       }
-
     </main>
   );
 }

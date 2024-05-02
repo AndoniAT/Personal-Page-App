@@ -1,17 +1,16 @@
 'use client'
 
-import { TrashIcon } from "@heroicons/react/24/outline";
 import { MinusCircleIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { AskConfirmation } from "./confirmation-modal";
 import clsx from "clsx";
 
-export default function TrashButton({
-    deleteElement,
+export default function MinusButton({
+    removeElement,
     cancel,
     confirmation
 }: Readonly<{
-    deleteElement:Function,
+    removeElement:Function,
     cancel:Function,
     confirmation? : {
         title:string,
@@ -29,7 +28,7 @@ export default function TrashButton({
 
     let acceptTrash = async () => {
         setLoading(true);
-        await deleteElement();
+        await removeElement();
         cancelTrash();
         setLoading(false);
     }
@@ -42,7 +41,7 @@ export default function TrashButton({
                 })}>
                     {
                         (!loading) ?
-                        <TrashIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer hover:bg-red-300"
+                        <MinusCircleIcon  className="border border-red-100 bg-red-500 self-center w-9 text-zinc-50 rounded border border-gray-600 hover:scale-110 cursor-pointer hover:bg-red-300"
                             onClick={async () => {
                                 if( confirmation ) {
                                     setShowConfirmation(true);

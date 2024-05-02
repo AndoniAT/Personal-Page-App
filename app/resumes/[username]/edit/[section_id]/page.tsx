@@ -4,9 +4,11 @@ import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import CustomEditView from '@/app/ui/resumes/custom/editMode/curstomResume';
 import { requiresSessionUserProperty } from '@/app/lib/actions';
-import { BlockClient } from '@/app/ui/resumes/custom/interfaces';
+import { BlockClient, BlocksScreenClient } from '@/app/ui/resumes/custom/interfaces';
 import { revalidatePath } from 'next/cache';
-import { createElementBlock, createNewBlock, deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
+import { getBlocksSection } from '@/app/lib/section/actions';
+import { createNewBlock } from '@/app/lib/blocks/actions';
+import { createElementInBlock } from '@/app/lib/elements/actions';
 
 export const metadata: Metadata = {
   title: 'Edit User\'s Section',
@@ -27,8 +29,7 @@ export default async function Page(
     const user = await getUserByUsername( username );
 
     let section = await getUserSection( username, section_id );
-
-    let blocks = await getBlocksSection( section.section_id ) as BlockClient[]|[];
+    let blocks = await getBlocksSection( section.section_id ) as BlocksScreenClient;
 
     const createBlockBind = async () => {
       'use server'
@@ -41,48 +42,13 @@ export default async function Page(
     }
 
     // Create function actions for each block (adding or edit an element)
-    blocks = blocks.map( block => {
-      const createElement = async ( type:string, form:FormData ) => {
-        'use server'
-        return new Promise( (resolve, reject) => {
-          createElementBlock.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, form: form, type:type } )
-          .then( () => {
-            resolve(true);
-            revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
-          })
-          .catch( err => {
-            reject( err );
-          });
-        })
-      }
+    for (const [screen, blocksScreen] of Object.entries(blocks)) {
 
-      block.elements = block.elements.map( element => {
-        // Create update function for elements
-        let updateElement = async ( form:FormData ) => {
+      blocksScreen.forEach( ( block:BlockClient ) => {
+        const createElement = async ( type:string, form:FormData ) => {
           'use server'
           return new Promise( (resolve, reject) => {
-            let fn = updateElementBlock;
-    
-            if ( fn ) {
-              fn.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id, form: form } )
-              .then( () => {
-                resolve(true);
-                revalidatePath(`/resumes/${user.username}/edit/${section.section_id}]`);
-              })
-              .catch( err => {
-                reject( err );
-              });
-            } else {
-              reject( 'No function' );
-            }
-  
-          });
-        }
-
-        let deleteElement = async () => {
-          'use server'
-          return new Promise( (resolve, reject) => {
-            deleteElementBlock.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id } )
+            createElementInBlock.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, form: form, type:type } )
             .then( () => {
               resolve(true);
               revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
@@ -90,21 +56,60 @@ export default async function Page(
             .catch( err => {
               reject( err );
             });
-          });
+          })
+        }
+  
+        /*block.elements = block.elements.map( element => {
+          // Create update function for elements
+          let updateElement = async ( form:FormData ) => {
+            'use server'
+            return new Promise( (resolve, reject) => {
+              let fn = updateElementBlock;
+      
+              if ( fn ) {
+                fn.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id, form: form } )
+                .then( () => {
+                  resolve(true);
+                  revalidatePath(`/resumes/${user.username}/edit/${section.section_id}]`);
+                })
+                .catch( err => {
+                  reject( err );
+                });
+              } else {
+                reject( 'No function' );
+              }
+    
+            });
+          }
+  
+          let deleteElement = async () => {
+            'use server'
+            return new Promise( (resolve, reject) => {
+              deleteElementBlock.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id } )
+              .then( () => {
+                resolve(true);
+                revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
+              })
+              .catch( err => {
+                reject( err );
+              });
+            });
+          }
+  
+          element.actions = {
+            updateElement: updateElement,
+            deleteElement: deleteElement
+          }
+          return element;
+        });*/
+  
+        block.actions = {
+          addElement: createElement
         }
 
-        element.actions = {
-          updateElement: updateElement,
-          deleteElement: deleteElement
-        }
-        return element;
-      });
-
-      block.actions = {
-        addElement: createElement
-      }
-      return block;
-    })
+        return block;
+      })
+    }
 
     const sendData = {
       user: {

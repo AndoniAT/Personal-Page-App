@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation';
 import { string, z } from 'zod';
 import { getUserByEmail, getUserByUsername } from '../data';
 import bcrypt from 'bcrypt';
+import { createNewBlock } from '../blocks/actions';
+import { Section } from '../definitions';
 
 const specialCharactersRegex = /^[a-zA-Z0-9]*$/;
 
@@ -138,13 +140,23 @@ export async function createAccount(
         if( resumeInsertId ) {
           let homeName = 'Home';
           let public_section = true;
-          let type = 'Home';
-          let style = '1';
-          let color = '#FFFFFF';
+          let css = {};
 
-          let homeInsert = sql`INSERT INTO SECTION ( name, public, type, style, backgroundColor, resume_id )
-          VALUES ( ${homeName}, ${public_section}, ${type}, ${style}, ${color}, ${resumeInsertId} )`
-
+          let homeInsert = (await sql`INSERT INTO SECTION ( 
+            name, 
+            public, 
+            ishome,
+            css,
+            resume_id )
+          VALUES ( 
+            ${homeName}, 
+            ${public_section},
+            ${true}, 
+            ${JSON.stringify( css )},
+            ${resumeInsertId} 
+          )
+          RETURNING section_id`).rows[ 0 ] as Section
+          await createNewBlock.call({section_id: homeInsert.section_id, username: username })
         }
       }
       

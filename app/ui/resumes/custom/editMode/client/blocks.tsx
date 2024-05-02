@@ -1,16 +1,16 @@
 'use client'
 import { FormEvent, useEffect, useState } from "react";
-import { BlockClient, ElementBlockClient } from "../../interfaces";
+import { BlockClient, BlocksScreenClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
 import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, TextElementType, VideoElementType } from "./modals";
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
-import Image from "next/image";
-import TrashButton from "@/app/ui/components/trash-button";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
 import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
 import { ImageElement } from "@/app/ui/components/image-element";
 import { TextElement } from "@/app/ui/components/text-element";
 import { MyTooltip } from "@/app/ui/components/tooltip";
+import MinusButton from "@/app/ui/components/minus-button";
+import { ButtonPlus } from "./components";
 
 const STEPS = {
   NONE: 0,
@@ -44,16 +44,22 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
     setAllBlocks( blocks );
   }, [ blocks ]);
 
-    return allBlocks.map( ( block:BlockClient ) => {
-
-          let deleteBlock = () => {
-            setLoadingBlock( block.block_id );
-            fetch(`/api/blocks/${block.block_id}` ,
+    return allBlocks.map( ( block_:BlockClient ) => {
+      
+      let actionRow = ( action:string ) => {
+            let formData = new FormData();
+            formData.set('action', action);
+            setLoadingBlock( block_.block_id );
+            fetch(`/api/blocks/${block_.block_id}` ,
               {
-                method: 'DELETE'
+                method: 'PUT',
+                body: formData
               }
-            ).then( () => {
-              let newBlocks = allBlocks.filter( b => b.block_id != block.block_id );
+            ).then( async res => {
+              let { block } = await res.json();
+
+              let newBlocks = allBlocks.map( b => ( b.block_id == block.block_id ) ? block : b );
+
               setAllBlocks( newBlocks );
               setLoadingBlock( '' );
             })
@@ -62,19 +68,32 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
               setLoadingBlock( '' );
             });
           }
+          
+          let removeRow = () => actionRow( 'remove_row' );
+          let addRow = () => actionRow( 'add_row' );
 
           return ( 
             <>
               {
-                ( loadingBlock == block.block_id ) ?
+                ( loadingBlock == block_.block_id ) ?
                 <LoadScreen/>
                 :
-                <div key={`blockContainer${block.block_id}`}>
-                  <Block key={block.block_id} block={block} /> 
-                  <MyTooltip content={'Delete this block'}>
-                      <TrashButton key={`trash_${block.block_id}`} deleteElement={deleteBlock} cancel={() => {}}></TrashButton>
-                  </MyTooltip>
-                </div>
+                <>
+                  <div key={`blockContainer${block_.block_id}`}>
+                    <Block key={block_.block_id} block={block_} /> 
+                    <MyTooltip content={'Remove a row'}>
+                        <MinusButton key={`trash_${block_.block_id}`} removeElement={removeRow} cancel={() => {}}></MinusButton>
+                    </MyTooltip>
+                  </div>
+
+                  <div className='grid grid-cols-12 grid-rows-1 h-20'>
+                    <div className='col-start-6 col-span-2 text-center flex justify-center'>
+                      <MyTooltip content='Add a new row'>
+                        <ButtonPlus handler={addRow}/>
+                      </MyTooltip>
+                    </div>
+                  </div>
+                </>
               }
             </>
         )
@@ -98,12 +117,12 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
       let colfrom = element.colfrom;
   
       let elementSet = false;
-  
+
       // - 1 because of the index in array
       for(let line = linefrom; line <= element.lineto; line++ ) {
         for(let col = colfrom; col <= element.colto; col++ ) {
           let idxLine = line - 1;
-          let idxCol = col-1;
+          let idxCol = col - 1;
           let setInLine = ( totCols * idxLine );
           let setPosition = setInLine + idxCol;
   
@@ -123,7 +142,8 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
     for (let index = 0; index < elementsList.length; index++) {
       if( elementsList[index] == undefined ) {
         let positionTable = index + 1;
-        let line = Math.ceil(positionTable/totLines);
+        //let line = Math.ceil(positionTable/totLines);
+        let line = Math.ceil(positionTable / totCols );
         let col = positionTable - ( totCols * ( line - 1 ) );
         elementsList[index] = <EmptyElement key={index} position={ { line:line, col:col, indexArr: index } } handler={handlerFusion} fusionBlocks={fusionBlocks}/>
       }
@@ -168,6 +188,7 @@ function Block({
         },
         to: fusionElements.to
       }
+
     } else if( fusionElements.from.col == element.col && fusionElements.from.line == element.line ) {
       // Doing nothing (null values)
     } else {
@@ -224,14 +245,18 @@ function Block({
   }
 
   /*grid-rows-50*/
+/*  */
   return ( 
     <>
       <div key={`blk1`} className={`
-      w-full min-h-80 h-fit grid overflow-hidden
-      grid-cols-${totCols/3}
-      xl:grid-cols-${totCols}
-      `}
-    >
+      w-full 
+      h-fit grid overflow-hidden
+      grid-cols-${block.numcols}
+      min-h-20
+      md:min-h-40
+      lg:min-h-60
+      xl:min-h-80
+      `}>
       {
         blockElements
       }
@@ -316,7 +341,12 @@ function EmptyElement({
             onClick={() => {
               handler(position);
             }}
-            />
+            >
+              {
+                  
+              <p>{`l:${position.line} c: ${position.col}`}</p>
+            }
+            </div>
       </MyTooltip>
     </div>
   
@@ -388,19 +418,18 @@ function ElementImageGrid({
   
   const css = getImageCss( element );
 
-  useEffect(() => {
+  /*useEffect(() => {
     fetch(`/api/medias/${element.media_id}`)
     .then( res => res.json() 
     )
     .then( res => {
       let media = res.media as Media
-      console.log('check media', media);
       setImage(media.url);
     })
     .catch( err => {
 
     });
-  }, [ image, element.media_id ] );
+  }, [ image, element.media_id ] );*/
 
   let submitEditImageElementBlock = async function (event: FormEvent<HTMLFormElement>) {
     submitEditElementBlock( event, element );
@@ -528,4 +557,135 @@ async function submitEditElementBlock( event: FormEvent<HTMLFormElement>, elemen
       console.log('Error', err);
     }
   }
+}
+
+export function TabsResponsive({
+  blocks
+}: Readonly<{
+  blocks: BlocksScreenClient
+}>) {
+    const [ active, setActive ] = useState<string>('');
+    const [ loadingBlock, setLoadingBlock ] = useState<string>( '' );
+
+    let blocks_phone = blocks.phone as BlockClient[];
+    let blocks_md = blocks.md as BlockClient[];
+    let blocks_lg = blocks.lg as BlockClient[];
+    let blocks_xl = blocks.xl as BlockClient[];
+    let blocks_2xl = blocks._2xl as BlockClient[];
+
+  return (
+    <>
+      <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400 mb-3">
+        <li className="me-2"
+          onClick={() => setActive('2xl')}
+        >
+          <div className={clsx({
+              ['hidden cursor-not-allowed text-gray-400']:true,
+              ['inline-block p-4 bg-gray-100 rounded-t-lg active']:true,
+              ['dark:bg-gray-800 dark:text-blue-500']:true,
+              ['2xl:cursor-pointer 2xl:block']:true,
+              ['2xl:text-blue-600']: active == '' || active == '2xl',
+              ['text-gray-400']: active != '2xl'
+          }
+          )}>2xl</div>
+        </li>
+        <li className="me-2"
+        onClick={() => setActive('xl')}
+        >
+          <div className={clsx({
+              ['hidden cursor-not-allowed text-gray-400']:true,
+              ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+              ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+              ['xl:cursor-pointer xl:block']:true,
+              ['xl:text-blue-600 2xl:text-gray-400']: active == '' || active == '2xl',
+              ['xl:text-blue-600']: active == 'xl'
+              })
+            }>Xl</div>
+        </li>
+
+        <li className="me-2"
+        onClick={() => setActive('lg')}
+        >
+          <div className={clsx({
+              ['hidden cursor-not-allowed text-gray-400']:true,
+              ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+              ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+              ['lg:cursor-pointer lg:block']:true,
+              ['lg:text-blue-600 xl:text-gray-400']: active == '' || active == 'xl',
+              ['lg:text-blue-600']: active == 'lg'
+              }
+              )}>Large</div>
+        </li>
+        <li className="me-2"
+        onClick={() => setActive('md')}
+        >
+          <div className={clsx({
+              ['hidden cursor-not-allowed text-gray-400']:true,
+              ['inline-block p-4 rounded-t-lg hover:bg-gray-50 ']:true,
+              ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+              ['md:cursor-pointer md:block']:true,
+              ['md:text-blue-600 lg:text-gray-400']: active == '' || active == 'lg',
+              ['md:text-blue-600']: active == 'md'
+              }
+              )}>Medium</div>
+        </li>
+        <li className="me-2"
+        onClick={() => setActive('phone')}
+        >
+          <div className={clsx({
+              ['cursor-not-allowed']:true,
+              ['inline-block p-4 rounded-t-lg hover:bg-gray-50 ']:true,
+              ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+              ['cursor-pointer']:true,
+              ['text-blue-600 md:text-gray-400']: active == '' || active == 'md',
+              ['text-blue-600']: active == 'phone'
+              }
+              )}>Phone</div>
+        </li>
+      </ul>
+
+      <div className="default flex justify-center">
+        <div className={clsx({
+          ['hidden w-full']:true,
+          ['2xl:grid']:active == '' || active == '2xl'
+        })
+        }
+        >
+            <BuildBlocksEditMode blocks={blocks_2xl}/>
+            
+        </div>
+        <div className={clsx({
+            ['hidden 2xl:p-2 2xl:border 2xl:border-2 2xl:border-gray-400 w-full']:true,
+            ['xl:grid 2xl:w-10/12']: active == '' || active == 'xl',
+            ['2xl:hidden']: active != 'xl'
+          })
+          }>
+          <BuildBlocksEditMode blocks={blocks_xl}/>
+        </div>
+        <div className={clsx({
+            ['hidden xl:p-2 xl:border xl:border-2 xl:border-gray-400 w-full']:true,
+            ['lg:grid 2xl:w-8/12 xl:w-10/12']: active == '' || active == 'lg',
+            ['xl:hidden']: active != 'lg',
+          })
+        }>
+            <BuildBlocksEditMode blocks={blocks_lg}/>
+        </div>
+        <div className={clsx({
+          ['hidden lg:p-2 lg:border lg:border-2 lg:border-gray-400 w-full']:true,
+          ['md:grid 2xl:w-6/12 xl:w-8/12 lg:w-10/12']: active == '' || active == 'md',
+          ['lg:hidden']: active != 'md',
+        })}>
+          <BuildBlocksEditMode blocks={blocks_md}/>
+        </div>
+        <div className={clsx({
+            ['p-2 border md:border-2 md:border-gray-400 w-full']:true,
+            ['grid 2xl:w-4/12 xl:w-6/12 lg:w-8/12 md:w-8/12']: active == '' || active == 'phone',
+            ['md:hidden']: active != 'phone',
+          })
+        }>
+          <BuildBlocksEditMode blocks={blocks_phone}/>
+        </div>
+      </div>
+    </>
+  )
 }

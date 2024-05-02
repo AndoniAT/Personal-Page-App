@@ -9,7 +9,7 @@ export async function POST( req: Request, context:any ) {
   noStore();
 
   const { params } = context;
-  const data = await req.formData()
+  const data = await req.formData();
   const image = data.get('image');
   let username = data.get('username') as string;
 

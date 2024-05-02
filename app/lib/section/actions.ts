@@ -1,149 +1,11 @@
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty, requiresSessionUserPropertySection } from '../actions';
 import { getSectionByIdForUser } from '../user/actions';
-import { Block, ElementBlock, FusionElementsBlock, Media, Section } from '../definitions';
+import { Block, ElementBlock, Media, Section } from '../definitions';
 import { sql } from '@vercel/postgres';
-import { insertMedia } from '@/app/lib/media/actions';
 import { utapi } from '@/server/uploadthing';
 
 const fsp = require('fs').promises
-
-const TYPESELEMENT = {
-  text: 'text',
-  media: 'media',
-  linkvideo: 'linkvideo',
-  html: 'html'
-}
-
-export async function createNewBlock(this:{ section_id:string, username:string}) {
-    'use server'
-    noStore();
-    let { section_id, username } = this;
-  
-    try {
-      await requiresSessionUserProperty( username );
-  
-      // Select section
-      let section = await getSectionByIdForUser( username, section_id ) as Section|undefined;
-  
-      if( !section ) {
-        throw new Error( 'Section not found for user' );
-      }
-  
-      // Get the block with the bigger place
-      const defClassName = 'w-full min-h-80 h-fit grid grid-rows-12 grid-cols-12';
-  
-      await sql`INSERT INTO BLOCK(
-        defclassName,
-        section_id
-      ) VALUES ( ${defClassName}, ${section_id} )`
-  
-    } catch( error:any ) {
-      throw new Error( 'Failed to create a block: ' + error?.message );
-    }
-}
-
-export async function createElementBlock(this:{ section_id:string, username:string, block_id:string, form:FormData, type:string } ) {
-  'use server'
-    noStore();
-    let { section_id, username, block_id, form, type } = this;
-    let fusionBlocks = JSON.parse( form.get('fusionBlocks') as string ) as FusionElementsBlock;
-    
-    try {
-      await requiresSessionUserProperty( username );
-      
-      // Select section
-      let section = await getSectionByIdForUser( username, section_id ) as Section|undefined;
-
-      if( !section ) {
-        throw new Error( 'Section not found for user' );
-      }
-
-      if( !fusionBlocks.from || !fusionBlocks.to ) {
-        throw new Error('Not positions given');
-      }
-
-      let positions = {
-        linefrom: Math.min( fusionBlocks.from.line, fusionBlocks.to.line ),
-        lineto: Math.max( fusionBlocks.from.line, fusionBlocks.to.line ),
-        colfrom: Math.min( fusionBlocks.from.col, fusionBlocks.to.col ),
-        colto: Math.max( fusionBlocks.from.col, fusionBlocks.to.col )
-      }
-
-      let newPositionsToOcupe = getOcupedPositions( positions );
-
-      // GET ELEMENTS FOR BLOCK
-      let res = await sql`SELECT * FROM ELEMENT WHERE block_id=${block_id}`;
-      
-      if( res.rowCount > 0 ) {
-        let elements = res.rows as ElementBlock[];
-        let currentOcupedPositions:{line:number, col:number}[] = [];
-        
-        elements.forEach( el => {
-          currentOcupedPositions = [ ...currentOcupedPositions, ...getOcupedPositions( el ) ];
-        } );
-        
-        let Collision = !checkNoCollisionOfElements( newPositionsToOcupe, currentOcupedPositions );
-        if( Collision ) {
-          throw new Error( 'Collision of blocks' );
-        }
-
-      }
-
-      let content = form.get('content') as string;
-      const defClassName = 'h-full';
-      let css = `{}`
-      let media_id = null;
-      switch( type ) {
-        case TYPESELEMENT.text:
-          /*let size = form.get('size') as string;*/
-          css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex", "height": "100%", "width":"100%"}`;
-          break;
-        case TYPESELEMENT.media:
-          /*css = `{"position": "unset", "objectFit": "cover" }`;*/
-          media_id = await insertMedia(section_id, form ) as string;
-          break;
-        case TYPESELEMENT.html:
-          css = `{"height": "100%"}`;
-          break;
-        case TYPESELEMENT.linkvideo:
-          // doing nothing
-          break;
-        default: {
-          throw new Error('Not recognized type');
-        }
-      }
-
-      //const css = `{"fontSize": "${size}rem", "wordWrap": "break-word"}`
-
-      await sql`INSERT INTO ELEMENT(
-        linefrom,
-        lineto,
-        colfrom,
-        colto,
-        defclassname,
-        css,
-        content,
-        type,
-        block_id,
-        media_id
-      ) VALUES ( 
-        ${positions.linefrom}, ${positions.lineto}, 
-        ${positions.colfrom}, ${positions.colto},
-        ${defClassName},
-        ${css},
-        ${content},
-        ${type},
-        ${block_id},
-        ${media_id}
-      )`
-
-    } catch( error:any ) {
-      throw new Error( 'Failed to create the element for block : ' + error?.message );
-    }
-    
-
-}
 
 export async function updateElementBlock(this:{ section_id:string, username:string, block_id:string, element_id:string, form:FormData } ) {
   'use server'
@@ -219,17 +81,28 @@ export async function getBlocksSection( section_id:string ) {
     noStore();
     
     try {
-        let res = await sql`SELECT * FROM BLOCK WHERE section_id = ${section_id}`;
-        let blocks = res.rows as Block[]|[]
+        let phoneBlocks = await getBlocksForScreen( section_id, 'def') as Block[];
+        await setElementsForBlocks( phoneBlocks );
 
-        for (let index = 0; index < blocks.length; index++) {
-          const block = blocks[index];
-         
-            let res = await sql`SELECT * FROM ELEMENT WHERE
-                                    block_id = ${block.block_id}`;
-            block.elements = res.rows as Element[];
-        };
-        return blocks;
+        let mdBlocks = await getBlocksForScreen( section_id, 'md') as Block[];
+        await  setElementsForBlocks( mdBlocks );
+
+        let lgBlocks = await getBlocksForScreen( section_id, 'lg') as Block[];
+        await setElementsForBlocks( lgBlocks );
+
+        let xlBlocks = await getBlocksForScreen( section_id, 'xl') as Block[];
+        await setElementsForBlocks( xlBlocks );
+
+        let _2xlBlocks = await getBlocksForScreen( section_id, '2xl') as Block[];
+        await setElementsForBlocks( _2xlBlocks );
+        
+        return {
+          phone: phoneBlocks,
+          md: mdBlocks,
+          lg: lgBlocks,
+          xl: xlBlocks,
+          _2xl: _2xlBlocks
+        }
 
     } catch( error:any ) {
         throw new Error( 'Failed to find a blocks for section: ' + error?.message );
@@ -284,37 +157,20 @@ export async function changeCssSection( id:string, css_to_change:string ) {
   }
 }
 
-/**
- * 
- */
-function getOcupedPositions( positions:{linefrom:number, lineto:number, colfrom:number, colto:number} ) {
-  let newPositionsToOcupe:{line:number, col:number}[] = [];
-  for (let line = positions.linefrom; line <= positions.lineto; line++) {
-    for (let col = positions.colfrom; col <= positions.colto; col++) {
-      let pos = { line: line, col: col};
-      newPositionsToOcupe.push( pos );
-    }
-  }
-  return newPositionsToOcupe;
+async function setElementsForBlocks( blocks:Block[] ) {
+    for (const block of blocks) {
+      let res = await sql`SELECT * FROM ELEMENT WHERE
+                            block_id = ${block.block_id}`;
+      block.elements = res.rows as ElementBlock[];
+    };
+return blocks;
 }
 
-/**
- * Detect a collition between two elements and avoid to create the block
- * @param element1
- * @param element2
- * @returns 
- */
-function checkNoCollisionOfElements( element1:{line:number, col:number}[], element2:{line:number, col:number}[]) {
-  let accept = true;
-  for (let i = 0; i < element2.length; i++) {
-    let pos = element2[ i ];
-    let collition = element1.some( e => e.line == pos.line && e.col == pos.col );
-    if( collition ) {
-      accept = false;
-      break;
-    }
-  }
-  return accept;
+async function getBlocksForScreen( section_id:string, screen:string ) {
+  return (await sql`
+              SELECT * FROM BLOCK WHERE section_id = ${section_id}
+              AND screen = ${screen}
+              `).rows;
 }
 
 async function updateElementText( block_id:string, element:ElementBlock, form:FormData ) {

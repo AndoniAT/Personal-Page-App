@@ -1,6 +1,6 @@
 import { UserClient, SectionsClient, BlockClient } from '../interfaces'
 import clsx from 'clsx';
-import { BuildBlocksEditMode } from './client/blocks';
+import { TabsResponsive } from './client/blocks';
 import TrashButton from '../../../components/trash-button';
 import { ButtonPlus, NameEditSectionIcon, ShowHeader } from './client/components';
 import CustomSection from '@/app/ui/components/custom-section';
@@ -21,77 +21,79 @@ export default function CustomEditView(
   }>) {
     const user = data.user;
     const section = data.section;
-    let blocks = section.blocks as BlockClient[];
+
     let css_string = section.css;
     let css = JSON.parse( css_string );
     let backgroundColor = css.backgroundColor ?? 'rgba(0,0,0,0)';
 
-  let handlerCreateBlock = async () => {
-    'use server'
-    await section?.actions?.addBlock();
-    revalidateTag('edit');
-  }
+    let handlerCreateBlock = async () => {
+      'use server'
+      await section?.actions?.addBlock();
+      revalidateTag('edit');
+    }
 
-  let deleteThisSection = async () => {
-    'use server'
-    await deleteSection( section.section_id );
-    redirect(`/resumes/${user.username}/`);
-  }
+    let deleteThisSection = async () => {
+      'use server'
+      await deleteSection( section.section_id );
+      redirect(`/resumes/${user.username}/`);
+    }
 
-  return (
-    <div>
-      <div className='flex bg-slate-600	flex justify-center'>
-        <NameEditSectionIcon
-          section={ { section_id: section.section_id, name:section.name } }
-          customRevalidateTag={customRevalidateTag}
-        />
-      </div> 
-      {
-        <CustomSection style={{ backgroundColor: backgroundColor, minHeight:'90vh' }}
-          className={clsx({
-            ['w-full']: true,
-            ['h-fit pb-10']: true
-          })} >
-          <div>
-            { 
-              ( user.showheader && ( section.ishome ) ) ?
-              <ShowHeader hero={user.url_hero ?? ''} user_photo_profile={user.url_profile ?? ''}/>
-              : <></>
-            }
-                <div>
-                  {
-                      <BuildBlocksEditMode blocks={blocks}/>
-                  }
-                </div>
-          </div>
-          <div className='grid grid-cols-12 grid-rows-1 h-20'>
-            <div className='col-start-6 col-span-2 text-center flex justify-center'>
-                <MyTooltip content='Create a new block'>
-                    <ButtonPlus handler={handlerCreateBlock}/>
-                </MyTooltip>
-            </div>
-          </div>
-        </CustomSection>
-      }
-      {
-        ( !section.ishome ) ?
-        <div className='flex bg-slate-600	fixed bottom-0 w-full'>
-          <TrashButton  
-          cancel={async () => {
-            'use server'
-          }} 
-          deleteElement={ deleteThisSection }
-          confirmation={{
-            title:'Delete Section',
-            question:'Are you sure you want to delete this section?'
-          }}/> 
-          <p className='mt-3 flex items-center text-white'>
-            Delete Section
-          </p>
+    return (
+      <div>
+        <div className='flex bg-slate-600	flex justify-center'>
+          <NameEditSectionIcon
+            section={ { section_id: section.section_id, name:section.name } }
+            customRevalidateTag={customRevalidateTag}
+          />
         </div> 
-        : <></>
-        
-      }
-    </div>
-  );
+        {
+          <CustomSection style={{ backgroundColor: backgroundColor, minHeight:'90vh' }}
+            className={clsx({
+              ['w-full']: true,
+              ['h-fit pb-10']: true
+            })} >
+            <div>
+              { 
+                ( user.showheader && ( section.ishome ) ) ?
+                <ShowHeader hero={user.url_hero ?? ''} user_photo_profile={user.url_profile ?? ''}/>
+                : <></>
+              }
+                  <div>
+                    <TabsResponsive blocks={section.blocks}/>
+                  </div>
+            </div>
+            {
+              /*
+              <div className='grid grid-cols-12 grid-rows-1 h-20'>
+                <div className='col-start-6 col-span-2 text-center flex justify-center'>
+                    <MyTooltip content='Add a new row'>
+                        <ButtonPlus handler={handlerCreateBlock}/>
+                    </MyTooltip>
+                </div>
+              </div>
+              */
+            }
+          </CustomSection>
+        }
+        {
+          ( !section.ishome ) ?
+          <div className='flex bg-slate-600	fixed bottom-0 w-full'>
+            <TrashButton  
+            cancel={async () => {
+              'use server'
+            }} 
+            deleteElement={ deleteThisSection }
+            confirmation={{
+              title:'Delete Section',
+              question:'Are you sure you want to delete this section?'
+            }}/> 
+            <p className='mt-3 flex items-center text-white'>
+              Delete Section
+            </p>
+          </div> 
+          : <></>
+          
+        }
+      </div>
+    );
 }

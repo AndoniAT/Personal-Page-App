@@ -45,7 +45,7 @@ async function createUsers( client ) {
           url_profile VARCHAR(255)
           );
           `;
-  
+
       console.log( `Created "USERS" table` );
 
       return createTable;
@@ -214,7 +214,8 @@ async function createBlock( client ) {
           place INT,
           screen type_screen,
 
-          section_id UUID NOT NULL
+          section_id UUID NOT NULL,
+          block_id_ref UUID
         );
       `;
       console.log( `Created "BLOCK" table` );
@@ -248,7 +249,7 @@ async function createElement( client ) {
           type type_element,
 
           block_id UUID NOT NULL,
-          element_id_ref UUID NOT NULL
+          element_id_ref UUID
         );
       `;
       console.log( `Created "ELEMENT" table` );
@@ -301,7 +302,8 @@ async function createForeignKeys( client ) {
     
     // BLOCK
     await client.sql`ALTER TABLE BLOCK
-      ADD CONSTRAINT fk_block_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
+      ADD CONSTRAINT fk_block_section FOREIGN KEY (section_id) REFERENCES SECTION(section_id) ON UPDATE CASCADE ON DELETE CASCADE,
+      ADD CONSTRAINT fk_block_block_ref FOREIGN KEY (block_id_ref) REFERENCES BLOCK(block_id) ON UPDATE CASCADE ON DELETE CASCADE;`;
 
     // ELEMENT
     await client.sql`ALTER TABLE ELEMENT
@@ -419,7 +421,7 @@ async function seedSection( client ) {
         
           SECTION.map( async ( section ) => {
 
-          return client.sql`
+          let { section_id } = (await client.sql`
           INSERT INTO SECTION ( 
             section_id, 
             name, 
@@ -437,13 +439,20 @@ async function seedSection( client ) {
 
             ${section.resume_id}
           )
-          ON CONFLICT ( section_id ) DO NOTHING;
-        `;
-        } ),
-      );
-  
+          RETURNING section_id;
+        `).rows[ 0 ];
+
+        let { block_id } = await insertBlock( section_id, undefined, 'def', 12, 4, client );
+        await insertBlock( section_id, block_id, 'md', 12, 6, client );
+        await insertBlock( section_id, block_id, 'lg', 12, 8, client );
+        await insertBlock( section_id, block_id, 'xl', 12, 10, client );
+        await insertBlock( section_id, block_id, '2xl', 12, 12, client );
+        
+        
+      } ),
+    );
+    
       console.log( `Seeded : ${insertedSections.length} sections` );
-  
       return {
         users: insertedSections,
       };
@@ -511,4 +520,25 @@ async function seedSocialMediaUser( client ) {
         console.error( 'Error seeding social medias:', error );
         throw error;
       }
+}
+
+async function insertBlock( section_id, block_id, screen, lines, cols, client ) {
+  let defClassName = `w-full h-fit`;
+
+  return (await client.sql`INSERT INTO BLOCK(
+    numlines,
+    numcols,
+    defclassName,
+    screen,
+    section_id,
+    block_id_ref
+    ) VALUES ( 
+      ${lines}, 
+      ${cols},
+      ${defClassName}, 
+      ${screen},
+      ${section_id},
+      ${block_id}
+    )
+    RETURNING block_id`).rows[ 0 ];
 }

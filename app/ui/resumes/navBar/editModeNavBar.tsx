@@ -20,7 +20,7 @@ export default function EditModeNavBar(  {
     {
     let { currentSection, user } = data;
     let css = currentSection?.css ? JSON.parse( currentSection.css ) : {};
-    let background = css.backgoroundColor;
+    let background = css.backgroundColor;
 
 
     let updateBg = async ( newColor:string ) => {
@@ -28,7 +28,7 @@ export default function EditModeNavBar(  {
       if( currentSection ) {
         let css_send = {
           ...css,
-          backgoroundColor: newColor
+          backgroundColor: newColor
         }
 
         await changeCssSection( currentSection.section_id, JSON.stringify( css_send ) )
