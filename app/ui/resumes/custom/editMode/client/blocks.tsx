@@ -565,7 +565,6 @@ export function TabsResponsive({
   blocks: BlocksScreenClient
 }>) {
     const [ active, setActive ] = useState<string>('');
-    const [ loadingBlock, setLoadingBlock ] = useState<string>( '' );
 
     let blocks_phone = blocks.phone as BlockClient[];
     let blocks_md = blocks.md as BlockClient[];
@@ -611,7 +610,7 @@ export function TabsResponsive({
               ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['lg:cursor-pointer lg:block']:true,
-              ['lg:text-blue-600 xl:text-gray-400']: active == '' || active == 'xl',
+              ['lg:text-blue-600 xl:text-gray-400']: active == '' || active == 'xl' || active == '2xl',
               ['lg:text-blue-600']: active == 'lg'
               }
               )}>Large</div>
@@ -624,7 +623,7 @@ export function TabsResponsive({
               ['inline-block p-4 rounded-t-lg hover:bg-gray-50 ']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['md:cursor-pointer md:block']:true,
-              ['md:text-blue-600 lg:text-gray-400']: active == '' || active == 'lg',
+              ['md:text-blue-600 lg:text-gray-400']: active == '' || active == 'lg' || active == 'xl' || active == '2xl',
               ['md:text-blue-600']: active == 'md'
               }
               )}>Medium</div>
@@ -637,7 +636,7 @@ export function TabsResponsive({
               ['inline-block p-4 rounded-t-lg hover:bg-gray-50 ']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['cursor-pointer']:true,
-              ['text-blue-600 md:text-gray-400']: active == '' || active == 'md',
+              ['text-blue-600 md:text-gray-400']: active == '' || active == 'md' || active == 'lg' || active == 'xl' || active == '2xl',
               ['text-blue-600']: active == 'phone'
               }
               )}>Phone</div>
@@ -652,35 +651,38 @@ export function TabsResponsive({
         }
         >
             <BuildBlocksEditMode blocks={blocks_2xl}/>
-            
         </div>
         <div className={clsx({
             ['hidden 2xl:p-2 2xl:border 2xl:border-2 2xl:border-gray-400 w-full']:true,
-            ['xl:grid 2xl:w-10/12']: active == '' || active == 'xl',
-            ['2xl:hidden']: active != 'xl'
+            ['xl:grid 2xl:hidden']: active == '' || active == '2xl',
+            ['xl:grid 2xl:w-10/12']: active == 'xl',
+            /*['2xl:hidden']: active != 'xl'*/
           })
           }>
           <BuildBlocksEditMode blocks={blocks_xl}/>
         </div>
         <div className={clsx({
             ['hidden xl:p-2 xl:border xl:border-2 xl:border-gray-400 w-full']:true,
-            ['lg:grid 2xl:w-8/12 xl:w-10/12']: active == '' || active == 'lg',
-            ['xl:hidden']: active != 'lg',
+            ['lg:grid xl:hidden']: active == '' || active == 'xl' || active == '2xl',
+            ['lg:grid 2xl:w-8/12 xl:w-10/12']: active == 'lg',
+            /*['xl:hidden']: active != 'lg',*/
           })
         }>
             <BuildBlocksEditMode blocks={blocks_lg}/>
         </div>
         <div className={clsx({
           ['hidden lg:p-2 lg:border lg:border-2 lg:border-gray-400 w-full']:true,
-          ['md:grid 2xl:w-6/12 xl:w-8/12 lg:w-10/12']: active == '' || active == 'md',
-          ['lg:hidden']: active != 'md',
+          ['md:grid lg:hidden']: active == '' || active == 'lg' || active == 'xl' || active == '2xl',
+          ['md:grid 2xl:w-6/12 xl:w-8/12 lg:w-10/12']: active == 'md',
+          /*['lg:hidden']: active != 'md',*/
         })}>
           <BuildBlocksEditMode blocks={blocks_md}/>
         </div>
         <div className={clsx({
             ['p-2 border md:border-2 md:border-gray-400 w-full']:true,
-            ['grid 2xl:w-4/12 xl:w-6/12 lg:w-8/12 md:w-8/12']: active == '' || active == 'phone',
-            ['md:hidden']: active != 'phone',
+            ['grid md:hidden']: active == '' || active == 'md' || active == 'lg' || active == 'xl' || active == '2xl',
+            ['grid 2xl:w-4/12 xl:w-6/12 lg:w-8/12 md:w-8/12']: active == 'phone',
+            /*['md:hidden']: active != 'phone',*/
           })
         }>
           <BuildBlocksEditMode blocks={blocks_phone}/>

@@ -62,17 +62,6 @@ export default function CustomEditView(
                     <TabsResponsive blocks={section.blocks}/>
                   </div>
             </div>
-            {
-              /*
-              <div className='grid grid-cols-12 grid-rows-1 h-20'>
-                <div className='col-start-6 col-span-2 text-center flex justify-center'>
-                    <MyTooltip content='Add a new row'>
-                        <ButtonPlus handler={handlerCreateBlock}/>
-                    </MyTooltip>
-                </div>
-              </div>
-              */
-            }
           </CustomSection>
         }
         {
