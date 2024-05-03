@@ -133,8 +133,8 @@ export async function PUT( req: Request, context:any) {
                   SET numlines = ${numlines}
                   WHERE block_id = ${block_id}`;
 
-  let block_return = (await sql`SELECT * FROM BLOCK where block_id = ${block_id}`).rows[ 0 ];
-
+  let block_return = (await sql`SELECT * FROM BLOCK where block_id = ${block_id}`).rows[ 0 ] as Block;
+  await setElementsForBlocks( [ block_return ] );
   return NextResponse.json({
     block: block_return,
 }, {
@@ -142,13 +142,11 @@ export async function PUT( req: Request, context:any) {
   });
 }
 
-async function verifyUserForBlock( block_id:string ) {
-  return (await sql`SELECT username FROM USERS
-    WHERE user_id IN(SELECT user_id FROM RESUME
-      WHERE resume_id IN( SELECT resume_id FROM SECTION
-        WHERE section_id IN (SELECT section_id FROM BLOCK
-          WHERE block_id = ${block_id}
-        )
-      )
-    )`).rows[0];
+async function setElementsForBlocks( blocks:Block[] ) {
+  for (const block of blocks) {
+    let res = await sql`SELECT * FROM ELEMENT WHERE
+                          block_id = ${block.block_id}`;
+    block.elements = res.rows as ElementBlock[];
+  };
+return blocks;
 }

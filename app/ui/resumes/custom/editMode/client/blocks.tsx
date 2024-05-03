@@ -67,12 +67,12 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
               console.log(err);
               setLoadingBlock( '' );
             });
-          }
+      }
           
-          let removeRow = () => actionRow( 'remove_row' );
-          let addRow = () => actionRow( 'add_row' );
+      let removeRow = () => actionRow( 'remove_row' );
+      let addRow = () => actionRow( 'add_row' );
 
-          return ( 
+      return ( 
             <>
               {
                 ( loadingBlock == block_.block_id ) ?
@@ -97,7 +97,7 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
               }
             </>
         )
-        })
+      })
 }
   
   /**
