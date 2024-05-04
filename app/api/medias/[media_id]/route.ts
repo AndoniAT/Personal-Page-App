@@ -16,4 +16,4 @@ export async function GET( request: Request, context:any) {
     return NextResponse.json({
       media: media
     });
-  }
+}

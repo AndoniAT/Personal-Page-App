@@ -52,34 +52,28 @@ async function createSideNav( paramsSend : {
   
   let isUsersSessionProfile = !( !session || session.user?.email != user?.email);
 
-  let visualModeNavBar = () => {
-    return (
-      <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='hidden md:block'>
-        <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
-          <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
-          <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
-            Edit mode
-          </span>
-        </div>
-      </Link>
-    );
-  }
-
-  let editModeNavBar = () => {
-    if( user ) {
-      return <EditModeNavBar data={ { user:user, currentSection: currentSection } }></EditModeNavBar>
-    } else {
-      return <></>
-    }
-  };
-
   return (
       <MySideNav>
         <NavLinks params={paramsSend}/>
         { // Edit or visual section mode 
           (isUsersSessionProfile) ? 
           ( 
-            (mode == 'edit') ? editModeNavBar() : visualModeNavBar()
+            (mode == 'edit' && user ) ? 
+                //Edit mode
+                <EditModeNavBar data={ { 
+                    user:user, 
+                    currentSection: currentSection
+                  } }></EditModeNavBar> 
+              :
+                // VISUAL MODE
+                <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='hidden md:block'>
+                  <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
+                    <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
+                    <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
+                      Edit mode
+                    </span>
+                  </div>
+                </Link>
           )
           :
           <></>

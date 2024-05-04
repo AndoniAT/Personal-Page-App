@@ -1,17 +1,33 @@
-import { NextResponse } from "next/server";
+import { requiresSessionUserProperty } from '@/app/lib/actions';
+import { Media } from '@/app/lib/definitions';
+import { insertMedia } from '@/app/lib/media/actions';
 import { unstable_noStore as noStore } from 'next/cache';
-import { requiresSessionUserProperty } from "@/app/lib/actions";
-import { sql } from "@vercel/postgres";
-import { Section } from "@/app/lib/definitions";
-import { insertMedia } from "@/app/lib/media/actions";
+import { sql } from '@vercel/postgres';
+import { NextResponse } from 'next/server';
+
+export async function GET( request: Request, context:any) {
+    noStore();
+    let { params } = context;
+    let { username } = params;
+
+    let res = await sql`SELECT * FROM MEDIA 
+                        WHERE user_id IN (SELECT user_id FROM USERS 
+                            WHERE username = ${username}
+                        )`;
+
+    let medias = res.rows as Media[];
+
+    return NextResponse.json({
+      medias: medias
+    });
+}
 
 export async function POST( req: Request, context:any ) {
   noStore();
-
   const { params } = context;
+  let { username } = params;
   const data = await req.formData();
   const image = data.get('image');
-  let username = data.get('username') as string;
 
     if( !username || !image) {
         throw new Error( 'Some params are missing' );

@@ -20,6 +20,8 @@ const config: Config = {
   },
   /*safelist: [{ pattern: /./ }],*/
   safelist: ['w-full', 'min-h-80', 'h-fit', 'grid', 'grid-rows-12', 'grid-cols-12', 'h-full', 
+  ...Array.from({ length: 97 }, (_, i) => `w-${i}`),  
+  ...Array.from({ length: 97 }, (_, i) => `p-${i}`),
   {
     pattern: /grid-cols-(1|2|3|4|5|6|7|8|9|10|11|12)/,
     variants: ['sm', 'lg', 'xl', '2xl'],

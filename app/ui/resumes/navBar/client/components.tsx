@@ -1,15 +1,20 @@
 "use client"
-
 import { SectionsNavBar } from "@/app/resumes/[username]/interfaces";
-import { ArrowDownCircleIcon, ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowUpCircleIcon, ClipboardDocumentCheckIcon, HomeIcon, PencilSquareIcon, PlusCircleIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import { ArrowDownCircleIcon, ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowUpCircleIcon, ClipboardDocumentCheckIcon, EyeIcon, HomeIcon, 
+  PencilSquareIcon, PhotoIcon, PlusCircleIcon, Squares2X2Icon,
+  ArrowPathIcon, ArrowUpOnSquareIcon
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreateSectionModal } from "./modals";
-import { useDebouncedCallback } from "use-debounce";
-import { LoadScreen } from "@/app/ui/components/loading-modal";
+import { Media } from "@/app/lib/definitions";
+import Image from "next/image";
+import TrashButton from "@/app/ui/components/trash-button";
+import emitter from "@/app/ui/emiter";
 import AcmeLogo from "@/app/ui/components/acme-logo";
+import { ColorButtons } from "../../custom/editMode/client/customButtons";
 
 interface LinkParam {
     name: string,
@@ -22,8 +27,44 @@ interface MySideNavProps extends React.AllHTMLAttributes<HTMLAllCollection> {
   children: React.ReactNode;
 }
 
+interface MyEditSideNavProps extends React.AllHTMLAttributes<HTMLAllCollection> {
+  children: React.ReactNode, 
+  currentSection: SectionsNavBar,
+  customRevalidateTag: Function,
+  updateBg: Function,
+  showHeader: boolean,
+  updateShowHeader: Function
+}
+
 export function MySideNav({ children, className, ...rest }: Readonly<MySideNavProps>) {
   const [ show, setShow ] = useState<boolean>(true);
+
+  const changeShow = () => {
+    let newShow = !show;
+    emitter.emit('side_nav', newShow ? 'open' : 'close');
+    setShow(newShow);
+  }
+
+  // Gallery listener
+  useEffect(() => {
+    const gallery_event = ( message:string ) => {
+      let newShow = message == 'open';
+      setShow( newShow );
+
+      if( !newShow ) {
+        // If the gallery closes, reopen the menu
+        setTimeout(() => {
+          setShow(true);
+        }, 600);
+      }
+    };
+
+    emitter.on( 'gallery', gallery_event );
+
+    return () => {
+      emitter.off( 'gallery', gallery_event );
+    };
+  }, []);
 
   return (
       <div
@@ -34,7 +75,7 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
           [ 'h-5 md:h-full md:w-5']: !show,
         })
         }>
-
+        
         <div className="md:hidden relative w-full flex items-center justify-center font-bold	block md:hidden">
             {
               show ?
@@ -46,9 +87,7 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
                   
                 }
               style={{top: '40px', right:'25px'}}
-              onClick={() => {
-                setShow(!show);
-              }}
+              onClick={changeShow}
               />
               :
               <ArrowDownCircleIcon className={`
@@ -59,9 +98,7 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
                   
                 }
               style={{top: '10px', right:'25px'}}
-              onClick={() => {
-                setShow(!show);
-              }}
+              onClick={changeShow}
               />
 
             }
@@ -74,30 +111,29 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
                   w-7 h-7 absolute right-0 cursor-pointer hover:scale-125
                   stroke-slate-200 bg-slate-500
                   rounded-full
+                  z-40
                   `
                   
                 }
               style={{top: '50vh', right:'-13'}}
-              onClick={() => {
-                setShow(!show);
-              }}
+              onClick={changeShow}
               />
               :
               <ArrowRightCircleIcon className={`
                   w-7 h-7 absolute right-0 cursor-pointer hover:scale-125
                   stroke-slate-200 bg-slate-500
                   rounded-full
+                  z-50
                   `
                   
                 }
               style={{top: '50vh', right:'-13'}}
-              onClick={() => {
-                setShow(!show);
-              }}
+              onClick={changeShow}
               />
 
             }
         </div>
+
         <div className="flex h-full flex-col px-3 py-4 md:px-2">
             {
               ( show ) ?
@@ -129,6 +165,335 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
         </div>
           
       </div>
+  )
+}
+
+export function MyEditSideNav({ 
+  children, 
+  currentSection,
+  customRevalidateTag,
+  updateBg,
+  showHeader,
+  updateShowHeader,
+  className, ...rest 
+}: Readonly<MyEditSideNavProps>) 
+{
+  let [ openInNavBar, setOpenInNavBar ] = useState<string>('menu');
+
+  let { username } = useParams();
+  let link = ( currentSection?.ishome ) ? `/resumes/${username}` : `/resumes/${username}/${currentSection?.section_id}`
+
+  let css = currentSection?.css ? JSON.parse( currentSection.css ) : {};
+  let background = css.backgroundColor;
+
+  return (
+    <>
+    {
+      <div style={{display: 'inline-flex', justifyContent: 'space-between'}}>
+        <div className={clsx({
+          [ 'transition-all duration-500 ease-out'] : true,
+          [ 'w-full -ml-0']: openInNavBar == 'menu',
+          [ '-ml-[200%]' ] : openInNavBar != 'menu'
+        })}>
+            <Link href={link}>
+              <div className='flex content-center gap-2 cursor-pointer'>
+                <EyeIcon className='w-5 stroke-slate-700 dark:stroke-white'/> 
+                <span className={`
+                  inline-block align-middle h-fit content-center place-self-center m-l-10
+                  text-black
+                  dark:text-white
+                  `}>
+                  Visual mode
+                </span>
+              </div>
+            </Link>
+            <div className="mt-5" onClick={() => setOpenInNavBar( 'Gallery' )} >
+              <div className='flex content-center gap-2 cursor-pointer'>
+                <PhotoIcon className='w-5 stroke-slate-700 dark:stroke-white'/> 
+                <span className={`
+                  inline-block align-middle h-fit content-center place-self-center m-l-10
+                  text-black
+                  dark:text-white
+                  `}>
+                  Open Gallery
+                </span>
+              </div>
+            </div>
+            <div className=' w-full mt-5 pt-1 border-t border-t-gray-300 '>
+              <div className="flex flex-col">
+                {
+                  <div className='w-full grid grid-cols-1 col-span-2 h-fit mb-2'>
+                    
+                    <ColorButtons
+                    title='Background'
+                    defaultColor={background}
+                    handleColorBgChange={updateBg}
+                    showAlpha={true}
+                    showTransparency={true}
+                    vertical={true}
+                    />
+                  </div>
+                }
+
+                {
+                <div className='w-full grid grid-cols-2 col-span-2 h-fit content-center mt-3'>
+                  <CreateButtonNewSection customRevalidateTag={customRevalidateTag}  label={'New Section'}/>
+                </div>
+                }
+
+                {
+                  
+                  ( currentSection?.ishome ) ? 
+                    <div className='w-full grid grid-cols-2 col-span-2 h-fit content-center mt-3'>
+                    <RadioButton label={'Show Home Header'} default_value={showHeader} update={updateShowHeader}/>
+                    </div>
+                  :<></>
+                }
+
+              </div>
+            </div>
+        </div>
+        {
+          ( openInNavBar != 'menu') ? 
+          <>
+            <Gallery close={() => setOpenInNavBar( 'menu' ) }/>
+          </>
+          :
+          <></>
+
+        }
+      </div>
+    }
+    </>
+  )
+}
+
+export function Gallery({
+  close,
+  pick
+}: Readonly<{
+  close?:Function,
+  pick?:Function
+}>) {
+  let { username } = useParams();
+  let [ medias, setMedias ] = useState<Media[]>([]);
+  let [ loading, setLoading ] = useState<boolean>(true);
+  const addImageInputRef = useRef<HTMLInputElement>(null);
+  let [ show, setShow ] = useState<boolean>(true);
+  
+  const addImage = async () => {
+    let inputRef = addImageInputRef;
+
+    if( inputRef?.current?.files ) {
+      const formData = new FormData();
+     formData.append('image', inputRef.current.files[0]);
+     setLoading(true);
+
+     try {
+       let res = await fetch(`/api/users/${username}/medias`, {
+           method: 'POST',
+           body: formData
+       } );
+       let { url } = await res.json();
+       refreshMedias();
+     } catch( err ) {
+       console.log('Error', err);
+       setLoading(false);
+     }
+    }
+  }
+
+  const deleteImage = async ( id:string ) => {
+    setLoading(true);
+    try {
+      console.log('calling delete', id);
+      await fetch(`/api/users/${username}/medias/${id}`, {
+          method: 'DELETE'
+      } );
+      refreshMedias();
+    } catch( err ) {
+      console.log('Error', err);
+      setLoading(false);
+    }
+  };
+
+  const handleAddImageClick = () => {
+    if ( addImageInputRef.current && !loading ) {
+      addImageInputRef.current.click();
+    }
+  };
+
+  let refreshMedias = async () => {
+    setLoading( true );
+    let { medias } = await (await fetch(`/api/users/${username}/medias`)).json();
+    console.log('check medias', medias);
+    setMedias( medias );
+    setLoading( false );
+  }
+
+  useEffect(() => {
+    if( medias.length == 0 && loading ) {
+      refreshMedias();
+    }
+  })
+  
+  // Nav bar listener
+  useEffect(() => {
+    const side_nav_event = ( message:string ) => {
+      let newShow = message == 'open';
+      setShow( newShow );
+
+      if( !newShow && close ) {
+        close();
+        emitter.emit('gallery', 'close' );
+      }
+    };
+
+    emitter.on( 'side_nav', side_nav_event );
+
+    return () => {
+      emitter.off( 'side_nav', side_nav_event );
+    };
+  }, []);
+
+  useEffect(() => {
+    if( show ) {
+      emitter.emit('gallery', 'open' );
+    }
+  }, [ show ] );
+
+  return (
+    <>
+      {
+        (show) ? 
+        <div id='gallery-images' className={clsx({
+          [ 'transition-all duration-500 ease-out'] : true,
+          [ 'fixed bottom-[7%] left-0 h-[88px] w-[20%]']: true,
+          [ 'block -mt-[70%]']: true,
+          [ 'w-full md:w-60 lg:w-72 2xl:w-80' ]: true,
+          ['min-h-[93%] max-h-[93%] overflow-y-auto']:true,
+          ["h-full p-1"]:true,
+          ["bg-slate-300 dark:bg-gray-700"]:true
+          /*[ '-ml-[200%] hidden' ] : openInNavBar == 'menu'*/
+        })}
+        >
+    
+          <div className={clsx({
+            
+          })}>
+            {
+              (close) ?
+              <div className="mt-5" onClick={()=> close() } >
+                    <div className='flex content-center gap-2 cursor-pointer'>
+                      <PhotoIcon className='w-5 stroke-slate-700 dark:stroke-white'/> 
+                      <span className={`
+                        inline-block align-middle h-fit content-center place-self-center m-l-10
+                        text-black
+                        dark:text-white
+                        `}>
+                        Return to menu
+                      </span>
+                    </div>
+              </div>
+              :
+              <></>
+            }
+                  <div className={clsx({
+                    ["mt-3 cursor-pointer w-fit"]:true,
+                    ['animate-spin']: loading
+                  })} onClick={() => refreshMedias() }>
+                    <ArrowPathIcon className='w-5 stroke-slate-700 dark:stroke-white'/> 
+                  </div>
+    
+                <div className="addImageToGallery flex justify-center"
+                onClick={handleAddImageClick}>
+                  <div className={
+                        `h-10 w-10 rounded-xl p-1 bg-gray-300 border border-slate-900 cursor-pointer m-2
+                        flex
+                        justify-center
+                        bg-gray-700
+                        dark:bg-slate-300
+                        hover:scale-105
+                        `
+                      }>
+                        {
+                          (!loading) ? 
+                          <ArrowUpOnSquareIcon className='w-5 stroke-slate-300 dark:stroke-slate-700'/> 
+                          :
+                          <div className={clsx({
+                            ['animate-spin']:true
+                          })}>
+                            <ArrowPathIcon className='w-full stroke-slate-200 dark:stroke-slate-700 dark:stroke-white'/> 
+                          </div>
+    
+                        }
+                    </div>
+                    <input
+                          ref={addImageInputRef}
+                          type="file"
+                          id="addImageGalleryInput"
+                          name="addImageGalleryInput"
+                          required
+                          onChange={addImage}
+                          style={{ display: 'none' }}
+                        />
+                </div>
+    
+                <div className={`sectionGallery flex flex-wrap justify-center`}>
+                  {
+                    ( medias.length> 0 ) ?
+                    medias.map( media => {
+    
+                    return (
+                      <div className={
+                        `h-fit w-fit rounded-xl p-1 bg-gray-300 border border-slate-900 m-2
+                        bg-gray-700
+                        dark:bg-slate-300
+                        `
+                      }>
+                        <div className={'image-container rounded-xl overflow-hidden hover:scale-105 h-24 w-24 cursor-pointer'}
+                        style={{height: '6rem', width:'6rem'}}
+                        onClick={() => { 
+                          if( pick ) pick( media.url )
+                        }}
+                        >
+                          <Image
+                            src={media.url}
+                                  layout='fill'
+                                  alt="img"
+                                  className={'h-20 w-20'}
+                                />
+                        </div>
+                        <div className="w-full h-fit flex justify-center">
+                            <TrashButton cancel={() => {}} 
+                                    deleteElement={() => deleteImage( media.media_id ) }
+                                    little={true}
+                                    confirmation={{
+                                      title: 'Delete image',
+                                      question: 'Are you sure you want to delete this image?'
+                            }}></TrashButton>
+                        </div>
+                      </div>
+                      )
+                    })
+                    : 
+                    ( loading ) ?
+                    <>
+                      Loading...
+                    </>
+                    :
+                    ( medias.length == 0 ) ?
+                    <> No images in your gallery </>
+                    :
+                    <></>
+                  }
+                </div>
+          </div>
+        </div>
+        :
+        <></>
+      }
+    </>
   )
 }
 

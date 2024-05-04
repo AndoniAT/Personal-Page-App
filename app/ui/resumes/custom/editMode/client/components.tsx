@@ -8,6 +8,7 @@ import { PencilSquareIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
 import { UpdateSectionModal } from "./modals";
 import { MyTooltip } from "@/app/ui/components/tooltip";
+import { Gallery } from "../../../navBar/client/components";
 
 export function ShowHeader({
     hero,
@@ -19,144 +20,116 @@ export function ShowHeader({
     const { username } = useParams();
     const [heroPhoto, setHeroPhoto] = useState<string>(hero);
     const [photoProfile, setPhotoProfile] = useState<string>(user_photo_profile);
-
+    const [ showGallery, setShowGallery ] = useState<boolean>(false);
     const paramsUrl = useParams<{ username: string }>()
     const heroInputRef = useRef<HTMLInputElement>(null);
     const profileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState<boolean>(false);
-
+    const [ imageToChange, setImageToChange ] = useState<string|undefined>();
     const handleHeroClick = () => {
-        if (heroInputRef.current) {
-          heroInputRef.current.click();
-        }
-    };
-    
+      setImageToChange('url_hero');
+      setShowGallery(true);
+    }
+
     const handleProfileClick = () => {
-        if (profileInputRef.current) {
-          profileInputRef.current.click();
-        }
-    };
+      setImageToChange('url_profile');
+      setShowGallery(true);
+    }
 
-    const changeImage = async ( attr:string ) => {
-      let inputRef = attr == 'url_hero' ? heroInputRef : profileInputRef;
-
-      if( inputRef?.current?.files ) {
+    const pickImage = async ( url:string ) => { 
+      try {
+        setLoading(true);
         const formData = new FormData();
-       formData.append('image', inputRef.current.files[0]);
-       formData.append('username', username as string );
-       formData.append('attr', attr );
-       setLoading(true);
-  
-       try {
-         let res = await fetch('/api/medias', {
-             method: 'POST',
-             body: formData
-         } );
-         let { url } = await res.json();
-         
-         // Save for user
-         formData.append('url', url);
-         await fetch(`/api/users/${username}/photo`, {
-            method: 'PUT',
-            body: formData
-          } );
-          
-        if( attr == 'url_hero') setHeroPhoto( url );
-        if( attr == 'url_profile') setPhotoProfile( url );
+          formData.append('url', url);
+          await fetch(`/api/users/${username}/photo`, {
+              method: 'PUT',
+              body: formData
+            } );
+            
+          if( imageToChange == 'url_hero') setHeroPhoto( url );
+          if( imageToChange == 'url_profile') setPhotoProfile( url );
+          setImageToChange( undefined );
+          setLoading( false );
+          setShowGallery( false );
+
+        } catch( e ) {
+        console.log( 'Error', e );
          setLoading(false);
-       } catch( err ) {
-         console.log('Error', err);
-         setLoading(false);
-       }
       }
     }
 
-    const handleHeroChange = async () => changeImage( 'url_hero' );
-    const handleProfileChange = async () => changeImage( 'url_profile' );
-
     return (
-        <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
-              <div className="grid grid-cols-1 gap-4 h-full">
-                <div className="grid grid-cols-12 h-full">
-                  { /* Hero */}
-                  <div className={clsx({
-                    [showHeaderStyles.custom.edit.hover]: !loading,
-                    [showHeaderStyles.custom.hero.gral]: true,
-                    [showHeaderStyles.custom.hero.withProfilePhoto]: true,
-                    [showHeaderStyles.custom.status.loading]: loading
-                  })}
-                    onClick={handleHeroClick}>
-                    {
-                      (heroPhoto) ?
-                        <div className={showHeaderStyles.custom.hero.imageContainer}>
-                          <Image
-                            src={heroPhoto}
-                            layout='fill'
-                            alt="Hero"
-                            className={showHeaderStyles.custom.hero.image}
-                          />
-                        </div>
-
-                        : <div className={showHeaderStyles.custom.hero.imageContainer + ' border border-slate-950'}>
-                        </div>
-                    }
-                    <input
-                      ref={heroInputRef}
-                      type="file"
-                      id="imageHero"
-                      name="imageHero"
-                      required
-                      onChange={handleHeroChange}
-                      style={{ display: 'none' }}
-                    />
-                  </div>
-                  { /* Profile photo */}
-                  {
-                    (photoProfile) ?
-                      <div className={showHeaderStyles.custom.profilePhoto.principalContainer}>
-                        <div className={clsx({
-                          ['cursor-pointer flex h-full w-full']: true,
-                          [showHeaderStyles.custom.edit.hover]: true,
-                          [showHeaderStyles.custom.status.loading]: loading
-                        })}
-                          onClick={handleProfileClick}>
-                          <div className={showHeaderStyles.custom.profilePhoto.imageContainer}>
+        <>
+          <div className="w-full bg-gray-200 bg-opacity-50 h-fit p-5">
+                <div className="grid grid-cols-1 gap-4 h-full">
+                  <div className="grid grid-cols-12 h-full">
+                    { /* Hero */}
+                    <div className={clsx({
+                      [showHeaderStyles.custom.edit.hover]: !loading,
+                      [showHeaderStyles.custom.hero.gral]: true,
+                      [showHeaderStyles.custom.hero.withProfilePhoto]: true,
+                      [showHeaderStyles.custom.status.loading]: loading
+                    })}
+                      onClick={handleHeroClick}>
+                      {
+                        (heroPhoto) ?
+                          <div className={showHeaderStyles.custom.hero.imageContainer}>
                             <Image
-                              src={photoProfile}
-                              width={500}
-                              height={500}
-                              alt="Profile"
-                              className={showHeaderStyles.custom.profilePhoto.image}
+                              src={heroPhoto}
+                              layout='fill'
+                              alt="Hero"
+                              className={showHeaderStyles.custom.hero.image}
                             />
                           </div>
-                        </div>
-                      </div>
-                      :
-                      <div className="col-span-3 rounded-r-xl cursor-pointer">
-                        <div className='h-full p-1 w-full flex justify-center  items-center	'>
-                          <div className={clsx({
-                            [showHeaderStyles.custom.edit.hover]: !loading,
-                            ['bg-gray-300 rounded-full size-4/6  border border-slate-950']: true,
 
-                          })} onClick={handleProfileClick}>
+                          : <div className={showHeaderStyles.custom.hero.imageContainer + ' border border-slate-950'}>
+                          </div>
+                      }
+                    </div>
+                    { /* Profile photo */}
+                    {
+                      (photoProfile) ?
+                        <div className={showHeaderStyles.custom.profilePhoto.principalContainer}>
+                          <div className={clsx({
+                            ['cursor-pointer flex h-full w-full']: true,
+                            [showHeaderStyles.custom.edit.hover]: true,
+                            [showHeaderStyles.custom.status.loading]: loading
+                          })}
+                            onClick={handleProfileClick}>
+                            <div className={showHeaderStyles.custom.profilePhoto.imageContainer}>
+                              <Image
+                                src={photoProfile}
+                                width={500}
+                                height={500}
+                                alt="Profile"
+                                className={showHeaderStyles.custom.profilePhoto.image}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                  }
-                  {
-                    <input
-                      ref={profileInputRef}
-                      type="file"
-                      id="imageProfile"
-                      name="imageProfile"
-                      required
-                      onChange={handleProfileChange}
-                      style={{ display: 'none' }}
-                    />
-                  }
+                        :
+                        <div className="col-span-3 rounded-r-xl cursor-pointer">
+                          <div className='h-full p-1 w-full flex justify-center  items-center	'>
+                            <div className={clsx({
+                              [showHeaderStyles.custom.edit.hover]: !loading,
+                              ['bg-gray-300 rounded-full size-4/6  border border-slate-950']: true,
+
+                            })} onClick={handleProfileClick}>
+                            </div>
+                          </div>
+                        </div>
+                    }
+                  </div>
                 </div>
-              </div>
-        </div>
+          </div>
+          {
+            ( showGallery ) ? 
+            <Gallery pick={pickImage} close={() => setShowGallery( false )}/>
+            :
+            <></>
+
+          }
+        </>
     )
 }
 
