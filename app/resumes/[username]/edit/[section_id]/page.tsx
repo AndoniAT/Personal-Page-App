@@ -3,10 +3,10 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import CustomEditView from '@/app/ui/resumes/custom/editMode/curstomResume';
-import { requiresSessionUserProperty } from '@/app/lib/actions';
+import { customRevalidateTag, requiresSessionUserProperty } from '@/app/lib/actions';
 import { BlockClient, BlocksScreenClient } from '@/app/ui/resumes/custom/interfaces';
 import { revalidatePath } from 'next/cache';
-import { getBlocksSection } from '@/app/lib/section/actions';
+import { deleteElementBlock, getBlocksSection, updateElementBlock } from '@/app/lib/section/actions';
 import { createNewBlock } from '@/app/lib/blocks/actions';
 import { createElementInBlock } from '@/app/lib/elements/actions';
 
@@ -59,7 +59,7 @@ export default async function Page(
           })
         }
   
-        /*block.elements = block.elements.map( element => {
+        block.elements = block.elements.map( element => {
           // Create update function for elements
           let updateElement = async ( form:FormData ) => {
             'use server'
@@ -70,11 +70,10 @@ export default async function Page(
                 fn.call( { section_id: section.section_id, username: user.username, block_id: block.block_id, element_id:element.element_id, form: form } )
                 .then( () => {
                   resolve(true);
-                  revalidatePath(`/resumes/${user.username}/edit/${section.section_id}]`);
+                  //revalidatePath(`/resumes/${user.username}/edit/${section.section_id}]`);
+                  customRevalidateTag('edit');
                 })
-                .catch( err => {
-                  reject( err );
-                });
+                .catch( reject );
               } else {
                 reject( 'No function' );
               }
@@ -90,9 +89,7 @@ export default async function Page(
                 resolve(true);
                 revalidatePath(`/resumes/${user.username}/edit/${section.section_id}`);
               })
-              .catch( err => {
-                reject( err );
-              });
+              .catch( reject );
             });
           }
   
@@ -101,7 +98,7 @@ export default async function Page(
             deleteElement: deleteElement
           }
           return element;
-        });*/
+        });
   
         block.actions = {
           addElement: createElement
@@ -134,7 +131,7 @@ export default async function Page(
         }
       }
     }
-
+    
     return (
       <main>
         <Suspense fallback={<MenuResumeUserSkeleton />}>

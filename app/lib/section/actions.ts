@@ -26,7 +26,7 @@ export async function updateElementBlock(this:{ section_id:string, username:stri
     let element = element_res.rows[ 0 ] as ElementBlock;
 
     if( element ) {
-      await updateElementText( block_id, element, form );
+      await updateElement( block_id, element, form );
       /*switch( element.type ) {
       case TYPESELEMENT.text : {
       case TYPESELEMENT.media : {
@@ -54,17 +54,6 @@ export async function deleteElementBlock(this:{ section_id:string, username:stri
 
     if( !section ) {
       throw new Error( 'Section not found for user' );
-    }
-    
-    let { media_id } = (await sql`SELECT media_id FROM ELEMENT WHERE element_id=${element_id}`).rows[ 0 ];
-    let media = (await sql`SELECT key FROM MEDIA WHERE media_id=${media_id}`).rows[ 0 ];
-
-    if( media ) {
-      let { key } = media;
-      // DELETE media releated
-      await sql`DELETE FROM MEDIA WHERE media_id = ${media_id}`; // From database
-      console.log('delete file', key);
-      await utapi.deleteFiles([key]); // From uploadthing
     }
 
     let res = await sql`DELETE FROM ELEMENT WHERE element_id = ${element_id} AND
@@ -120,7 +109,6 @@ export async function deleteSection( section_id:string ) {
                                 WHERE section_id = ${section_id}
                             )
                         )`).rows[ 0 ];
-    console.log('username', username);
     await requiresSessionUserProperty( username );
 
     let allMediaSection = (await getAllMediaSection( section_id )) as Media[];
@@ -144,7 +132,6 @@ export async function changeCssSection( id:string, css_to_change:string ) {
     let old_css_obj = JSON.parse( css );
 
     for ( const [ prop, value ] of Object.entries( new_css ) ) {
-      console.log(`${prop}: ${value}`);
       old_css_obj[ prop ] =  value
     }
     
@@ -158,6 +145,8 @@ export async function changeCssSection( id:string, css_to_change:string ) {
 }
 
 async function setElementsForBlocks( blocks:Block[] ) {
+  'use server';
+  noStore();
     for (const block of blocks) {
       let res = await sql`SELECT * FROM ELEMENT WHERE
                             block_id = ${block.block_id}`;
@@ -173,7 +162,7 @@ async function getBlocksForScreen( section_id:string, screen:string ) {
               `).rows;
 }
 
-async function updateElementText( block_id:string, element:ElementBlock, form:FormData ) {
+async function updateElement( block_id:string, element:ElementBlock, form:FormData ) {
   let target = form.get('target') as string;
 
   switch( target ) {
@@ -210,7 +199,6 @@ async function updateElementText( block_id:string, element:ElementBlock, form:Fo
       case 'borderBottomRightRadius':
       case 'borderWidth':
       case 'height':
-        console.log('check', element);
         await getAndUpdateFormAttribute( target, block_id, element, form, 'rem' );
         break;
       case 'customclassname': {

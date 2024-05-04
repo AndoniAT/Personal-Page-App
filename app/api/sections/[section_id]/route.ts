@@ -8,15 +8,14 @@ import { insertMedia } from "@/app/lib/media/actions";
 export async function PUT( req: Request, context:any ) {
   noStore();
   const { params } = context;
-  console.log('check params', params);
   const { section_id } = params;
+
   const data = await req.formData()
   const name = data.get('name');
 
   if( !name ) {
       throw new Error( 'Some params are missing' );
   }
-  console.log('name', name);
 
   try {
     let { username } = (await sql`SELECT username FROM USERS as u

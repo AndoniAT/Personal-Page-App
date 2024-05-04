@@ -2,17 +2,19 @@
 import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../interfaces';
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useDebouncedCallback }from 'use-debounce';
 import { TYPES_TO_CHOOSE } from './blocks';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import clsx from 'clsx';
-import { BorderButtons, ColorButton, ColorButtons, DirectionButtons, DirectionMarginButtons, PositionTextButtons } from './customButtons';
+import { BorderButtons, ColorButtons, DirectionButtons, DirectionMarginButtons, PositionTextButtons } from './customButtons';
 import { InputValueButton } from '@/app/ui/components/value-input';
 import TrashButton from '@/app/ui/components/trash-button';
 import { LoadScreen } from '@/app/ui/components/loading-modal';
 import { CustomModal } from '@/app/ui/components/modalForm';
+import { Gallery } from '../../../navBar/client/components';
+import { listenerNavBar } from '@/app/ui/emiter';
 
 const waitTime = 700;
 
@@ -299,18 +301,16 @@ export function TextElementType({
 export function MediaElementType({
     handler,
     cancel,
-    element,
-    imageUrl
+    element
 }:Readonly<{
     handler:Function,
     cancel:Function,
-    element:ElementBlockClient|null,
-    imageUrl?:string|null
+    element:ElementBlockClient|null
 }>) {
     const isEdit = !!element;
-    const [image, setImage] = useState<string>('');
-    const imageInputRef = useRef<HTMLInputElement>(null);
+    const [image, setImage] = useState<string>('');    
     const [loading, setLoading] = useState<boolean>(false);
+    const [ showGallery, setShowGallery ] = useState<boolean>(false);
 
     const params = useParams()
     const username = params.username as string;
@@ -344,6 +344,8 @@ export function MediaElementType({
     // Colors
     const handleColorBgChange = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'backgroundColor', value, element) : '', 0 );
     const handleColorBorderChange = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'borderColor', value, element) : '', waitTime );
+    
+    const handleContentUrl = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'content', value, element) : '', waitTime );
 
     const handlerMargin = useDebouncedCallback( (direction, value) => {
         if( direction == 'Bottom' ) {
@@ -360,157 +362,156 @@ export function MediaElementType({
     const handlerHeight = useDebouncedCallback( (value) => { sendFormDataForElement( 'height', value, element) }, waitTime );
     const handlerHeightImage = useDebouncedCallback( (value) => sendFormDataForElement( 'heightContent', value, element), waitTime );
     const handlerWidthImage = useDebouncedCallback( (value) => sendFormDataForElement( 'widthContent', value, element), waitTime );
-
-    const handleImageChange = async () => {
-        if ( imageInputRef?.current?.files && imageInputRef.current.files.length > 0 ) {
-          let file = imageInputRef.current.files[0];
-          let reader = new FileReader();
-          reader.onloadend = () => {
-            setImage(reader.result as string);
-            setLoading(false);
-          }
-
-          setLoading(true);
-          reader.readAsDataURL(file);
-        }
-    };
+    
+    const handlerContentUrl = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), waitTime );
     
     const handleImageClick = () => {
-        if (imageInputRef.current && !isEdit && !loading ) {
-            imageInputRef.current.click();
-        }
+        setShowGallery( true );
     };
 
-    useEffect(() => {
-        if( imageUrl ) {
-            setImage( imageUrl )
+    const pickImage = async ( url:string ) => {
+        setImage( url );
+        setShowGallery( false );
+
+        if( isEdit ) {;
+            handlerContentUrl( url );
         }
-    }, [imageUrl])
+    }
+
+    useEffect(() => {
+        if( element?.content ) {
+            setImage( element?.content );
+        }
+    }, [element?.content])
 
     return (
-        <MyDragModal className={clsx({
-            ['loading']: loading,
-        })}
-        id='customImageModal'
-        close={cancel}
-        maxWidth='max-w-lg'
-        title='Image Element'
-        >
-            <MyForm
-                handlerSubmit={async( event:any ) => {
-                    setLoading(true);
-                    await handler( event, TYPES_TO_CHOOSE.image );
-                    setLoading(false);
-                }}
-                showSubmitButton={(!isEdit && !loading)}
+        <>
+            <MyDragModal className={clsx({
+                ['loading']: loading,
+            })}
+            id='customImageModal'
+            close={cancel}
+            maxWidth='max-w-lg'
+            title='Image Element'
             >
-                    { /* Image Container */}
-                    {
-                        (image) ?
-                            <div className='col-span-2 border border-2 border-slate-500 p-3 rounded-xl'>
-                                <div className={clsx({
-                                    ["image-found overflow-hidden"]:true,
-                                    ["image-new"]: !isEdit
-                                })
-                                } style={{position:"relative"}}
-                                    onClick={handleImageClick}
-                                >
-                                    <Image
-                                        src={image}
-                                        layout='fill'
-                                        alt="Imageelement"
-                                        className={"bg-cover bg-center Imageelement"}
-                                    />
-                                </div>
-                            </div>
-                        : 
-                            <>
+                <MyForm
+                    handlerSubmit={async( event:any ) => {
+                        setLoading(true);
+                        await handler( event, TYPES_TO_CHOOSE.image );
+                        setLoading(false);
+                    }}
+                    showSubmitButton={(!isEdit && !loading)}
+                >
+                        { /* Image Container */}
+                        {
+                            (image) ?
                                 <div className='col-span-2 border border-2 border-slate-500 p-3 rounded-xl'>
                                     <div className={clsx({
-                                        ["no-image"]: true,
-                                        ["hover:scale-105"]: !loading
-                                        })
-                                        }
+                                        ["image-found overflow-hidden"]:true,
+                                        ["image-new"]: true
+                                    })
+                                    } style={{position:"relative"}}
                                         onClick={handleImageClick}
                                     >
+                                        <Image
+                                            src={image}
+                                            layout='fill'
+                                            alt="Imageelement"
+                                            className={"bg-cover bg-center Imageelement"}
+                                        />
                                     </div>
+                                    <input name="content"
+                                        className="hidden"
+                                        value={image}
+                                    >
+                                    </input>
                                 </div>
-                            </>
-                    }
-                    <input
-                        ref={imageInputRef}
-                        type="file"
-                        id="imageElement"
-                        name="image"
-                        required
-                        onChange={handleImageChange}
-                        style={{ display: 'none' }}
-                    />
-                    {
-                        ( isEdit ) ? 
-                        <>
-                            <div className="w-full col-span-2">
-                                { /* Padding */}
-                                {
-                                                    
-                                    <div className='mt-5'>
-                                        <DirectionButtons handlerValue={handlerPadding} defaults={DefaultsPadding} title={'Padding'}></DirectionButtons>
+                            : 
+                                <>
+                                    <div className='col-span-2 border border-2 border-slate-500 p-3 rounded-xl'>
+                                        <div className={clsx({
+                                            ["no-image"]: true,
+                                            ["hover:scale-105"]: !loading
+                                            })
+                                            }
+                                            onClick={handleImageClick}
+                                        >
+                                        </div>
                                     </div>
-                                }
-                            </div>
+                                </>
+                        }
+                        {
+                            ( isEdit ) ? 
+                            <>
+                                <div className="w-full col-span-2">
+                                    { /* Padding */}
+                                    {
+                                                        
+                                        <div className='mt-5'>
+                                            <DirectionButtons handlerValue={handlerPadding} defaults={DefaultsPadding} title={'Padding'}></DirectionButtons>
+                                        </div>
+                                    }
+                                </div>
 
-                            <div className="w-full col-span-2">
-                                { /* Margin */}
-                                {                
-                                    <div className='mt-5'>
-                                        <DirectionMarginButtons handlerValue={handlerMargin} defaults={DefaultsMargin} title={'Margin'}/>
-                                    </div>
-                                }
-                            </div>
-                            { /* BACKGROUND */}
-                            <div className='mt-5 col-span-2'>
-                                <ColorButtons
-                                title='Background'
-                                defaultColor={backgroundColor}
-                                handleColorBgChange={handleColorBgChange}
-                                showAlpha={true}
-                                showTransparency={true}
-                                />
-                            </div>
-
-                            { /* ALIGN TEXT*/}
-                            <div className='mt-5 col-span-2'>
-                                <PositionTextButtons handlerAlign={handlerAlign} handlerJustify={handlerJustify}/>
-                            </div>
-
-                            { /* Border */}
-                            <div className='mt-5 col-span-2'>
-                                <BorderButtons defaults={DefaultsBorder} handleColorBorderChange={handleColorBorderChange} handlerBorder={handlerBorder}/>
-                            </div>
-
-                            <div className='mt-5 col-span-2 flex flex-row space-x-4'>
-                                <InputValueButton title='Height Image (%)' min={10} defaultVal={defaultHeightImage} handlerValueChange={handlerHeightImage} step={1}/>
-                                <InputValueButton title='Width Image (%)' min={10} defaultVal={defaultWidthImage} handlerValueChange={handlerWidthImage} step={1}/>
-                            </div>
-
-                            <div className='mt-5 col-span-2 flex flex-row space-x-4'>
-                                <InputValueButton title='Height Container' min={8} defaultVal={defaultHeight} handlerValueChange={handlerHeight} step={1}/>
-                            </div>
-
-                            { /* DELETE */}
-                            {
-                                (element.actions?.deleteElement) ?
+                                <div className="w-full col-span-2">
+                                    { /* Margin */}
+                                    {                
+                                        <div className='mt-5'>
+                                            <DirectionMarginButtons handlerValue={handlerMargin} defaults={DefaultsMargin} title={'Margin'}/>
+                                        </div>
+                                    }
+                                </div>
+                                { /* BACKGROUND */}
                                 <div className='mt-5 col-span-2'>
-                                    <TrashButton cancel={cancel} deleteElement={element.actions.deleteElement}></TrashButton>
+                                    <ColorButtons
+                                    title='Background'
+                                    defaultColor={backgroundColor}
+                                    handleColorBgChange={handleColorBgChange}
+                                    showAlpha={true}
+                                    showTransparency={true}
+                                    />
                                 </div>
-                                : <></>
 
-                            }
-                        </>
-                            : <></>
-                    }
-            </MyForm>
-        </MyDragModal>
+                                { /* ALIGN TEXT*/}
+                                <div className='mt-5 col-span-2'>
+                                    <PositionTextButtons handlerAlign={handlerAlign} handlerJustify={handlerJustify}/>
+                                </div>
+
+                                { /* Border */}
+                                <div className='mt-5 col-span-2'>
+                                    <BorderButtons defaults={DefaultsBorder} handleColorBorderChange={handleColorBorderChange} handlerBorder={handlerBorder}/>
+                                </div>
+
+                                <div className='mt-5 col-span-2 flex flex-row space-x-4'>
+                                    <InputValueButton title='Height Image (%)' min={10} defaultVal={defaultHeightImage} handlerValueChange={handlerHeightImage} step={1}/>
+                                    <InputValueButton title='Width Image (%)' min={10} defaultVal={defaultWidthImage} handlerValueChange={handlerWidthImage} step={1}/>
+                                </div>
+
+                                <div className='mt-5 col-span-2 flex flex-row space-x-4'>
+                                    <InputValueButton title='Height Container' min={8} defaultVal={defaultHeight} handlerValueChange={handlerHeight} step={1}/>
+                                </div>
+
+                                { /* DELETE */}
+                                {
+                                    (element.actions?.deleteElement) ?
+                                    <div className='mt-5 col-span-2'>
+                                        <TrashButton cancel={cancel} deleteElement={element.actions.deleteElement}></TrashButton>
+                                    </div>
+                                    : <></>
+
+                                }
+                            </>
+                                : <></>
+                        }
+                </MyForm>
+            </MyDragModal>
+            {
+                ( showGallery ) ?
+                <Gallery pick={pickImage} close={() => setShowGallery( false )} />
+                :
+                <></>
+            }
+        </>
     )
 }
 
@@ -548,7 +549,6 @@ export function HtmlElementType({
     }, 1000);
 
     return (
-        <>
         <MyDragModal className={clsx({
             ['loading']: loading,
         })}
@@ -602,7 +602,6 @@ export function HtmlElementType({
                 }
             </MyForm>
         </MyDragModal>
-        </>
     )
 }
 
@@ -739,7 +738,7 @@ export function UpdateSectionModal({
                     method: 'PUT',
                     body: formData
                 });
-                console.log('updated', section_updated);
+
                 cancel();
                 customRevalidateTag('edit');
                 setLoading(false);
@@ -862,13 +861,31 @@ export function MyStaticModal({
     close, drag, ...rest 
 }: Readonly<MyModalProps>) {
     let maxW = maxWidth ?? 'max-w-2xl';
+
+    let [ showNavBar, setShowNavbar ] = useState<boolean>(true);
+
+    useEffect(() => {
+        listenerNavBar( setShowNavbar );
+      }, []);
+
     return (
         <div id={rest.id} tabIndex={-1} aria-hidden="true" 
             className={clsx({
-                ['overflow-hidden overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex']:true,
-                ['cursor-grab']: drag
+                ['overflow-hidden overflow-x-hidden fixed top-0 right-0 left-0 justify-center items-center md:inset-0 h-[calc(100%-1rem)] max-h-full flex']:true,
+                ['cursor-grab']: drag,
+                ['bg-slate-400 w-full']: true,
+                ['mt-30%']: true,
+                ['z-20']:true,
+                ['md:w-[75%] xl:w-[80%]']: showNavBar,
+                ['md:ml-[25%] xl:ml-[20%]']: showNavBar,
+                ['md:w-full xl:w-full']: !showNavBar,
+                ['md:ml-0 xl:ml-0']: !showNavBar
             })
-            }>
+            }
+            style={{
+                backgroundColor: 'rgba(100, 116, 139, 0.5)'
+            }}
+            >
             <div className={`relative p-4 w-full ${maxW} max-h-full`} style={{margin:'0 auto'}}>
                 <div className={`
                     relative rounded-lg shadow border-2
@@ -995,6 +1012,12 @@ export function NoButton({
 }
   
 export function MyDragModal({ children, className, title, close, maxWidth, ...rest }: Readonly<MyModalProps>) {
+    let [ showNavBar, setShowNavbar ] = useState<boolean>(true);
+
+    useEffect(() => {
+        listenerNavBar( setShowNavbar );
+      }, []);
+
     return (
         <motion.div
         drag
@@ -1006,7 +1029,20 @@ export function MyDragModal({ children, className, title, close, maxWidth, ...re
             right: 300,
             bottom: 150,
         }}
-        tabIndex={-1} aria-hidden="true" className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
+        tabIndex={-1} aria-hidden="true" 
+        className={clsx({
+        ['overflow-y-auto overflow-x-hidden ']:true,
+        ['fixed top-0 right-0 left-0 justify-center']:true,
+        ['items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex']:true,
+        ['mt-30%']:true,
+        ['z-20']:true,
+        ['md:w-[75%] xl:w-[80%]']:showNavBar,
+        ['md:ml-[25%] xl:ml-[20%]']:showNavBar,
+        ['md:w-full xl:w-full']: !showNavBar,
+        ['md:ml-0 xl:ml-0']: !showNavBar
+        })
+        }
+
         id={rest.id}
         >
             <MyStaticModal close={close} title={title} maxWidth={maxWidth} drag={true} className={className}>

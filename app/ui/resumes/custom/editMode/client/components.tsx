@@ -22,10 +22,9 @@ export function ShowHeader({
     const [photoProfile, setPhotoProfile] = useState<string>(user_photo_profile);
     const [ showGallery, setShowGallery ] = useState<boolean>(false);
     const paramsUrl = useParams<{ username: string }>()
-    const heroInputRef = useRef<HTMLInputElement>(null);
-    const profileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [ imageToChange, setImageToChange ] = useState<string|undefined>();
+
     const handleHeroClick = () => {
       setImageToChange('url_hero');
       setShowGallery(true);

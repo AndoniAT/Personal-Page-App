@@ -45,15 +45,14 @@ export async function createElementInBlock(this:{ section_id:string, username:st
         const positions = await getPositionsForBlock( fusionBlocks, block_id );
 
         let content = form.get('content') as string;
+
         const defClassName = 'h-full';
         let css = `{}`
-        let media_url = null;
         switch( type ) {
           case TYPESELEMENT.text:
             css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex", "height": "100%", "width":"100%"}`;
             break;
           case TYPESELEMENT.media:
-            media_url = await insertMedia(section_id, form ) as string;
             break;
           case TYPESELEMENT.html:
             css = `{"height": "100%"}`;

@@ -1,14 +1,12 @@
-import { UserClient, SectionsClient, BlockClient } from '../interfaces'
+import { UserClient, SectionsClient } from '../interfaces'
 import clsx from 'clsx';
 import { TabsResponsive } from './client/blocks';
 import TrashButton from '../../../components/trash-button';
-import { ButtonPlus, NameEditSectionIcon, ShowHeader } from './client/components';
+import { NameEditSectionIcon, ShowHeader } from './client/components';
 import CustomSection from '@/app/ui/components/custom-section';
-import { revalidateTag } from 'next/cache';
 import { deleteSection } from '@/app/lib/section/actions';
 import { redirect } from 'next/navigation';
 import { customRevalidateTag } from '@/app/lib/actions';
-import { MyTooltip } from '@/app/ui/components/tooltip';
 
 export default function CustomEditView(
   {
@@ -26,18 +24,12 @@ export default function CustomEditView(
     let css = JSON.parse( css_string );
     let backgroundColor = css.backgroundColor ?? 'rgba(0,0,0,0)';
 
-    let handlerCreateBlock = async () => {
-      'use server'
-      await section?.actions?.addBlock();
-      revalidateTag('edit');
-    }
-
     let deleteThisSection = async () => {
       'use server'
       await deleteSection( section.section_id );
       redirect(`/resumes/${user.username}/`);
     }
-
+    
     return (
       <div>
         <div className='flex bg-slate-600	flex justify-center'>

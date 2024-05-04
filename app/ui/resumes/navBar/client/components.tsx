@@ -12,7 +12,7 @@ import { CreateSectionModal } from "./modals";
 import { Media } from "@/app/lib/definitions";
 import Image from "next/image";
 import TrashButton from "@/app/ui/components/trash-button";
-import emitter from "@/app/ui/emiter";
+import emitter, { listenerGallery, listenerNavBar } from "@/app/ui/emiter";
 import AcmeLogo from "@/app/ui/components/acme-logo";
 import { ColorButtons } from "../../custom/editMode/client/customButtons";
 
@@ -47,24 +47,21 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
 
   // Gallery listener
   useEffect(() => {
-    const gallery_event = ( message:string ) => {
-      let newShow = message == 'open';
-      setShow( newShow );
-
-      if( !newShow ) {
+    return listenerGallery( ( showGallery:boolean ) => {
+      if( showGallery ) {
+        setShow( true );
+      } else {
         // If the gallery closes, reopen the menu
-        setTimeout(() => {
-          setShow(true);
-        }, 600);
+        if ( show ) {
+          setShow(false);
+          setTimeout(() => {
+            setShow(true);
+          }, 600);
+        }
       }
-    };
-
-    emitter.on( 'gallery', gallery_event );
-
-    return () => {
-      emitter.off( 'gallery', gallery_event );
-    };
+    } );
   }, []);
+
 
   return (
       <div
@@ -306,7 +303,6 @@ export function Gallery({
   const deleteImage = async ( id:string ) => {
     setLoading(true);
     try {
-      console.log('calling delete', id);
       await fetch(`/api/users/${username}/medias/${id}`, {
           method: 'DELETE'
       } );
@@ -326,7 +322,6 @@ export function Gallery({
   let refreshMedias = async () => {
     setLoading( true );
     let { medias } = await (await fetch(`/api/users/${username}/medias`)).json();
-    console.log('check medias', medias);
     setMedias( medias );
     setLoading( false );
   }
@@ -336,24 +331,16 @@ export function Gallery({
       refreshMedias();
     }
   })
-  
+
   // Nav bar listener
   useEffect(() => {
-    const side_nav_event = ( message:string ) => {
-      let newShow = message == 'open';
+    return listenerNavBar( ( newShow:boolean ) => {
       setShow( newShow );
-
       if( !newShow && close ) {
         close();
         emitter.emit('gallery', 'close' );
       }
-    };
-
-    emitter.on( 'side_nav', side_nav_event );
-
-    return () => {
-      emitter.off( 'side_nav', side_nav_event );
-    };
+    } );
   }, []);
 
   useEffect(() => {
@@ -368,12 +355,14 @@ export function Gallery({
         (show) ? 
         <div id='gallery-images' className={clsx({
           [ 'transition-all duration-500 ease-out'] : true,
-          [ 'fixed bottom-[7%] left-0 h-[88px] w-[20%]']: true,
+          [ 'fixed bottom-[50%] md:bottom-[7%] left-0 w-[20%]']: true,
           [ 'block -mt-[70%]']: true,
           [ 'w-full md:w-60 lg:w-72 2xl:w-80' ]: true,
-          ['min-h-[93%] max-h-[93%] overflow-y-auto']:true,
+          ['min-h-[50%] max-h-[50%] md:min-h-[93%] md:max-h-[93%]']:true,
+          ['overflow-y-auto']:true,
           ["h-full p-1"]:true,
-          ["bg-slate-300 dark:bg-gray-700"]:true
+          ["bg-slate-300 dark:bg-gray-700"]:true,
+          ['z-30']:true
           /*[ '-ml-[200%] hidden' ] : openInNavBar == 'menu'*/
         })}
         >

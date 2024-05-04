@@ -132,7 +132,7 @@ export async function modifyProfile(
 
       // Check if user exists by username
       let userByUsername = await getUserByUsername( username );
-      if( userByUsername && userByUsername.user_id != user_id && errorss.username ) {console.log('username exists');
+      if( userByUsername && userByUsername.user_id != user_id && errorss.username ) {
         errorss.username.push( 'This username already exists' );
         success = false;
       }

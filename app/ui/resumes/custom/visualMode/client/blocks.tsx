@@ -149,23 +149,7 @@ function ElementImageGrid({
   element:ElementBlockClient
 }>) {
 
-  let [image, setImage] = useState<string>('');
-  
   const css = getImageCss( element );
-
-  useEffect(() => {
-    fetch(`/api/medias/${element.media_id}`)
-    .then( res => res.json() 
-    )
-    .then( res => {
-      let media = res.media as Media
-      console.log('check media', media);
-      setImage(media.url);
-    })
-    .catch( err => {
-      console.log( 'Error', err );
-    });
-  }, [ image, element.media_id ] );
 
   //let customClass = element.customclassname ?? '';
 
@@ -176,7 +160,7 @@ function ElementImageGrid({
       ['min-h-10']:true
     })}
     >
-      <ImageElement css={css} image={image} className="hover:scale-105"/>
+      <ImageElement css={css} image={element.content} className="hover:scale-105"/>
     </div>
   )
 }

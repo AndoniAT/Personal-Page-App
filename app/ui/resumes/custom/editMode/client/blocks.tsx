@@ -355,11 +355,11 @@ function EmptyElement({
 
 function CustomElement({
   element,
-}:{
+}:Readonly<{
   element:ElementBlockClient,
-}) {
+}>) {
   element.customclassname = element.customclassname + "            ";
-  if( element.customclassname == null || element.customclassname == '') alert('nooo');
+  //if( element.customclassname == null || element.customclassname == '') alert('nooo');
   switch(element.type) {
     case TYPES_TO_CHOOSE.text:
       return <ElementTextGrid element={element}></ElementTextGrid>
@@ -414,28 +414,12 @@ function ElementImageGrid({
   element:ElementBlockClient,
 }>) {
   let [editElement, setEditElement] = useState<boolean>(false);
-  let [image, setImage] = useState<string>('');
   
   const css = getImageCss( element );
-
-  /*useEffect(() => {
-    fetch(`/api/medias/${element.media_id}`)
-    .then( res => res.json() 
-    )
-    .then( res => {
-      let media = res.media as Media
-      setImage(media.url);
-    })
-    .catch( err => {
-
-    });
-  }, [ image, element.media_id ] );*/
 
   let submitEditImageElementBlock = async function (event: FormEvent<HTMLFormElement>) {
     submitEditElementBlock( event, element );
   }
-
-  //let customClass = element.customclassname ?? '';
 
   return (
     <>
@@ -445,13 +429,13 @@ function ElementImageGrid({
               min-h-10
               hover:scale-105 cursor-pointer hover:border-solid border-2 rounded hover:border-slate-700
               `}
-            onClick={() => { setEditElement(true)}}
+            onClick={() => setEditElement(true) }
             >
-              <ImageElement css={css} image={image}/>
+              <ImageElement css={css} image={element.content}/>
         </div>
       {
         editElement ? 
-        <MediaElementType handler={submitEditImageElementBlock} cancel={() => { setEditElement(false) }} element={element} imageUrl={image}></MediaElementType>
+        <MediaElementType handler={submitEditImageElementBlock} cancel={() => { setEditElement(false) }} element={element}></MediaElementType>
         : <></>
       }
     </>

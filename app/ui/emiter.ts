@@ -1,3 +1,4 @@
+'use client'
 var EventEmitter2 = require('eventemitter2');
 const emitter = new EventEmitter2({
 
@@ -24,3 +25,31 @@ const emitter = new EventEmitter2({
 });
 
 export default emitter;
+
+export const listenerNavBar = ( fn:Function ) => {
+  const side_nav_event = ( message:string ) => {
+    let newShow = message == 'open';
+    fn( newShow );
+  };
+
+  emitter.on( 'side_nav', side_nav_event );
+
+  return () => {
+    emitter.off( 'side_nav', side_nav_event );
+  };
+}
+
+export const listenerGallery = ( fn:Function ) => {
+  const gallery_event = ( message:string ) => {
+    emitter.off( 'gallery', gallery_event );
+    let newShow = message == 'open';
+    fn( newShow );
+    emitter.on( 'gallery', gallery_event );
+  };
+
+  emitter.on( 'gallery', gallery_event );
+
+  return () => {
+    emitter.off( 'gallery', gallery_event );
+  };
+}
