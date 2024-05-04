@@ -2,7 +2,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { BlockClient, BlocksScreenClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
-import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, TextElementType, VideoElementType } from "./modals";
+import { AcceptFussion, ChooseTypeFusion, ErrorModal, HtmlElementType, MediaElementType, RefElementType, TextElementType, VideoElementType } from "./modals";
 import { FusionElementsBlock, Media, Positions } from "@/app/lib/definitions";
 import { LoadScreen } from "@/app/ui/components/loading-modal";
 import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
@@ -28,7 +28,8 @@ export const TYPES_TO_CHOOSE = {
   text: 'text',
   image: 'media',
   video: 'linkvideo',
-  html: 'html'
+  html: 'html',
+  ref: 'ref'
 }
 
 /**
@@ -216,6 +217,7 @@ function Block({
       case TYPES_TO_CHOOSE.image:
       case TYPES_TO_CHOOSE.video: 
       case TYPES_TO_CHOOSE.html:
+      case TYPES_TO_CHOOSE.ref:
         setTypeSelected(type);
         setStep( STEPS.SET_ELEM_VALUE );
         break;
@@ -227,10 +229,11 @@ function Block({
 
   let blockElements = buildElementsForBlock( elements, totLines, totCols, handlerFusion, fusionElements );
 
-  async function SubmitCreateElementBlock(event: FormEvent<HTMLFormElement>, type:string) {
-    event.preventDefault()
+  async function SubmitCreateElementBlock(type:string, event?: FormEvent<HTMLFormElement>, formData?:FormData ) {
+    event?.preventDefault()
      
-    const formData = new FormData( event.currentTarget )
+    formData = formData && !event ? formData : new FormData( event.currentTarget )
+
     if( block.actions?.addElement ) {
       formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );
       try {
@@ -289,6 +292,9 @@ function Block({
             :
             ( typeSelected == TYPES_TO_CHOOSE.video ) ?
             <VideoElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></VideoElementType>
+            :
+            ( typeSelected == TYPES_TO_CHOOSE.ref ) ?
+            <RefElementType handler={SubmitCreateElementBlock} cancel={finishProcess} element={null}></RefElementType>
             :
             <></>
         }

@@ -1,11 +1,11 @@
 'use client'
-import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
+import { FaceFrownIcon, HandRaisedIcon, ArrowsPointingOutIcon, LinkIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 import { ElementBlockClient } from '../../interfaces';
 import { FormEvent, useEffect, useState } from 'react';
 import { useDebouncedCallback }from 'use-debounce';
 import { TYPES_TO_CHOOSE } from './blocks';
-import Image from 'next/image';
+import Image from "next/image";
 import { useParams } from 'next/navigation'
 import clsx from 'clsx';
 import { BorderButtons, ColorButtons, DirectionButtons, DirectionMarginButtons, PositionTextButtons } from './customButtons';
@@ -15,6 +15,7 @@ import { LoadScreen } from '@/app/ui/components/loading-modal';
 import { CustomModal } from '@/app/ui/components/modalForm';
 import { Gallery } from '../../../navBar/client/components';
 import { listenerNavBar } from '@/app/ui/emiter';
+import Spin from '@/app/ui/components/spin';
 
 const waitTime = 700;
 
@@ -149,6 +150,31 @@ export function ChooseTypeFusion({
                                     <span className="flex-1 ms-3 whitespace-nowrap">HTML Content</span>
                                 </div>
                             </li>
+                            <li onClick={() => { chooseElementType(TYPES_TO_CHOOSE.ref)}} >
+                                <div className={`
+                                    flex items-center p-3 text-base font-bold cursor-pointer 
+                                    border border-2 border-slate-500
+                                    hover:shadow
+
+                                    bg-gray-50 text-gray-900 rounded-lg group  
+                                    dark:bg-gray-600 dark:text-white
+                                    
+                                    hover:bg-gray-200
+                                    dark:hover:bg-gray-500
+                                    `
+                                    }>
+                                    <div className='flex'>
+                                        <LinkIcon
+                                        className={`
+                                        w-6 
+                                        text-gray-900
+                                        dark:text-gray-400
+                                        `}
+                                        />
+                                        <span className="flex-1 ms-3 whitespace-nowrap">Reference to element</span>
+                                    </div>
+                                </div>
+                            </li>
                 </ul>
             </div>
         </MyStaticModal>
@@ -203,7 +229,7 @@ export function TextElementType({
     return (
         <MyDragModal title='Text Element' close={cancel} maxWidth='max-w-lg'>
             <MyForm 
-                handlerSubmit={( event: any ) => handler( event, TYPES_TO_CHOOSE.text ) }
+                handlerSubmit={( event: any ) => handler( TYPES_TO_CHOOSE.text, event ) }
                 showSubmitButton={!isEdit}
                 >
                  {
@@ -397,7 +423,7 @@ export function MediaElementType({
                 <MyForm
                     handlerSubmit={async( event:any ) => {
                         setLoading(true);
-                        await handler( event, TYPES_TO_CHOOSE.image );
+                        await handler( TYPES_TO_CHOOSE.image, event );
                         setLoading(false);
                     }}
                     showSubmitButton={(!isEdit && !loading)}
@@ -560,7 +586,7 @@ export function HtmlElementType({
             <MyForm 
                 handlerSubmit={ async ( event:any ) => {
                     setLoading(true);
-                    await handler( event, TYPES_TO_CHOOSE.html );
+                    await handler( TYPES_TO_CHOOSE.html, event );
                     setLoading(false);
                 }}
                 showSubmitButton={(!isEdit && !loading)}
@@ -634,7 +660,7 @@ export function VideoElementType({
             <MyForm
                 handlerSubmit={async( event:any ) => {
                     setLoading(true);
-                    await handler( event, TYPES_TO_CHOOSE.video );
+                    await handler( TYPES_TO_CHOOSE.video, event );
                     setLoading(false);
                 }}
                 showSubmitButton={(!isEdit && !loading)}
@@ -781,6 +807,286 @@ export function UpdateSectionModal({
                 }
             </>
         )
+}
+
+interface AllElements {
+    elements:{
+        text: ElementBlockClient[],
+        media: ElementBlockClient[],
+        linkvideo: ElementBlockClient[],
+        html: ElementBlockClient[]
+
+    }
+}
+export function RefElementType({
+    handler,
+    cancel,
+    element,
+}:Readonly<{
+    handler:Function,
+    cancel:Function,
+    element:ElementBlockClient|null
+}>) {
+    const [ loading, setLoading ] = useState<boolean>(true);
+    const [ currentElementSelection, setCurrentElementSelection] = useState<string>('images');
+    const [ myElementsImages, setMyElementsImages ] = useState<ElementBlockClient[]>([]);
+    const [ myElementsText, setMyElementsText ] = useState<ElementBlockClient[]>([]);
+    const [ myElementsHtml, setMyElementsHtml ] = useState<ElementBlockClient[]>([]);
+    const [ myElementsYT, setMyElementsYT ] = useState<ElementBlockClient[]>([]);
+
+    const { username } = useParams();
+
+    let fetchElements = async () => {
+        let { elements } = await (await fetch(`/api/users/${username}/elements`)).json() as AllElements;
+
+        setLoading(false);
+
+        setMyElementsImages(elements.media);
+        setMyElementsText(elements.text);
+        setMyElementsHtml(elements.html);
+        setMyElementsYT(elements.linkvideo);
+    }
+
+    const selectElement = async ( element_id:string ) => {
+        console.log('element selected', element_id);
+        setLoading( true );
+        let form = new FormData();
+        form.set('ref', element_id );
+        await handler( TYPES_TO_CHOOSE.ref, undefined, form );
+        setLoading( false );
+    }
+
+    useEffect(() => {
+        if( loading ) {
+            fetchElements();  
+        }
+    }, [ loading ] );
+    
+    return (
+        <MyStaticModal title='Reference to another element' close={cancel} maxWidth='max-w-full'>
+            <div className='p-3' style={{ maxHeight:'70vh', overflowY:'auto'}}>
+                <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400 mb-3">
+                    <li className="me-2"
+                    onClick={() => setCurrentElementSelection('images')}
+                    >
+                    <div className={clsx({
+                        ['cursor-not-allowed']:true,
+                        ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                        ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+                        ['cursor-pointer block']:true,
+                        ['text-gray-400']: currentElementSelection != 'images',
+                        ['text-blue-600 bg-gray-100']: currentElementSelection == 'images'
+                    }
+                    )}>My Images</div>
+                    </li>
+
+                    <li className="me-2"
+                    onClick={() => setCurrentElementSelection('text')}
+                    >
+                        <div className={clsx({
+                            ['cursor-not-allowed']:true,
+                            ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                            ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+                            ['cursor-pointer block']:true,
+                            ['text-gray-400']: currentElementSelection != 'text',
+                            ['text-blue-600 bg-gray-100']: currentElementSelection == 'text'
+                            })
+                            }>My Text
+                        </div>
+                    </li>
+
+                    <li className="me-2"
+                    onClick={() => setCurrentElementSelection('html')}
+                    >
+                        <div className={clsx({
+                            ['cursor-not-allowed']:true,
+                            ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                            ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+                            ['cursor-pointer block']:true,
+                            ['text-gray-400']: currentElementSelection != 'html',
+                            ['text-blue-600 bg-gray-100']: currentElementSelection == 'html'
+                            })
+                            }>My HTML
+                        </div>
+                    </li>
+
+                    <li className="me-2"
+                    onClick={() => setCurrentElementSelection('videos')}
+                    >
+                        <div className={clsx({
+                            ['cursor-not-allowed']:true,
+                            ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                            ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
+                            ['cursor-pointer block']:true,
+                            ['text-gray-400']: currentElementSelection != 'videos',
+                            ['text-blue-600 bg-gray-100']: currentElementSelection == 'videos'
+                            })
+                            }>My Videos
+                        </div>
+                    </li>
+                </ul>
+
+                <div className="default flex">
+
+                    <div className={clsx({
+                        ['hidden']: currentElementSelection != 'images'
+                    })}>
+                        {
+                            ( myElementsImages.length > 0 ) ?
+                            myElementsImages.map( el => {
+                                return (
+                                    <div className={
+                                    `h-fit w-fit rounded-xl p-1 bg-gray-300 border border-slate-900 m-2
+                                    bg-gray-700
+                                    dark:bg-slate-300
+                                    `
+                                    }
+                                    key={el.element_id}
+                                    onClick={() => selectElement( el.element_id ) }
+                                    >
+                                    <div className={'image-container rounded-xl overflow-hidden hover:scale-105 h-24 w-24 cursor-pointer'}
+                                    style={{height: '6rem', width:'6rem'}}
+                                    onClick={() => { 
+                                    }}
+                                    >
+                                        <Image
+                                                src={el.content}
+                                                layout='fill'
+                                                alt="img"
+                                                className={'h-20 w-20'}
+                                                />
+                                    </div>
+                                    </div>
+                                    )
+                            })
+                            :
+                            <></>
+                        }
+                        {
+                            (loading) ?
+                            <Spin refreshFn={() => {}} infinity={true}></Spin>
+                            :
+                            <></>
+                        }
+
+                    </div>
+
+                    <div className={clsx({
+                        ['hidden']: currentElementSelection != 'text'
+                    })}>
+                        {
+                            (myElementsText.length>0) ?
+                            myElementsText.map( el => {
+                                return (
+                                    <div className={
+                                    `h-fit w-fit rounded-xl p-1 bg-gray-300 border border-slate-900 m-2
+                                    bg-gray-700
+                                    dark:bg-slate-300
+                                    `
+                                    }
+                                    key={el.element_id}
+                                    onClick={() => selectElement( el.element_id ) }
+                                    >
+                                    <div className={`hover:scale-105 h-24 w-24 cursor-pointer w-fit h-fit 
+                                    text-white dark:text-black
+                                    `}
+                                    onClick={() => { 
+                                    }}
+                                    >
+                                        { el.content }
+                                    </div>
+                                    </div>
+                                    )
+                            })
+                            :
+                            <></>
+                        }
+                        {
+                            (loading) ?
+                            <Spin refreshFn={() => {}} infinity={true}></Spin>
+                            :
+                            <></>
+                        }
+
+                    </div>
+
+                    <div className={clsx({
+                        ['hidden']: currentElementSelection != 'html'
+                    })}>
+                        {
+                            (myElementsHtml.length>0) ?
+                            myElementsHtml.map( el => {
+                                return (
+                                    <div className={
+                                    `h-fit w-fit rounded-xl p-1 bg-gray-300 border border-slate-900 m-2
+                                    bg-gray-700
+                                    dark:bg-slate-300
+                                    hover:scale-105
+                                    cursor-pointer
+                                    `
+                                    }
+                                    key={el.element_id}
+                                    onClick={() => selectElement( el.element_id ) }
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{__html: el.content}} 
+                                        />
+                                    </div>
+                                    )
+                            })
+                            :
+                            <></>
+                        }
+                        {
+                            (loading) ?
+                            <Spin refreshFn={() => {}} infinity={true}></Spin>
+                            :
+                            <></>
+                        }
+
+                    </div>
+
+                    <div className={clsx({
+                        ['hidden']: currentElementSelection != 'videos'
+                    })}>
+                        {
+                            (myElementsYT.length>0) ?
+                            myElementsYT.map( el => {
+                                return (
+                                    <div className={
+                                    `h-fit w-fit rounded-xl p-1 bg-gray-300 border border-slate-900 m-2
+                                    bg-gray-700
+                                    dark:bg-slate-300
+                                    hover:scale-105
+                                    cursor-pointer
+                                    pb-10
+                                    `
+                                    }
+                                    key={el.element_id}
+                                    onClick={() => selectElement( el.element_id ) }
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{__html: el.content}} 
+                                        />
+                                    </div>
+                                    )
+                            })
+                            :
+                            <></>
+                        }
+                        {
+                            (loading) ?
+                            <Spin refreshFn={() => {}} infinity={true}></Spin>
+                            :
+                            <></>
+                        }
+
+                    </div>
+
+                </div>
+            </div>
+        </MyStaticModal>
+    )
 }
 
 /**

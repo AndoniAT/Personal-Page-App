@@ -10,7 +10,8 @@ const TYPESELEMENT = {
     text: 'text',
     media: 'media',
     linkvideo: 'linkvideo',
-    html: 'html'
+    html: 'html',
+    ref: 'ref'
 }
 
 interface positions {
@@ -45,8 +46,9 @@ export async function createElementInBlock(this:{ section_id:string, username:st
         const positions = await getPositionsForBlock( fusionBlocks, block_id );
 
         let content = form.get('content') as string;
+        let ref = undefined;
 
-        const defClassName = 'h-full';
+        let defClassName = 'h-full';
         let css = `{}`
         switch( type ) {
           case TYPESELEMENT.text:
@@ -57,6 +59,18 @@ export async function createElementInBlock(this:{ section_id:string, username:st
           case TYPESELEMENT.html:
             css = `{"height": "100%"}`;
             break;
+          case TYPESELEMENT.ref:
+            ref = form.get('ref') as string;
+            let elementReference = (await sql`SELECT * FROM ELEMENT WHERE element_id = ${ref}`).rows[ 0 ] as ElementBlock;
+
+            if( !elementReference ) {
+              throw new Error( 'No element to reference' );
+            }
+            type = elementReference.type;
+            defClassName = elementReference.defclassname;
+            css = elementReference.css;
+            content = elementReference.content;
+            break;
           case TYPESELEMENT.linkvideo:
             // doing nothing
             break;
@@ -65,7 +79,7 @@ export async function createElementInBlock(this:{ section_id:string, username:st
           }
         }
 
-        let { element_id } = await insertElement( positions, defClassName, css, content, type, block_id );
+        let { element_id } = await insertElement( positions, defClassName, css, content, type, block_id, ref );
         return element_id;
 
       } catch( error:any ) {

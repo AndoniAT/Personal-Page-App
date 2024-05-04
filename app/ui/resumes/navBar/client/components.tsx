@@ -15,6 +15,7 @@ import TrashButton from "@/app/ui/components/trash-button";
 import emitter, { listenerGallery, listenerNavBar } from "@/app/ui/emiter";
 import AcmeLogo from "@/app/ui/components/acme-logo";
 import { ColorButtons } from "../../custom/editMode/client/customButtons";
+import Spin from "@/app/ui/components/spin";
 
 interface LinkParam {
     name: string,
@@ -387,13 +388,8 @@ export function Gallery({
               :
               <></>
             }
-                  <div className={clsx({
-                    ["mt-3 cursor-pointer w-fit"]:true,
-                    ['animate-spin']: loading
-                  })} onClick={() => refreshMedias() }>
-                    <ArrowPathIcon className='w-5 stroke-slate-700 dark:stroke-white'/> 
-                  </div>
-    
+                <Spin refreshFn={refreshMedias} infinity={false}/>
+
                 <div className="addImageToGallery flex justify-center"
                 onClick={handleAddImageClick}>
                   <div className={
