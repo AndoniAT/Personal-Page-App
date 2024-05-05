@@ -1,4 +1,5 @@
 import { requiresSessionUserProperty } from '@/app/lib/actions';
+import { createNewBlock } from '@/app/lib/blocks/actions';
 import { Resume, Section } from '@/app/lib/definitions';
 import { sql } from '@vercel/postgres';
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
@@ -43,6 +44,7 @@ export async function POST( req: Request, context:any ) {
         ${resume.resume_id}
       ) RETURNING section_id
       `).rows[ 0 ] as Section;
+      await createNewBlock.call({section_id: sec.section_id, username: username });
 
       return NextResponse.json( { section_id: sec.section_id } )
 
