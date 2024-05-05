@@ -151,7 +151,7 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
                   <div className={`
                   grow justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 flex
                   flex-col overflow-hidden
-                  md:overflow-auto
+                  md:overflow-y-auto
                   `
                   }
                   style={{ maxHeight: '90vh', overflowY:'auto'}}>

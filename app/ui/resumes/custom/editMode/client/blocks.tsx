@@ -87,7 +87,7 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
                     </MyTooltip>
                   </div>
 
-                  <div className='grid grid-cols-12 grid-rows-1 h-20'>
+                  <div className='grid grid-cols-12 grid-rows-1 h-fit'>
                     <div className='col-start-6 col-span-2 text-center flex justify-center'>
                       <MyTooltip content='Add a new row'>
                         <ButtonPlus handler={addRow}/>
@@ -129,7 +129,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
   
           if( !elementSet ) {
             // If the element has not been set, save it in its first position
-            elementsList[ setPosition ] = <CustomElement key={element.element_id} element={element}></CustomElement>,
+            elementsList[ setPosition ] = <CustomElement key={element.element_id} element={element}></CustomElement>;
             elementSet = true;
           } else {
             // If the element has already been set, mark this case as ocuped

@@ -42,7 +42,7 @@ export default async function Page(
     }
 
     // Create function actions for each block (adding or edit an element)
-    for (const [screen, blocksScreen] of Object.entries(blocks)) {
+    for (const [ screen, blocksScreen ] of Object.entries( blocks ) ) {
 
       blocksScreen.forEach( ( block:BlockClient ) => {
         const createElement = async ( type:string, form:FormData ) => {

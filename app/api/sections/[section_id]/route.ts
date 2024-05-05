@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from 'next/cache';
 import { requiresSessionUserProperty } from "@/app/lib/actions";
 import { sql } from "@vercel/postgres";
-import { Section } from "@/app/lib/definitions";
-import { insertMedia } from "@/app/lib/media/actions";
 
 export async function PUT( req: Request, context:any ) {
   noStore();

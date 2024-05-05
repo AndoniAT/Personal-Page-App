@@ -111,9 +111,6 @@ export async function deleteSection( section_id:string ) {
                         )`).rows[ 0 ];
     await requiresSessionUserProperty( username );
 
-    let allMediaSection = (await getAllMediaSection( section_id )) as Media[];
-    const keys = allMediaSection.map(m => m.key);
-    await utapi.deleteFiles( keys ); // Delete from uploadthing
     await sql`DELETE FROM SECTION WHERE section_id = ${section_id}`;
 
   } catch( error:any ) {

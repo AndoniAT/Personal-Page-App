@@ -1,6 +1,6 @@
 import { BlockClient, SectionsClient, UserClient } from "../interfaces";
 import clsx from "clsx";
-import { BuildBlocks } from "./client/blocks";
+import { BuildBlocks, VisualResponsive } from "./client/blocks";
 import { ShowHeader } from "./client/components";
 import CustomSection from "@/app/ui/components/custom-section";
 
@@ -20,7 +20,6 @@ export default function CustomView(
   
     const user = data.user;
     const section = data.section;
-    let blocks = section.blocks as BlockClient[];
     let css_string = section.css;
     let css = JSON.parse( css_string );
     let { backgroundColor } = css.backgroundColor ?? 'rgba( 0, 0, 0, 0)';
@@ -37,7 +36,7 @@ export default function CustomView(
             : <></>
           }
           <div>
-            { <BuildBlocks blocks={blocks}></BuildBlocks> }
+            { <VisualResponsive blocks={section.blocks}></VisualResponsive> }
           </div>
         </div>
       </CustomSection>

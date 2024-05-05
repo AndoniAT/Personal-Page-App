@@ -1,19 +1,67 @@
 'use client'
-import { useEffect, useState } from "react";
-import { BlockClient, ElementBlockClient } from "../../interfaces";
+import { BlockClient, BlocksScreenClient, ElementBlockClient } from "../../interfaces";
 import clsx from "clsx";
 import { TYPES_TO_CHOOSE } from "../../editMode/client/blocks";
-import { Media } from "@/app/lib/definitions";
 import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
 import { ImageElement } from "@/app/ui/components/image-element";
 import { TextElement } from "@/app/ui/components/text-element";
+
+export function VisualResponsive({
+  blocks
+}: Readonly<{
+  blocks: BlocksScreenClient
+}>) {
+  return (
+    <div className="default flex justify-center">
+    <div className={clsx({
+      ['hidden w-full']:true,
+      ['2xl:grid']:true
+    })
+    }
+    >
+        <BuildBlocks blocks={blocks._2xl as BlockClient[]}/>
+    </div>
+    <div className={clsx({
+        ['hidden 2xl:p-2 2xl:border 2xl:border-2 2xl:border-gray-400 w-full']:true,
+        ['xl:grid 2xl:hidden']:true
+      })
+      }>
+      <BuildBlocks blocks={blocks.xl as BlockClient[]}/>
+    </div>
+    <div className={clsx({
+        ['hidden xl:p-2 xl:border xl:border-2 xl:border-gray-400 w-full']:true,
+        ['lg:grid xl:hidden']:true
+      })
+    }>
+        <BuildBlocks blocks={blocks.lg as BlockClient[]}/>
+    </div>
+    <div className={clsx({
+      ['hidden lg:p-2 lg:border lg:border-2 lg:border-gray-400 w-full']:true,
+      ['md:grid lg:hidden']: true
+    })}>
+      <BuildBlocks blocks={blocks.md as BlockClient[]}/>
+    </div>
+    <div className={clsx({
+        ['p-2 border md:border-2 md:border-gray-400 w-full']:true,
+        ['grid md:hidden']: true
+      })
+    }>
+      <BuildBlocks blocks={blocks.phone as BlockClient[]}/>
+    </div>
+  </div>
+  )
+}
 
 /**
  * Construct customed blocks to show in page
  * @param blocks 
  * @returns 
  */
-export function BuildBlocks( { blocks }:Readonly<{ blocks:BlockClient[] }> ) {
+export function BuildBlocks( { 
+  blocks 
+}:Readonly<{ 
+  blocks:BlockClient[] 
+}> ) {
     return (<>
       {
         blocks.map( ( block:BlockClient ) => <Block key={block.block_id} block={block} /> )
@@ -43,7 +91,7 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
       for(let line = linefrom; line <= element.lineto; line++ ) {
         for(let col = colfrom; col <= element.colto; col++ ) {
           let idxLine = line - 1;
-          let idxCol = col-1;
+          let idxCol = col - 1;
           let setInLine = ( totCols * idxLine );
           let setPosition = setInLine + idxCol;
   
@@ -63,7 +111,8 @@ function buildElementsForBlock( blockElements:ElementBlockClient[], totLines:num
     for (let index = 0; index < elementsList.length; index++) {
       if( elementsList[index] == undefined ) {
         let positionTable = index + 1;
-        let line = Math.ceil(positionTable/totLines);
+        //let line = Math.ceil(positionTable/totLines);
+        let line = Math.ceil(positionTable / totCols );
         let col = positionTable - ( totCols * ( line - 1 ) );
         elementsList[index] = <EmptyElement key={index}/>
       }

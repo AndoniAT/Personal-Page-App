@@ -6,7 +6,7 @@ import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import CustomView from '@/app/ui/resumes/custom/visualMode/customResume';
 import { getBlocksSection } from '@/app/lib/section/actions';
-import { BlockClient } from '@/app/ui/resumes/custom/interfaces';
+import { BlockClient, BlocksScreenClient } from '@/app/ui/resumes/custom/interfaces';
 
 export const metadata: Metadata = {
   title: 'Resume User',
@@ -30,7 +30,7 @@ export default async function Page(
     }
 
     const home = await getHomeUserSection( username );
-    const blocks = await getBlocksSection( home.section_id ) as BlockClient[]|[];
+    const blocks = await getBlocksSection( home.section_id ) as BlocksScreenClient;
 
     const sendData = {
       user: {
@@ -43,7 +43,7 @@ export default async function Page(
         url_hero: user.url_hero,
       },
       section: {
-         section_id: home.section_id,
+        section_id: home.section_id,
         name: home.name,
         created: home.created,
         public: home.public,
