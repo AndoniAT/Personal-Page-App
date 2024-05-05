@@ -1,5 +1,6 @@
 import SideNav from '@/app/ui/resumes/navBar/sidenav';
 import { getUserByUsername, getAllUserSections } from '@/app/lib/data';
+import { User } from '@/app/lib/definitions';
 
 export default async function Layout({ 
   children,
@@ -12,7 +13,7 @@ Readonly<{
 }>) {
   const username = params.username;
   let sections = await getAllUserSections( username );
-  const user = await getUserByUsername( username );
+  const user = await getUserByUsername( username ) as User;
   const home = sections.find( s => s.ishome );
 
   return (

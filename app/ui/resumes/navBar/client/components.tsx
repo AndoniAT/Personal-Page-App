@@ -16,6 +16,8 @@ import emitter, { listenerGallery, listenerNavBar } from "@/app/ui/emiter";
 import AcmeLogo from "@/app/ui/components/acme-logo";
 import { ColorButtons } from "../../custom/editMode/client/customButtons";
 import Spin from "@/app/ui/components/spin";
+import { UserClient } from "../../custom/interfaces";
+import { Button } from "@/app/ui/components/button";
 
 interface LinkParam {
     name: string,
@@ -652,6 +654,75 @@ export function EditUserPencilLink() {
     >
       <PencilSquareIcon className="w-6 ml-3"/>
   </Link>
+  )
+}
+
+export function FollowButton({
+  user_session
+} : {
+  user_session?:string
+}) {
+  const [ loading, setLoading ] = useState<boolean>(false);
+  const [ following, setFollowing ] = useState<boolean>(false);
+  let { username } = useParams();
+
+  useEffect(() => {
+    if( user_session ){
+      fetch(`/api/users/${user_session}/follows/${username}`)
+      .then( res => res.json() )
+      .then( res => {
+        setFollowing( res );
+      })
+    }
+  }, [ user_session ])
+
+  let followHandle = async () => {
+    if( user_session && username ) {
+      setLoading( true );
+
+      const formData = new FormData();
+      formData.append('username_session', user_session);
+      formData.append('follow', username as string);
+
+      let meth = following ? 'DELETE': 'POST';
+
+      let { follows } = await (await fetch(`/api/users/${user_session}/follows/${username}`, {
+                method: meth
+              } )
+            ).json();
+      setFollowing( follows );
+      setLoading( false );
+    }
+
+  }
+
+  return (
+    <>
+    {
+      ( following ) ?
+        ( loading ) ?
+        <Button className='h-fit ml-3 py-px'>
+          <Spin infinity={true} refreshFn={() => {}}></Spin>
+        </Button>
+        :
+        <Button className='h-fit ml-3 py-px'
+        onClick={followHandle}>
+          Follow
+        </Button>
+      :
+      ( loading ) ? 
+      <Button className='h-fit ml-3 py-px bg-gray-500 hover:bg-gray-200 hover:text-black'>
+          <Spin infinity={true} refreshFn={() => {}}></Spin>
+      </Button>
+      :
+      <Button className='h-fit ml-3 py-px bg-gray-500 hover:bg-gray-200 hover:text-black'
+      onClick={followHandle}>
+          Unfollow
+      </Button>
+    }
+
+
+    </>
   )
 }
 

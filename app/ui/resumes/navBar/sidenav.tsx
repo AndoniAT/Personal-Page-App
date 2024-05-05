@@ -8,6 +8,7 @@ import { auth, signOut } from '@/auth';
 import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import EditModeNavBar from './editModeNavBar';
 import { MySideNav } from './client/components';
+import { getUserByEmail } from '@/app/lib/data';
 
 export default async function SideNav( { 
   sections, user, mode, currentSection 
@@ -51,10 +52,17 @@ async function createSideNav( paramsSend : {
   let session = await auth();
   
   let isUsersSessionProfile = !( !session || session.user?.email != user?.email);
+  
+  let user_session:User|undefined = session?.user?.email ? await getUserByEmail( session.user.email ) as User : undefined;
+
+  let prms = {
+    ...paramsSend,
+    session_username: user_session?.username
+  }
 
   return (
       <MySideNav>
-        <NavLinks params={paramsSend}/>
+        <NavLinks params={prms}/>
         { // Edit or visual section mode 
           (isUsersSessionProfile) ? 
           ( 

@@ -24,7 +24,7 @@ export default function Spin({
 
     return (
         <div className={clsx({
-            ["mt-3 cursor-pointer w-fit"]:true,
+            ["cursor-pointer w-fit"]:true,
             ['animate-spin']: loading || infinity
           })} onClick={refresh}>
             <ArrowPathIcon className='w-5 stroke-slate-700 dark:stroke-white'/> 

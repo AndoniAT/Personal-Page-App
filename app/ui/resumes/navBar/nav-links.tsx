@@ -1,14 +1,16 @@
 import { SectionsNavBar } from '@/app/resumes/[username]/interfaces';
-import { User } from 'next-auth';
-import { CreateHomeLink, CreateSectionsLink, EditUserPencilLink, GetUsernameSection, MainLinks } from './client/components';
+import { CreateHomeLink, CreateSectionsLink, EditUserPencilLink, FollowButton, GetUsernameSection, MainLinks } from './client/components';
 import { auth } from '@/auth';
+import { Button } from '../../components/button';
+import { User } from '@/app/lib/definitions';
 
 interface ParamsProps {
   home?: SectionsNavBar
   sections?: SectionsNavBar[],
   mode?: 'edit',
   user?: User,
-  currentSection?: SectionsNavBar
+  currentSection?: SectionsNavBar,
+  session_username?: string
 }
 
 export default async function NavLinks( { params } : Readonly<{ params: ParamsProps }>) {
@@ -17,7 +19,8 @@ export default async function NavLinks( { params } : Readonly<{ params: ParamsPr
     mode,
     sections, 
     home, 
-    currentSection
+    currentSection,
+    session_username
   } = params;
 
   let session = await auth();
@@ -33,9 +36,15 @@ export default async function NavLinks( { params } : Readonly<{ params: ParamsPr
       <div className='grid grid-rows-* gap-1 mt-10'>
         <div className={`font-bold text-lg flex
         text-gray-600 
-        dark:text-white`}>
+        dark:text-white
+        items-center
+        `}>
           {<GetUsernameSection/>}
           { ( isUsersSessionProfile && isEdit ) ? <EditUserPencilLink/> : <></>}
+          { ( !isUsersSessionProfile ) ? 
+            <FollowButton user_session={session_username}/>:
+            <></> 
+          }
         </div>
         {
           ( currentSection ) ?
