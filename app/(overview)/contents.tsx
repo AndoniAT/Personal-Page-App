@@ -160,7 +160,6 @@ export function Content3() {
                         h-60
                         md:h-96
                         rounded-2xl overflow-hidden hover:scale-105 cursor-pointer
-                        h-9
                         col-span-4
                         md:col-span-6
                         lg:col-span-4
