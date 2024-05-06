@@ -74,7 +74,7 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
       let addRow = () => actionRow( 'add_row' );
 
       return ( 
-            <>
+            <div key={'block_'+block_.block_id}>
               {
                 ( loadingBlock == block_.block_id ) ?
                 <LoadScreen/>
@@ -96,7 +96,7 @@ export function BuildBlocksEditMode( { blocks }:Readonly<{ blocks:BlockClient[] 
                   </div>
                 </>
               }
-            </>
+            </div>
         )
       })
 }
