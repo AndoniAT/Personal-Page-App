@@ -13,11 +13,11 @@ export function Content1() {
 
     return (
         <div className={`myGridMainPage`}>
-            { createArr( 4 ).map( () => <div className="box box-phone"></div> ) }
-            { createArr( 6 ).map( () => <div className="box box-md"></div> ) }
-            { createArr( 8 ).map( () => <div className="box box-lg"></div> ) }
-            { createArr( 10 ).map( () => <div className="box box-xl"></div> ) }
-            { createArr( 12 ).map( () => <div className="box box-2xl"></div> ) }
+            { createArr( 4 ).map( (i:number) => <div key={i} className="box box-phone"></div> ) }
+            { createArr( 6 ).map( (i:number) => <div key={i} className="box box-md"></div> ) }
+            { createArr( 8 ).map( (i:number) => <div key={i} className="box box-lg"></div> ) }
+            { createArr( 10 ).map( (i:number) => <div key={i} className="box box-xl"></div> ) }
+            { createArr( 12 ).map( (i:number) => <div key={i} className="box box-2xl"></div> ) }
         </div>
     )
 }
@@ -26,11 +26,11 @@ export function Content2() {
     return (
         <div className="myGridMainPage">
             <Head/>
-            { createArr( 4 ).map( () => <div className="box box-phone"></div> ) }
-            { createArr( 6 ).map( () => <div className="box box-md"></div> ) }
-            { createArr( 8 ).map( () => <div className="box box-lg"></div> ) }
-            { createArr( 10 ).map( () => <div className="box box-xl"></div> ) }
-            { createArr( 12 ).map( () => <div className="box box-2xl"></div> ) }
+            { createArr( 4 ).map( (i:number) => <div key={i} className="box box-phone"></div> ) }
+            { createArr( 6 ).map( (i:number) => <div key={i} className="box box-md"></div> ) }
+            { createArr( 8 ).map( (i:number) => <div key={i} className="box box-lg"></div> ) }
+            { createArr( 10 ).map( (i:number) => <div key={i} className="box box-xl"></div> ) }
+            { createArr( 12 ).map( (i:number) => <div key={i} className="box box-2xl"></div> ) }
       </div>
     )
 }
