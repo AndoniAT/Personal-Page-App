@@ -1,5 +1,5 @@
 import SideNav from '@/app/ui/resumes/navBar/sidenav';
-import { getUserByUsername, getAllUserSections, getHomeUserSection } from '@/app/lib/data';
+import { getUserByUsername, getAllUserSections } from '@/app/lib/data';
 
 export default async function Layout({ 
   children,

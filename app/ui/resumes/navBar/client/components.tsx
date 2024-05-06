@@ -432,7 +432,7 @@ export function Gallery({
                     medias.map( media => {
     
                     return (
-                      <div className={
+                      <div key={'media_'+media.media_id} className={
                         `h-fit w-fit rounded-xl p-1 bg-gray-300 border border-slate-900 m-2
                         bg-gray-700
                         dark:bg-slate-300
@@ -793,6 +793,7 @@ export function FollowTabs(){
                 followList.map( f => {
                   return (
                     <Link 
+                    key={'user'+f.username}
                     href={`/resumes/${f.username}`}
                     className="bg-slate-400 w-full p-2 rounded-xl flex cursor-pointer hover:scale-105 items-center mb-3">
                       <div className="photo">

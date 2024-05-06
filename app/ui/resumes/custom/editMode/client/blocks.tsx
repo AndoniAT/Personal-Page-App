@@ -232,7 +232,7 @@ function Block({
   async function SubmitCreateElementBlock(type:string, event?: FormEvent<HTMLFormElement>, formData?:FormData ) {
     event?.preventDefault()
      
-    formData = formData && !event ? formData : new FormData( event.currentTarget )
+    formData = formData && !event ? formData : new FormData( event?.currentTarget )
 
     if( block.actions?.addElement ) {
       formData.set( 'fusionBlocks', JSON.stringify( fusionElements ) );

@@ -1,11 +1,11 @@
-import { getUserByUsername, getHomeUserSection, getProfilePhotoForUser, getUserSection } from '@/app/lib/data';
+import { getUserByUsername, getUserSection } from '@/app/lib/data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import MenuResumeUserSkeleton from '@/app/ui/resumes/sekeletons';
 import CustomView from '@/app/ui/resumes/custom/visualMode/customResume';
 import { getBlocksSection } from '@/app/lib/section/actions';
-import { BlockClient, BlocksScreenClient } from '@/app/ui/resumes/custom/interfaces';
+import { BlocksScreenClient } from '@/app/ui/resumes/custom/interfaces';
 
 export const metadata: Metadata = {
   title: 'Resume Section User',
