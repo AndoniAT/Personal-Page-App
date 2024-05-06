@@ -871,7 +871,7 @@ export function RefElementType({
                     >
                     <div className={clsx({
                         ['cursor-not-allowed']:true,
-                        ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                        ['inline-block p-1 md:p-4 rounded-t-lg hover:bg-gray-50']:true,
                         ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
                         ['cursor-pointer block']:true,
                         ['text-gray-400']: currentElementSelection != 'images',
@@ -885,7 +885,7 @@ export function RefElementType({
                     >
                         <div className={clsx({
                             ['cursor-not-allowed']:true,
-                            ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                            ['inline-block p-1 md:p-4 rounded-t-lg hover:bg-gray-50']:true,
                             ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
                             ['cursor-pointer block']:true,
                             ['text-gray-400']: currentElementSelection != 'text',
@@ -900,7 +900,7 @@ export function RefElementType({
                     >
                         <div className={clsx({
                             ['cursor-not-allowed']:true,
-                            ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                            ['inline-block p-1 md:p-4 rounded-t-lg hover:bg-gray-50']:true,
                             ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
                             ['cursor-pointer block']:true,
                             ['text-gray-400']: currentElementSelection != 'html',
@@ -915,7 +915,7 @@ export function RefElementType({
                     >
                         <div className={clsx({
                             ['cursor-not-allowed']:true,
-                            ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+                            ['inline-block p-1 md:p-4 rounded-t-lg hover:bg-gray-50']:true,
                             ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
                             ['cursor-pointer block']:true,
                             ['text-gray-400']: currentElementSelection != 'videos',
@@ -929,10 +929,11 @@ export function RefElementType({
                 <div className="default flex">
 
                     <div className={clsx({
-                        ['hidden']: currentElementSelection != 'images'
+                        ['hidden']: currentElementSelection != 'images',
+                        ['flex flex-wrap']:true
                     })}>
                         {
-                            ( myElementsImages.length > 0 ) ?
+                            ( myElementsImages.length > 0 && !loading) ?
                             myElementsImages.map( el => {
                                 return (
                                     <div className={
@@ -975,7 +976,7 @@ export function RefElementType({
                         ['hidden']: currentElementSelection != 'text'
                     })}>
                         {
-                            (myElementsText.length>0) ?
+                            (myElementsText.length>0 && !loading) ?
                             myElementsText.map( el => {
                                 return (
                                     <div className={
@@ -1014,7 +1015,7 @@ export function RefElementType({
                         ['hidden']: currentElementSelection != 'html'
                     })}>
                         {
-                            (myElementsHtml.length>0) ?
+                            (myElementsHtml.length>0 && !loading) ?
                             myElementsHtml.map( el => {
                                 return (
                                     <div className={
@@ -1047,10 +1048,11 @@ export function RefElementType({
                     </div>
 
                     <div className={clsx({
-                        ['hidden']: currentElementSelection != 'videos'
+                        ['hidden']: currentElementSelection != 'videos',
+                        ['overflow-auto rounded-xl'] : true
                     })}>
                         {
-                            (myElementsYT.length>0) ?
+                            (myElementsYT.length>0 && !loading) ?
                             myElementsYT.map( el => {
                                 return (
                                     <div className={

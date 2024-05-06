@@ -564,16 +564,16 @@ export function TabsResponsive({
 
   return (
     <>
-      <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400 mb-3">
+      <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400 mb-3 mt-3 ml-3">
         <li className="me-2"
           onClick={() => setActive('2xl')}
         >
           <div className={clsx({
               ['hidden cursor-not-allowed text-gray-400']:true,
-              ['inline-block p-4 bg-gray-100 rounded-t-lg active']:true,
-              ['dark:bg-gray-800 dark:text-blue-500']:true,
+              ['inline-block w-24 p-3 bg-gray-100 dark:bg-gray-200 rounded-t-lg active']:true,
+              ['dark:hover:bg-gray-800']:true,
               ['2xl:cursor-pointer 2xl:block']:true,
-              ['2xl:text-blue-600']: active == '' || active == '2xl',
+              ['2xl:text-blue-600 2xl:dark:text-blue-600']: active == '' || active == '2xl',
               ['text-gray-400']: active != '2xl'
           }
           )}>2xl</div>
@@ -583,7 +583,7 @@ export function TabsResponsive({
         >
           <div className={clsx({
               ['hidden cursor-not-allowed text-gray-400']:true,
-              ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+              ['inline-block w-24 p-3 bg-gray-100 dark:bg-gray-200 rounded-t-lg hover:bg-gray-50']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['xl:cursor-pointer xl:block']:true,
               ['xl:text-blue-600 2xl:text-gray-400']: active == '' || active == '2xl',
@@ -597,7 +597,7 @@ export function TabsResponsive({
         >
           <div className={clsx({
               ['hidden cursor-not-allowed text-gray-400']:true,
-              ['inline-block p-4 rounded-t-lg hover:bg-gray-50']:true,
+              ['inline-block w-24 p-3 bg-gray-100 dark:bg-gray-200 rounded-t-lg hover:bg-gray-50']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['lg:cursor-pointer lg:block']:true,
               ['lg:text-blue-600 xl:text-gray-400']: active == '' || active == 'xl' || active == '2xl',
@@ -610,7 +610,7 @@ export function TabsResponsive({
         >
           <div className={clsx({
               ['hidden cursor-not-allowed text-gray-400']:true,
-              ['inline-block p-4 rounded-t-lg hover:bg-gray-50 ']:true,
+              ['inline-block w-24 p-3 bg-gray-100 dark:bg-gray-200 rounded-t-lg hover:bg-gray-50 ']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['md:cursor-pointer md:block']:true,
               ['md:text-blue-600 lg:text-gray-400']: active == '' || active == 'lg' || active == 'xl' || active == '2xl',
@@ -623,7 +623,7 @@ export function TabsResponsive({
         >
           <div className={clsx({
               ['cursor-not-allowed']:true,
-              ['inline-block p-4 rounded-t-lg hover:bg-gray-50 ']:true,
+              ['inline-block w-24 p-3 bg-gray-100 dark:bg-gray-200 rounded-t-lg hover:bg-gray-50 ']:true,
               ['dark:hover:bg-gray-800 dark:hover:text-gray-300']:true,
               ['cursor-pointer']:true,
               ['text-blue-600 md:text-gray-400']: active == '' || active == 'md' || active == 'lg' || active == 'xl' || active == '2xl',

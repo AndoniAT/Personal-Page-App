@@ -22,27 +22,27 @@ export function VisualResponsive({
         <BuildBlocks blocks={blocks._2xl as BlockClient[]}/>
     </div>
     <div className={clsx({
-        ['hidden 2xl:p-2 2xl:border 2xl:border-2 2xl:border-gray-400 w-full']:true,
+        ['hidden 2xl:p-2 w-full']:true,
         ['xl:grid 2xl:hidden']:true
       })
       }>
       <BuildBlocks blocks={blocks.xl as BlockClient[]}/>
     </div>
     <div className={clsx({
-        ['hidden xl:p-2 xl:border xl:border-2 xl:border-gray-400 w-full']:true,
+        ['hidden xl:p-2 w-full']:true,
         ['lg:grid xl:hidden']:true
       })
     }>
         <BuildBlocks blocks={blocks.lg as BlockClient[]}/>
     </div>
     <div className={clsx({
-      ['hidden lg:p-2 lg:border lg:border-2 lg:border-gray-400 w-full']:true,
+      ['hidden lg:p-2 w-full']:true,
       ['md:grid lg:hidden']: true
     })}>
       <BuildBlocks blocks={blocks.md as BlockClient[]}/>
     </div>
     <div className={clsx({
-        ['p-2 border md:border-2 md:border-gray-400 w-full']:true,
+        ['p-2 w-full']:true,
         ['grid md:hidden']: true
       })
     }>

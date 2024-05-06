@@ -124,13 +124,49 @@ body {
 }
 
 /* MAIN PAGE*/
+.myGridMainPage {
+  @apply grid 
+  grid-cols-4
+  md:grid-cols-6
+  lg:grid-cols-8
+  xl:grid-cols-10
+  2xl:grid-cols-12
+  w-full
+  gap-9
+  place-items-center
+}
 
 .box {
   background-color: rgb(108, 108, 108);
   border-radius: 50%; /* Forme initiale : cercle */
   animation: rotate 5.7s infinite; /* 0.7s pour la rotation et 5s de délai avant de redémarrer */
-  @apply min-w-9 min-h-9 md:min-w-10 md:min-h-10 lg:min-w-14 lg:min-h-14 xl:min-w-20 xl:min-h-20 
-  before:absolute before:inset-0 before:rounded-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent
+  @apply min-w-10 min-h-10 w-10 h-10
+  md:min-w-10 md:min-h-10 
+  lg:min-w-14 lg:min-h-14 
+  xl:min-w-20 xl:min-h-20 
+  before:absolute before:inset-0 before:rounded-full before:animate-[shimmer_2s_infinite] 
+  before:bg-gradient-to-r before:from-transparent before:via-white/60 
+  before:to-transparent
+}
+
+.box-phone {
+  @apply md:hidden
+}
+
+.box-md {
+  @apply hidden md:block
+}
+
+.box-lg {
+  @apply hidden lg:block
+}
+
+.box-xl {
+  @apply hidden xl:block
+}
+
+.box-2xl {
+  @apply hidden 2xl:block
 }
 
 .box-header {

@@ -75,7 +75,7 @@ async function createSideNav( paramsSend : {
               :
                 // VISUAL MODE
                 <>
-                  <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='hidden md:block'>
+                  <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='block mt-3 md:mt-0'>
                     <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
                       <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
                       <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
@@ -124,15 +124,18 @@ async function createSideNav( paramsSend : {
             ) : 
             (
               <div className='grid grid-cols-2'>
-                  <form action={goToLogin}>
+                  <form action={goToLogin}
+                  className='flex justify-center'>
                     <button className="sessionIconsNavBar">
                       <PowerIcon className="w-6 text-blue-600 mr-5" />
                       <div className="text-session-btn">Login</div>
                     </button>
                   </form>
-                  <form action={goToCreateAccount}>
+                  <form action={goToCreateAccount}
+                  className='flex justify-center'
+                  >
                     <button className="sessionIconsNavBar">
-                      <UserCircleIcon className="w-10 text-blue-600 mr-5" />
+                      <UserCircleIcon className="w-6 text-blue-600 mr-5" />
                       <div className="text-session-btn">Create an account</div>
                     </button>
                   </form>
