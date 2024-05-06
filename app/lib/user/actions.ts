@@ -59,52 +59,10 @@ export async function deleteUserByUsername( username:string ) {
     noStore();
     try {
         await requiresSessionUserProperty( username );
-
-       await retirePofilePhoto( username );
-       await deleteSectionsMedia( username );
-       await deleteUser( username );
+        await deleteUser( username );
     } catch( error:any ) {
         throw new Error( 'Failed to delete user: ' + error?.message );
     }
-}
-
-async function retirePofilePhoto( username:string ) {
-    let photoprofile = (await sql`SELECT * FROM MEDIA
-        WHERE media_id IN(SELECT photo_profile_id FROM USERS
-            WHERE username = ${username}
-        )`).rows[ 0 ];
-
-    await sql`UPDATE USERS
-    SET photo_profile_id = NULL
-    WHERE username = ${username};`
-
-    if( photoprofile ) {            
-        let { key, media_id } = photoprofile;
-        await sql`DELETE FROM MEDIA WHERE media_id = ${media_id}`;
-        await utapi.deleteFiles([key]); // From uploadthing
-    }
-}
-
-async function deleteSectionsMedia( username:string ) {
-    let sectionMedias = (await sql`SELECT * FROM MEDIA
-    WHERE section_id IN (SELECT section_id FROM SECTION WHERE
-        resume_id IN(SELECT resume_id FROM RESUME
-            WHERE user_id IN(SELECT user_id FROM USERS
-                WHERE username = ${username}
-            )
-        )
-    )`).rows;
-
-   if( sectionMedias.length > 0 ) {
-    let keys = sectionMedias.map( m => m.key );
-    let ids = sectionMedias.map( m => m.media_id ) as UUID[];
-
-    for ( const id of ids) {
-        await sql`DELETE FROM MEDIA WHERE media_id = ${id}`;
-    }
-
-    await utapi.deleteFiles(keys); // From uploadthing
-   }
 }
 
 async function deleteUser( username:string ) {
