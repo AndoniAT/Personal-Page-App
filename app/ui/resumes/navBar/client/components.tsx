@@ -671,7 +671,8 @@ export function FollowButton({
       fetch(`/api/users/${user_session}/follows/${username}`)
       .then( res => res.json() )
       .then( res => {
-        setFollowing( res );
+        let { follows } = res;
+        setFollowing( follows );
       })
     }
   }, [ user_session ])
@@ -683,15 +684,19 @@ export function FollowButton({
       const formData = new FormData();
       formData.append('username_session', user_session);
       formData.append('follow', username as string);
-
       let meth = following ? 'DELETE': 'POST';
-
-      let { follows } = await (await fetch(`/api/users/${user_session}/follows/${username}`, {
-                method: meth
-              } )
-            ).json();
-      setFollowing( follows );
-      setLoading( false );
+      
+      try {
+        let { follows } = await (await fetch(`/api/users/${user_session}/follows/${username}`, {
+                  method: meth
+                } )
+              ).json();
+        setFollowing( follows );
+        setLoading( false );
+      } catch( e ) {
+        console.log('Error', e );
+        setLoading( false );
+      }
     }
 
   }
@@ -699,7 +704,7 @@ export function FollowButton({
   return (
     <>
     {
-      ( following ) ?
+      ( !following ) ?
         ( loading ) ?
         <Button className='h-fit ml-3 py-px'>
           <Spin infinity={true} refreshFn={() => {}}></Spin>
@@ -722,6 +727,98 @@ export function FollowButton({
     }
 
 
+    </>
+  )
+}
+
+export function FollowTabs(){
+  const [ active, setActive ] = useState<string>('follow');
+  const [ following, setFollowing ] = useState<{username:string, url_profile:string|null}[]>([]);
+  const [ followers, setFollowers ] = useState<{username:string, url_profile:string|null}[]>([]);
+
+  const { username } = useParams();
+
+  useEffect(() => {
+    fetch(`/api/users/${username}/follows`)
+    .then( res => res.json() )
+    .then( res => {
+      let { follows } = res;
+      setFollowing( follows );
+    })
+
+    fetch(`/api/users/${username}/followed`)
+    .then( res => res.json() )
+    .then( res => {
+      let { followed } = res;
+      setFollowers( followed );
+    })
+
+  }, [ username ] );
+
+  let followList = ( active == 'follow' ) ? following : followers;
+
+  return (
+    <>
+      <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400 mb-3 mt-3">
+
+        <li className="me-2"
+          onClick={() => setActive('follow')}
+        >
+          <div className={clsx({
+              ['inline-block p-2 rounded-t-lg active']:true,
+              ['cursor-pointer block']:true,
+              ['text-blue-600 dark:text-blue-500 bg-gray-100 dark:bg-gray-800']: active == 'follow',
+              ['text-gray-400']: active != 'follow'
+          }
+          )}>Follow</div>
+        </li>
+
+        <li className="me-2"
+        onClick={() => setActive('followedBy')}
+        >
+          <div className={clsx({
+              ['inline-block p-2 rounded-t-lg active']:true,
+              ['cursor-pointer block']:true,
+              ['text-blue-600 dark:text-blue-500 bg-gray-100 dark:bg-gray-800']: active == 'followedBy',
+              ['text-gray-400']: active != 'followedBy'
+              })
+            }>Followers</div>
+        </li>
+
+      </ul>
+
+      <div className="default flex justify-center px-3 h-full max-h-[50%]">
+            <div className="w-full max-h-[100%] overflow-y-auto overflow-x-hidden">
+              {
+                followList.map( f => {
+                  return (
+                    <Link 
+                    href={`/resumes/${f.username}`}
+                    className="bg-slate-400 w-full p-2 rounded-xl flex cursor-pointer hover:scale-105 items-center mb-3">
+                      <div className="photo">
+                        { f.url_profile ?
+                        <Image
+                        src={f.url_profile}
+                        width={50}
+                        height={50}
+                        alt="Profile"
+                        className={'flex h-10 w-10 shrink-0 grow-0 items-center justify-center rounded-full text-green-700'}
+                        />
+                        :
+                        <div className="h-10 w-10 bg-slate-700 rounded-full">
+
+                        </div>
+                        }
+                      </div>
+                      <div className="name ml-3">
+                        {f.username}
+                      </div>
+                    </Link>
+                  )
+                })
+              }
+            </div>
+      </div>
     </>
   )
 }

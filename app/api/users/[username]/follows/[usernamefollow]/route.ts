@@ -8,11 +8,11 @@ export async function GET( request: Request, context:any) {
     noStore();
     let { params } = context;
     let { username,  usernamefollow } = params;
-    console.log(`checking if ${username} follows ${usernamefollow}`);
+    //console.log(`checking if ${username} follows ${usernamefollow}`);
 
     let res = (await sql`SELECT * FROM USER_FOLLOW_USER 
       WHERE user_id IN(SELECT user_id FROM USERS WHERE username = ${username}) AND
-      user_id_followed IN(SELECT user_id FROM USERS WHERE username = ${username})`).rowCount
+      user_id_followed IN(SELECT user_id FROM USERS WHERE username = ${usernamefollow})`).rowCount
 
     return NextResponse.json({
       follows: res > 0

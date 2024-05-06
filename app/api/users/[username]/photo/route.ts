@@ -19,7 +19,7 @@ export async function PUT( req: Request, context:any ) {
       }
 
       if( attr != 'url_hero' && attr != 'url_profile' ) {
-        throw new Error( 'No valid attribute photo' );
+        throw new Error( 'No valid attribute photo' + attr );
       }
 
       let res:any = '';

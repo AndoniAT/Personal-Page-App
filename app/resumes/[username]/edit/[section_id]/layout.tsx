@@ -16,10 +16,10 @@ Readonly<{
   const section = sections.find( s => s.section_id == section_id );
 
   return (
-    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden myBackgroundPage">
+    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
       { /* <div className="w-full flex-none md:w-80"> */ }
       <SideNav sections={sections} user={user} mode={'edit'} currentSection={section || undefined} />
-      <div className="flex-grow p-2 md:overflow-y-auto md:p-3 mb-10">
+      <div className="flex-grow p-2 md:overflow-y-auto md:p-3 mb-10 myBackgroundPage">
         {children}
       </div>
     </div>

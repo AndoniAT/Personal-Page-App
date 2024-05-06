@@ -17,9 +17,9 @@ Readonly<{
   const home = sections.find( s => s.ishome );
 
   return (
-    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden myBackgroundPage">
+    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
         <SideNav sections={sections} user={user} currentSection={home} />
-      <div className="flex-grow p-2 md:overflow-y-auto md:p-3">{
+      <div className="flex-grow p-2 md:overflow-y-auto md:p-3 myBackgroundPage">{
         children
       }</div>
     </div>

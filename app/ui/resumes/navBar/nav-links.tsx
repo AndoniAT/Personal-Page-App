@@ -3,6 +3,8 @@ import { CreateHomeLink, CreateSectionsLink, EditUserPencilLink, FollowButton, G
 import { auth } from '@/auth';
 import { Button } from '../../components/button';
 import { User } from '@/app/lib/definitions';
+import { revalidateTag } from 'next/cache';
+import { customRevalidateTag } from '@/app/lib/actions';
 
 interface ParamsProps {
   home?: SectionsNavBar
@@ -41,7 +43,7 @@ export default async function NavLinks( { params } : Readonly<{ params: ParamsPr
         `}>
           {<GetUsernameSection/>}
           { ( isUsersSessionProfile && isEdit ) ? <EditUserPencilLink/> : <></>}
-          { ( !isUsersSessionProfile ) ? 
+          { ( user && !isUsersSessionProfile ) ? 
             <FollowButton user_session={session_username}/>:
             <></> 
           }

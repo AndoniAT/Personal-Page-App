@@ -7,7 +7,7 @@ import { PowerIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24
 import { auth, signOut } from '@/auth';
 import { goToCreateAccount, goToLogin, goToMyresume } from '@/app/lib/actions';
 import EditModeNavBar from './editModeNavBar';
-import { MySideNav } from './client/components';
+import { FollowTabs, MySideNav } from './client/components';
 import { getUserByEmail } from '@/app/lib/data';
 
 export default async function SideNav( { 
@@ -74,15 +74,21 @@ async function createSideNav( paramsSend : {
                   } }></EditModeNavBar> 
               :
                 // VISUAL MODE
-                <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='hidden md:block'>
-                  <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
-                    <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
-                    <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
-                      Edit mode
-                    </span>
-                  </div>
-                </Link>
+                <>
+                  <Link href={`/resumes/${user?.username}/edit/${currentSection?.section_id}`} className='hidden md:block'>
+                    <div className='flex content-center gap-2 cursor-pointer dark:text-white'>
+                      <PencilSquareIcon className='stroke-slate-700 w-5 dark:stroke-white'/> 
+                      <span className='inline-block text-black dark:text-white align-middle h-fit content-center place-self-center'>
+                        Edit mode
+                      </span>
+                    </div>
+                  </Link>
+                  <FollowTabs/>
+                </>
           )
+          :
+          ( user ) ?
+          <FollowTabs/>
           :
           <></>
         }

@@ -40,6 +40,7 @@ export function ShowHeader({
         setLoading(true);
         const formData = new FormData();
           formData.append('url', url);
+          formData.append('attr', imageToChange as string );
           await fetch(`/api/users/${username}/photo`, {
               method: 'PUT',
               body: formData
