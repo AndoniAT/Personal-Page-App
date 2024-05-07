@@ -140,8 +140,7 @@ function Block({
   return ( 
     <div key={`blk1`} className={`
       w-full min-h-80 h-fit grid overflow-hidden
-      grid-cols-${totCols/3}
-      xl:grid-cols-${totCols}`
+      grid-cols-${block.numcols}`
       }
       >
       {
