@@ -22,7 +22,7 @@ export default function CustomView(
     const section = data.section;
     let css_string = section.css;
     let css = JSON.parse( css_string );
-    let { backgroundColor } = css.backgroundColor ?? 'rgba( 0, 0, 0, 0)';
+    let backgroundColor = css.backgroundColor ?? 'rgba( 0, 0, 0, 0)';
 
     return (
       <CustomSection style={{ backgroundColor: backgroundColor }} className={clsx({
