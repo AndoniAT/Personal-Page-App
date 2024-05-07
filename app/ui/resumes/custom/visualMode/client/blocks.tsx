@@ -5,6 +5,7 @@ import { TYPES_TO_CHOOSE } from "../../editMode/client/blocks";
 import { getHTMLCss, getImageCss, getTextCss, getVideoCss } from "../../sharedFunctions";
 import { ImageElement } from "@/app/ui/components/image-element";
 import { TextElement } from "@/app/ui/components/text-element";
+import Link from "next/link";
 
 export function VisualResponsive({
   blocks
@@ -184,17 +185,25 @@ function ElementTextGrid({
 
   let css = getTextCss( element );
 
+  const TextEl = () => <TextElement className={element.defclassname} content={element.content} css={css}/>;
+
   return (
     <div style={css.gridCss} className={clsx({
       ['min-h-8 h-fit']:true,
       ['cursor-pointer']: element.link
     })
     }
-    onClick={() => { openLink( element.link ) }}
     >
-      <TextElement className={element.defclassname} content={element.content} css={css}/>
+      {
+        ( element.link ) ?
+        <Link href={element.link} target="_blank" className="cursor-pointer h-fit w-fit">
+          <TextEl/>
+        </Link>
+        :
+        <TextEl/>
+      }
     </div>
-  )
+  );
 }
 
 function ElementImageGrid({
@@ -206,6 +215,9 @@ function ElementImageGrid({
   const css = getImageCss( element );
 
   //let customClass = element.customclassname ?? '';
+
+  const ImgEl = () => <ImageElement css={css} image={element.content} className="hover:scale-105"/>;
+
   return (
     <div style={css.gridCss}
      className={clsx({
@@ -215,7 +227,16 @@ function ElementImageGrid({
     })}
     onClick={() => { openLink( element.link ) }}
     >
-      <ImageElement css={css} image={element.content} className="hover:scale-105"/>
+      {
+        ( element.link ) ?
+        <Link href={element.link} target="_blank" className="cursor-pointer h-fit w-fit">
+          <ImgEl/>
+        </Link>
+
+        :
+        <ImgEl/>
+      }
+      
     </div>
   )
 }
