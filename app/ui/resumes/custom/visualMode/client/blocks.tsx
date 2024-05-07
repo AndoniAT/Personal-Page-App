@@ -186,7 +186,13 @@ function ElementTextGrid({
   let css = getTextCss( element );
 
   return (
-    <div style={css.gridCss} className={'min-h-8 h-fit'}>
+    <div style={css.gridCss} className={clsx({
+      ['min-h-8 h-fit']:true,
+      ['cursor-pointer']: element.link
+    })
+    }
+    onClick={() => { openLink( element.link ) }}
+    >
       <TextElement className={element.defclassname} content={element.content} css={css}/>
     </div>
   )
@@ -201,13 +207,14 @@ function ElementImageGrid({
   const css = getImageCss( element );
 
   //let customClass = element.customclassname ?? '';
-
   return (
     <div style={css.gridCss}
      className={clsx({
       [element.defclassname]:true,
-      ['min-h-10']:true
+      ['min-h-10']:true,
+      ['cursor-pointer']: element.link
     })}
+    onClick={() => { openLink( element.link ) }}
     >
       <ImageElement css={css} image={element.content} className="hover:scale-105"/>
     </div>
@@ -251,4 +258,10 @@ function ElementVideoGrid({
 
 function createHTML( str:string ) {
   return {__html: str };
+}
+
+function openLink( link:string|null ) {
+  if( link ) {
+    window.open( link );
+  }
 }

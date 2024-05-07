@@ -247,6 +247,7 @@ async function createElement( client ) {
           css TEXT,
           content TEXT,
           type type_element,
+          link TEXT,
 
           block_id UUID NOT NULL,
           element_id_ref UUID

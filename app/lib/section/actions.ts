@@ -170,6 +170,13 @@ async function updateElement( block_id:string, element:ElementBlock, form:FormDa
         WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
         break;
       }
+      case 'link': {
+        let link = form.get('link') as string;
+        await sql`UPDATE ELEMENT
+        SET link = ${link}
+        WHERE block_id = ${block_id} AND element_id = ${element.element_id}`;
+        break;
+      }
       case 'backgroundColor':
       case 'color':
       case 'borderColor':

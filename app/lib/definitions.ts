@@ -70,6 +70,7 @@ export interface ElementBlock {
     css: string,
     content:string
     type: ElementType,
+    link: string|null,
 
     block_id:string
     element_id_ref:string|null

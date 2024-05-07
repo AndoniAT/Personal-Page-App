@@ -209,7 +209,8 @@ export function TextElementType({
     let textColor = ( isEdit && myCss.color && typeof myCss.color == 'string' ) ? myCss.color : '';
 
     let content = ( isEdit && element.content ) ? element.content : '';
-    
+    const defaultLink = ( isEdit && element.link ) ? element.link : '';
+
     // HANDLERS
     const handlerText = useDebouncedCallback( (value) => sendFormDataForElement( 'content', value, element), waitTime );
     const handlerSize = useDebouncedCallback( (value) => sendFormDataForElement( 'fontSize', value, element), waitTime );
@@ -217,6 +218,7 @@ export function TextElementType({
     const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
     const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), waitTime );
     const handleAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), waitTime );
+    const handlerLink = useDebouncedCallback( ( value ) => sendFormDataForElement( 'link', value, element), waitTime );
     //const handleTransparency = useDebouncedCallback( ( newcolor ) => sendFormDataForElement( 'backgroundColor', newcolor, element ), 200 );
 
 
@@ -307,6 +309,17 @@ export function TextElementType({
                                 <div className='mt-5'>
                                         <BorderButtons defaults={DefaultsBorder} handleColorBorderChange={handleColorBorderChange} handlerBorder={handlerBorder}/>
                                 </div>
+
+                                <div className='mt-5 col-span-2 flex flex-row space-x-4'>
+                                    <span>Link</span>
+                                    <div className='mt-5 ml-10'>
+                                        <input type="text" placeholder="Enter your url" className='rounded-md px-3 text-black'
+                                        defaultValue={defaultLink}
+                                        onChange={ ( e ) => handlerLink( e.target.value ) }
+                                        />
+                                    </div>
+                                </div>
+
                                 { /* DELETE */}
                                 {
                                     (element.actions?.deleteElement) ?
@@ -359,14 +372,16 @@ export function MediaElementType({
     const defaultHeight = ( isEdit && myCss.height ) ? parseFloat( myCss.height.split('rem')[0] ) : 8;
     const defaultHeightImage = ( isEdit && myCss.heightContent ) ? parseFloat( myCss.heightContent.split('%')[0] ) : 100;
     const defaultWidthImage = ( isEdit && myCss.widthContent ) ? parseFloat( myCss.widthContent.split('%')[0] ) : 100;
+    const defaultLink = ( isEdit && element.link ) ? element.link : '';
 
     const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
-    
+
     /* HANDLERS */
     const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element) , 200 );
     const handlerJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), waitTime );
     const handlerAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), waitTime );
-    
+    const handlerLink = useDebouncedCallback( ( value ) => sendFormDataForElement( 'link', value, element), waitTime );
+
     // Colors
     const handleColorBgChange = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'backgroundColor', value, element) : '', 0 );
     const handleColorBorderChange = useDebouncedCallback( ( value ) => ( isEdit ) ? sendFormDataForElement( 'borderColor', value, element) : '', waitTime );
@@ -515,6 +530,16 @@ export function MediaElementType({
 
                                 <div className='mt-5 col-span-2 flex flex-row space-x-4'>
                                     <InputValueButton title='Height Container' min={8} defaultVal={defaultHeight} handlerValueChange={handlerHeight} step={1}/>
+                                </div>
+
+                                <div className='mt-5 col-span-2 flex flex-row space-x-4'>
+                                    <span>Link</span>
+                                    <div className='mt-5 ml-10'>
+                                        <input type="text" placeholder="Enter your url" className='rounded-md px-3 text-black'
+                                        defaultValue={defaultLink}
+                                        onChange={ ( e ) => handlerLink( e.target.value ) }
+                                        />
+                                    </div>
                                 </div>
 
                                 { /* DELETE */}
