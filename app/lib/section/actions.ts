@@ -182,6 +182,7 @@ async function updateElement( block_id:string, element:ElementBlock, form:FormDa
       case 'borderColor':
       case 'justifyContent':
       case 'alignItems':
+      case 'textAlign':
         await getAndUpdateFormAttribute( target, block_id, element, form, '' );
         break;
       case 'heightContent':

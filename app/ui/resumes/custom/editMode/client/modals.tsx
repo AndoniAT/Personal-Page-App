@@ -216,7 +216,7 @@ export function TextElementType({
     const handlerSize = useDebouncedCallback( (value) => sendFormDataForElement( 'fontSize', value, element), waitTime );
     const handlerPadding = useDebouncedCallback( (direction, value) => sendFormDataForElement( 'padding'+direction, value, element), waitTime );
     const handlerBorder = useDebouncedCallback( (attr, value) => sendFormDataForElement( 'border'+attr, value, element), waitTime );
-    const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'justifyContent', value, element), waitTime );
+    const handleJustify = useDebouncedCallback( ( value ) => sendFormDataForElement( 'textAlign', value, element), waitTime );
     const handleAlign = useDebouncedCallback( ( value ) => sendFormDataForElement( 'alignItems', value, element), waitTime );
     const handlerLink = useDebouncedCallback( ( value ) => sendFormDataForElement( 'link', value, element), waitTime );
     //const handleTransparency = useDebouncedCallback( ( newcolor ) => sendFormDataForElement( 'backgroundColor', newcolor, element ), 200 );
