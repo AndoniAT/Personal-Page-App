@@ -20,7 +20,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={clsx({
         [ inter.className ] :true,
-        [ 'dark:bg-slate-900' ]:true
+        [ 'dark:bg-slate-900' ]:true,
+        [ 'max-h-screen overflow-hidden' ]:true
       })}>{children}</body>
     </html>
   );
