@@ -49,7 +49,9 @@ export async function createElementInBlock(this:{ section_id:string, username:st
         let ref = undefined;
 
         let defClassName = 'h-full';
-        let css = `{}`
+        let css = `{}`;
+        let link = null;
+
         switch( type ) {
           case TYPESELEMENT.text:
             css = `{"fontSize": "1rem", "wordWrap": "break-word", "display": "inline-flex", "height": "100%", "width":"100%"}`;
@@ -69,6 +71,7 @@ export async function createElementInBlock(this:{ section_id:string, username:st
             type = elementReference.type;
             defClassName = elementReference.defclassname;
             css = elementReference.css;
+            link = elementReference.link;
             content = elementReference.content;
             break;
           case TYPESELEMENT.linkvideo:
@@ -79,7 +82,7 @@ export async function createElementInBlock(this:{ section_id:string, username:st
           }
         }
 
-        let { element_id } = await insertElement( positions, defClassName, css, content, type, block_id, ref );
+        let { element_id } = await insertElement( positions, defClassName, css, content, type, block_id, link, ref );
         return element_id;
 
       } catch( error:any ) {
@@ -94,6 +97,7 @@ async function insertElement(
     content:string,
     type:string,
     block_id:string,
+    link:string|null,
     element_id_ref?:string
 ) {
     return (await sql`INSERT INTO ELEMENT(
@@ -105,6 +109,7 @@ async function insertElement(
         css,
         content,
         type,
+        link,
 
         block_id,
         element_id_ref
@@ -115,6 +120,7 @@ async function insertElement(
         ${css},
         ${content},
         ${type},
+        ${link},
 
         ${block_id},
         ${element_id_ref}
