@@ -138,18 +138,18 @@ export function MySideNav({ children, className, ...rest }: Readonly<MySideNavPr
             {
               ( show ) ?
                 <>
-                <Link  href="/" className={`
+                <div className={`
                       mb-2 flex h-20 items-end justify-start rounded-md  p-4 md:h-30
                       bg-slate-800
                       dark:bg-slate-200
                       `} >
-                      <div className={`w-32 md:w-60
+                      <div className={`w-fit md:w-60
                         text-white 
                         dark:text-zinc-800	
                         `}>
                         <AcmeLogo />
                       </div>
-                  </Link>
+                  </div>
                   <div className={`
                   grow justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 flex
                   flex-col overflow-hidden

@@ -216,7 +216,7 @@ function ElementImageGrid({
 
   //let customClass = element.customclassname ?? '';
 
-  const ImgEl = () => <ImageElement css={css} image={element.content} className="hover:scale-105"/>;
+  const ImgEl = () => <ImageElement css={css} image={element.content} className={clsx({ [ "hover:scale-105" ]:element.link }) }/>;
 
   return (
     <div style={css.gridCss}

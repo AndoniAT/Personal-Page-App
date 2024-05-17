@@ -10,7 +10,10 @@ export default function AcmeLogo() {
       `}
     >
       <HomeIcon className="h-12 w-12 rotate-[15deg] md:w-9" />
-      <p className="text-3xl ml-3">Resumes</p>
+      <div className='flex w-64 flex-col'>
+        <p className="text-3xl ml-3">Resumes</p>
+        <p className="text-lg ml-3 text-right">By Andoni Alonso Tort</p>
+      </div>
     </div>
   );
 }

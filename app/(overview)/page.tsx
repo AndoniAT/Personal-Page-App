@@ -23,7 +23,6 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between 
     mt-5 md:mt-0
     lg:p-2
-
     ">
       {
         (content == 1)  ?
