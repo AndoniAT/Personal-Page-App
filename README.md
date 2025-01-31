@@ -105,7 +105,7 @@ On the homepage, there will be a brief presentation of the application. There is
   <img src="https://github.com/user-attachments/assets/7c5fc96a-3fd6-4399-8612-e539267e9218" width="500"/>
 </div>
 
-## == 🔒 Profile ==
+## == 👨‍💻 Profile ==
 
 The profile consists of several parts:
   - Sections: All the sections that have been created; new ones can be added.
@@ -173,7 +173,13 @@ All changes are made in real-time, allowing the user to see the site's appearanc
   <img src="https://github.com/user-attachments/assets/9671bd69-d798-41f1-bb7c-55c301272ced" width="500"/>
 </div>
 
+### 🤝 Follow Accounts
 
+The application includes a social network feature. You can access other users' profiles and follow them.
+
+<div style="flex inline-flex">
+  <img src="https://github.com/user-attachments/assets/5dc13cc9-279b-47c5-95ff-ae028449a8cf" width="500"/>
+</div>
 
 <hr/>
 <h5>Author: <i>Andoni ALONSO TORT</i><h5>
