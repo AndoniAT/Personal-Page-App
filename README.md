@@ -1,6 +1,6 @@
 <h1 class="text-center" style="background-color: rgb(226 232 240 / var(--tw-bg-opacity, 1));
  padding: 5px;"> Resumes Social Network in NextJs + PostgreSQL + Vercel
- <img src="./src/assets/react.svg"/>
+ <img src="https://github.com/user-attachments/assets/0f0f9f25-769a-49f3-a68e-ae3f4a71748e" width="100"/>
  </h1>
 <h4>Author : Andoni ALONSO TORT</h4>
 
