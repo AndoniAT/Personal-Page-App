@@ -176,4 +176,4 @@ All changes are made in real-time, allowing the user to see the site's appearanc
 
 
 <hr/>
-`Author: Andoni ALONSO TORT`
+<h5>Author: <i>Andoni ALONSO TORT</i><h5>
